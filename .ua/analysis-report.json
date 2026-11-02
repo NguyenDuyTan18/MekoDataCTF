@@ -1,0 +1,64 @@
+{
+  "tool": "Understand-Anything",
+  "version": "2.9.8",
+  "project": "atk_def_platform",
+  "description": "Workspace MEKOSHARING tập hợp website MekoDataCTF, nền tảng chấm điểm ForcAD, các bản đóng gói cyberrange, dịch vụ/checker, công cụ vận hành và mô hình StarUML. Có hơn 100 tệp nguồn; lần phân tích này bao phủ toàn workspace theo yêu cầu, không thu hẹp vào thư mục con.",
+  "analyzedAt": "2026-11-01T16:04:24.125Z",
+  "files": 401,
+  "internalImports": 248,
+  "excludedBeyondDefaults": 46,
+  "topLevelDirectories": 14,
+  "nodes": 890,
+  "edges": 2214,
+  "layers": 10,
+  "tourSteps": 13,
+  "validation": {
+    "issues": [],
+    "warnings": [],
+    "stats": {
+      "totalNodes": 890,
+      "totalEdges": 2214,
+      "totalLayers": 10,
+      "tourSteps": 13,
+      "nodeTypes": {
+        "file": 302,
+        "function": 324,
+        "class": 87,
+        "service": 63,
+        "config": 45,
+        "document": 34,
+        "table": 17,
+        "schema": 1,
+        "pipeline": 2,
+        "module": 15
+      },
+      "edgeTypes": {
+        "contains": 944,
+        "exports": 379,
+        "calls": 108,
+        "serves": 16,
+        "depends_on": 230,
+        "imports": 248,
+        "configures": 29,
+        "reads_from": 4,
+        "writes_to": 5,
+        "inherits": 15,
+        "routes": 12,
+        "tested_by": 24,
+        "deploys": 102,
+        "migrates": 2,
+        "triggers": 19,
+        "documents": 59,
+        "defines_schema": 13,
+        "related": 4,
+        "transforms": 1
+      }
+    }
+  },
+  "limitations": [
+    "Không phân tích 35 kết quả/checker runtime và 3 PostgreSQL dump backup, credentials, dependencies, dữ liệu runtime và binary media.",
+    "Một số định dạng Vue/EJS/CSS/PowerShell/MDJ không có parser cấu trúc đầy đủ; đã đọc nguồn/JSON và tóm tắt ở mức tệp.",
+    "Các hàm CommonJS/object methods và Vue methods không phải lúc nào cũng được tách thành function nodes.",
+    "Các biến thể checkout được giữ thành module/file riêng theo đường dẫn."
+  ]
+}

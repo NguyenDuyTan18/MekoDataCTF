@@ -1,0 +1,3297 @@
+{
+  "nodes": [
+    {
+      "id": "file:config/defaultContent.js",
+      "type": "file",
+      "name": "defaultContent.js",
+      "filePath": "config/defaultContent.js",
+      "summary": "Cung cấp nội dung tiếng Việt và tiếng Anh ban đầu cho trang giới thiệu cuộc thi, thể lệ, giải thưởng và hỏi đáp; được seed vào bảng nội dung.",
+      "tags": [
+        "configuration",
+        "i18n",
+        "content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:controllers/adminController.js",
+      "type": "file",
+      "name": "adminController.js",
+      "filePath": "controllers/adminController.js",
+      "summary": "Điều phối khu ban tổ chức: thống kê đăng ký, sửa nội dung và lịch thi, quản lý đội và token, gán tên ForcAD, xuất danh sách Excel/CSV.",
+      "tags": [
+        "api-handler",
+        "admin",
+        "team-management"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:middlewares/locals.js",
+      "type": "file",
+      "name": "locals.js",
+      "filePath": "middlewares/locals.js",
+      "summary": "Nạp tài khoản hoặc đội từ session, vô hiệu hóa phiên token cũ và cung cấp flash message, ngôn ngữ cùng đường dẫn hiện tại cho EJS.",
+      "tags": [
+        "middleware",
+        "session",
+        "view-context"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:models/Content.js",
+      "type": "file",
+      "name": "Content.js",
+      "filePath": "models/Content.js",
+      "summary": "Đọc và cập nhật các mục nội dung trang chủ theo ngôn ngữ trong SQLite; trả đủ các mục mặc định ngay cả khi chưa có dữ liệu.",
+      "tags": [
+        "data-model",
+        "content",
+        "i18n"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:models/User.js",
+      "type": "file",
+      "name": "User.js",
+      "filePath": "models/User.js",
+      "summary": "Truy vấn tài khoản, tạo người dùng và đổi mật khẩu bằng bcrypt; cung cấp kiểm tra mật khẩu và thống kê tài khoản thí sinh.",
+      "tags": [
+        "data-model",
+        "authentication",
+        "password-hashing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:routes/admin.js",
+      "type": "file",
+      "name": "admin.js",
+      "filePath": "routes/admin.js",
+      "summary": "Bảo vệ toàn bộ khu quản trị bằng requireAdmin và ánh xạ các thao tác nội dung, lịch thi, đội, token và xuất tệp tới adminController.",
+      "tags": [
+        "routing",
+        "admin",
+        "authorization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/seed.js",
+      "type": "file",
+      "name": "seed.js",
+      "filePath": "scripts/seed.js",
+      "summary": "Tạo hoặc cập nhật tài khoản ban tổ chức từ biến môi trường, nạp nội dung song ngữ khi cần và khởi tạo các cài đặt cuộc thi.",
+      "tags": [
+        "script",
+        "initialization",
+        "content"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:services/exportService.js",
+      "type": "file",
+      "name": "exportService.js",
+      "filePath": "services/exportService.js",
+      "summary": "Chuyển danh sách đội và thành viên thành Excel hai sheet hoặc CSV UTF-8; CSV xử lý dấu phân cách và chặn công thức do dữ liệu người dùng.",
+      "tags": [
+        "service",
+        "excel",
+        "csv",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:services/exportService.js:toRows",
+      "type": "function",
+      "name": "toRows",
+      "filePath": "services/exportService.js",
+      "lineRange": [
+        6,
+        24
+      ],
+      "summary": "Trải đội và danh sách thành viên thành các dòng báo cáo, giữ thông tin đội và vai trò đội trưởng trên từng dòng.",
+      "tags": [
+        "service",
+        "excel",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:services/exportService.js:buildXlsx",
+      "type": "function",
+      "name": "buildXlsx",
+      "filePath": "services/exportService.js",
+      "lineRange": [
+        26,
+        52
+      ],
+      "summary": "Dựng workbook Excel có sheet danh sách thí sinh và sheet tổng hợp đội, định dạng cột và trả buffer XLSX.",
+      "tags": [
+        "service",
+        "excel",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:services/exportService.js:buildCsv",
+      "type": "function",
+      "name": "buildCsv",
+      "filePath": "services/exportService.js",
+      "lineRange": [
+        61,
+        65
+      ],
+      "summary": "Tạo CSV có BOM UTF-8 từ dòng tiêu đề và dữ liệu đội, giúp Excel hiển thị đúng tiếng Việt.",
+      "tags": [
+        "service",
+        "excel",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:config/database.js",
+      "type": "file",
+      "name": "database.js",
+      "filePath": "config/database.js",
+      "summary": "Mở cơ sở dữ liệu SQLite, bật WAL và khóa ngoại, chạy schema và nâng cấp cột token/forcad_name cho dữ liệu cũ.",
+      "tags": [
+        "database",
+        "initialization",
+        "migration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:controllers/teamController.js",
+      "type": "file",
+      "name": "teamController.js",
+      "filePath": "controllers/teamController.js",
+      "summary": "Hiển thị đội và biểu mẫu, chuẩn hóa và kiểm tra dữ liệu thành viên, áp dụng hạn đăng ký, rồi lưu đội cùng thành viên trong transaction.",
+      "tags": [
+        "api-handler",
+        "team-management",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:controllers/teamController.js:parseForm",
+      "type": "function",
+      "name": "parseForm",
+      "filePath": "controllers/teamController.js",
+      "lineRange": [
+        10,
+        23
+      ],
+      "summary": "Chuẩn hóa dữ liệu biểu mẫu đội: cắt khoảng trắng, giới hạn độ dài, viết hoa MSSV và loại dòng thành viên trống.",
+      "tags": [
+        "api-handler",
+        "team-management",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:controllers/teamController.js:validate",
+      "type": "function",
+      "name": "validate",
+      "filePath": "controllers/teamController.js",
+      "lineRange": [
+        25,
+        51
+      ],
+      "summary": "Kiểm tra tên đội, số điện thoại, số lượng thành viên và MSSV, bao gồm trùng trong đội và đã đăng ký ở đội khác.",
+      "tags": [
+        "api-handler",
+        "team-management",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:controllers/teamController.js:formView",
+      "type": "function",
+      "name": "formView",
+      "filePath": "controllers/teamController.js",
+      "lineRange": [
+        53,
+        63
+      ],
+      "summary": "Dựng biểu mẫu tạo hoặc sửa đội với dữ liệu hiện tại, lỗi kiểm tra và giới hạn số thành viên từ cài đặt.",
+      "tags": [
+        "api-handler",
+        "team-management",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:middlewares/auth.js",
+      "type": "file",
+      "name": "auth.js",
+      "filePath": "middlewares/auth.js",
+      "summary": "Cung cấp các chốt kiểm tra session, vai trò admin, đội trưởng và thành viên token, cùng hàm xác định đội của phiên hiện tại.",
+      "tags": [
+        "middleware",
+        "authentication",
+        "authorization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:middlewares/auth.js:sessionTeam",
+      "type": "function",
+      "name": "sessionTeam",
+      "filePath": "middlewares/auth.js",
+      "lineRange": [
+        4,
+        11
+      ],
+      "summary": "Xác định đội và vai trò thành viên hoặc đội trưởng từ phiên token hay tài khoản thí sinh.",
+      "tags": [
+        "middleware",
+        "authentication",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:middlewares/auth.js:requireLogin",
+      "type": "function",
+      "name": "requireLogin",
+      "filePath": "middlewares/auth.js",
+      "lineRange": [
+        13,
+        17
+      ],
+      "summary": "Cho phép tài khoản đã đăng nhập hoặc chuyển tới đăng nhập kèm đường dẫn quay lại.",
+      "tags": [
+        "middleware",
+        "authentication",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:middlewares/auth.js:requireCaptain",
+      "type": "function",
+      "name": "requireCaptain",
+      "filePath": "middlewares/auth.js",
+      "lineRange": [
+        20,
+        27
+      ],
+      "summary": "Cho tài khoản đi tiếp, chặn phiên thành viên token chỉnh sửa đội và yêu cầu khách đăng nhập.",
+      "tags": [
+        "middleware",
+        "authentication",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:middlewares/auth.js:requireTeamAccess",
+      "type": "function",
+      "name": "requireTeamAccess",
+      "filePath": "middlewares/auth.js",
+      "lineRange": [
+        30,
+        33
+      ],
+      "summary": "Cho tài khoản hoặc phiên token đội xem trang đội; khách được yêu cầu đăng nhập.",
+      "tags": [
+        "middleware",
+        "authentication",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:middlewares/auth.js:requireAdmin",
+      "type": "function",
+      "name": "requireAdmin",
+      "filePath": "middlewares/auth.js",
+      "lineRange": [
+        35,
+        39
+      ],
+      "summary": "Yêu cầu đăng nhập và vai trò admin; trả trang 403 cho tài khoản không có quyền.",
+      "tags": [
+        "middleware",
+        "authentication",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:middlewares/auth.js:requireGuest",
+      "type": "function",
+      "name": "requireGuest",
+      "filePath": "middlewares/auth.js",
+      "lineRange": [
+        41,
+        45
+      ],
+      "summary": "Chuyển phiên đã đăng nhập về trang đội hoặc quản trị, chỉ để khách truy cập trang dành cho khách.",
+      "tags": [
+        "middleware",
+        "authentication",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:middlewares/auth.js:requireSession",
+      "type": "function",
+      "name": "requireSession",
+      "filePath": "middlewares/auth.js",
+      "lineRange": [
+        48,
+        51
+      ],
+      "summary": "Cho phép cả phiên tài khoản và token thực hiện thao tác phiên như đăng xuất.",
+      "tags": [
+        "middleware",
+        "authentication",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:models/Member.js",
+      "type": "file",
+      "name": "Member.js",
+      "filePath": "models/Member.js",
+      "summary": "Truy vấn và thay thế danh sách thành viên theo thứ tự; kiểm tra MSSV đã thuộc đội khác và đếm tổng số thí sinh.",
+      "tags": [
+        "data-model",
+        "members",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:models/Team.js",
+      "type": "file",
+      "name": "Team.js",
+      "filePath": "models/Team.js",
+      "summary": "Quản lý đội, token đăng nhập và tên ghép ForcAD; tạo hoặc sửa đội cùng thành viên bằng transaction và hỗ trợ tra cứu, tìm kiếm, thống kê.",
+      "tags": [
+        "data-model",
+        "team-management",
+        "transaction"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:routes/team.js",
+      "type": "file",
+      "name": "team.js",
+      "filePath": "routes/team.js",
+      "summary": "Ánh xạ trang đội cho phiên được phép xem và giới hạn tạo/sửa đội qua middleware dành cho đội trưởng.",
+      "tags": [
+        "routing",
+        "team-management",
+        "authorization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/sync-forcad-tokens.js",
+      "type": "file",
+      "name": "sync-forcad-tokens.js",
+      "filePath": "scripts/sync-forcad-tokens.js",
+      "summary": "Ghép đội website với đội ForcAD rồi lập kế hoạch đồng bộ token; mặc định chỉ xem và chỉ ghi sang ForcAD khi có --apply.",
+      "tags": [
+        "script",
+        "forcad",
+        "integration"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/sync-forcad-tokens.js:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/sync-forcad-tokens.js",
+      "lineRange": [
+        22,
+        108
+      ],
+      "summary": "Đăng nhập API ForcAD, ghép đội theo tên, kiểm tra xung đột token và áp dụng kế hoạch đồng bộ chỉ khi có cờ --apply.",
+      "tags": [
+        "script",
+        "forcad",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:app.js",
+      "type": "file",
+      "name": "app.js",
+      "filePath": "app.js",
+      "summary": "Khởi tạo Express/EJS, CSP, session SQLite, CSRF và các middleware ngôn ngữ; gắn các nhóm route công khai, tài khoản, đội, quản trị và bảng điểm.",
+      "tags": [
+        "entry-point",
+        "express",
+        "middleware"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:controllers/homeController.js",
+      "type": "file",
+      "name": "homeController.js",
+      "filePath": "controllers/homeController.js",
+      "summary": "Tổng hợp nội dung theo ngôn ngữ, cài đặt cuộc thi, trạng thái đăng ký và tình trạng có đội để dựng trang chủ.",
+      "tags": [
+        "api-handler",
+        "home",
+        "content"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:helpers/format.js",
+      "type": "file",
+      "name": "format.js",
+      "filePath": "helpers/format.js",
+      "summary": "Chuyển văn bản nội dung thành HTML đã escape với danh sách và hỏi đáp; định dạng ngày giờ theo tiếng Việt hoặc tiếng Anh.",
+      "tags": [
+        "utility",
+        "formatting",
+        "security"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:helpers/format.js:escapeHtml",
+      "type": "function",
+      "name": "escapeHtml",
+      "filePath": "helpers/format.js",
+      "lineRange": [
+        1,
+        8
+      ],
+      "summary": "Escape các ký tự HTML đặc biệt trước khi văn bản nhập từ người dùng được đưa vào trang.",
+      "tags": [
+        "utility",
+        "formatting",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:helpers/format.js:renderBody",
+      "type": "function",
+      "name": "renderBody",
+      "filePath": "helpers/format.js",
+      "lineRange": [
+        12,
+        39
+      ],
+      "summary": "Chuyển từng dòng văn bản thành đoạn, danh sách hoặc cặp hỏi đáp sau khi escape HTML để hiển thị an toàn.",
+      "tags": [
+        "utility",
+        "formatting",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:helpers/format.js:formatDateTime",
+      "type": "function",
+      "name": "formatDateTime",
+      "filePath": "helpers/format.js",
+      "lineRange": [
+        42,
+        52
+      ],
+      "summary": "Định dạng ngày giờ theo locale vi-VN hoặc en-GB, giữ giá trị đầu vào khi không phải ngày hợp lệ.",
+      "tags": [
+        "utility",
+        "formatting",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:middlewares/csrf.js",
+      "type": "file",
+      "name": "csrf.js",
+      "filePath": "middlewares/csrf.js",
+      "summary": "Tạo CSRF token theo session và kiểm tra token cho các phương thức thay đổi dữ liệu bằng so sánh timing-safe trước khi cho request tiếp tục.",
+      "tags": [
+        "middleware",
+        "csrf",
+        "security"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:middlewares/i18n.js",
+      "type": "file",
+      "name": "i18n.js",
+      "filePath": "middlewares/i18n.js",
+      "summary": "Chọn ngôn ngữ Việt/Anh qua query và cookie, tra từ điển có fallback tiếng Việt và cung cấp hàm dịch có nội suy tham số cho controller và view.",
+      "tags": [
+        "middleware",
+        "i18n",
+        "localization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:routes/index.js",
+      "type": "file",
+      "name": "index.js",
+      "filePath": "routes/index.js",
+      "summary": "Ánh xạ đường dẫn gốc tới controller dựng trang chủ.",
+      "tags": [
+        "routing",
+        "home",
+        "express"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:config/zodiac.js",
+      "type": "file",
+      "name": "zodiac.js",
+      "filePath": "config/zodiac.js",
+      "summary": "Danh mục 12 con giáp Việt Nam dùng làm linh thú cho đội thi, gồm mã ảnh, tên, hướng mặt và kiểu chuyển động.",
+      "tags": [
+        "configuration",
+        "zodiac",
+        "arena"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:controllers/authController.js",
+      "type": "file",
+      "name": "authController.js",
+      "filePath": "controllers/authController.js",
+      "summary": "Xử lý đăng ký, đăng nhập email hoặc token đội và đăng xuất; tái tạo phiên, kiểm tra hạn đăng ký và giới hạn nhập sai token theo IP.",
+      "tags": [
+        "api-handler",
+        "authentication",
+        "session",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:models/Setting.js",
+      "type": "file",
+      "name": "Setting.js",
+      "filePath": "models/Setting.js",
+      "summary": "Đọc và cập nhật cấu hình cuộc thi trong SQLite, áp dụng giá trị mặc định và giới hạn tối đa bốn thành viên mỗi đội. Kiểm tra trạng thái mở đăng ký theo cờ bật và thời hạn.",
+      "tags": [
+        "data-model",
+        "configuration",
+        "registration",
+        "database"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:routes/auth.js",
+      "type": "file",
+      "name": "auth.js",
+      "filePath": "routes/auth.js",
+      "summary": "Khai báo các tuyến đăng nhập, đăng ký, đăng nhập bằng token đội và đăng xuất; gắn middleware kiểm tra khách hoặc phiên đăng nhập trước controller.",
+      "tags": [
+        "routing",
+        "authentication",
+        "middleware"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:services/arenaService.js",
+      "type": "file",
+      "name": "arenaService.js",
+      "filePath": "services/arenaService.js",
+      "summary": "Tổng hợp dữ liệu công khai từ ForcAD thành trạng thái World Arena, gán linh thú ổn định cho các đội và gộp yêu cầu bằng cache. Cung cấp JSON có ETag và luồng SSE chỉ chạy khi có người xem.",
+      "tags": [
+        "service",
+        "forcad",
+        "cache",
+        "server-sent-events"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:services/arenaService.js:load",
+      "type": "function",
+      "name": "load",
+      "filePath": "services/arenaService.js",
+      "lineRange": [
+        61,
+        80
+      ],
+      "summary": "Lấy song song điểm tick, thông tin arena và danh sách đội từ ForcAD; chỉ chọn các trường công khai và giới hạn độ dài các luồng sự kiện.",
+      "tags": [
+        "service",
+        "forcad",
+        "scoreboard"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:services/arenaService.js:getState",
+      "type": "function",
+      "name": "getState",
+      "filePath": "services/arenaService.js",
+      "lineRange": [
+        95,
+        102
+      ],
+      "summary": "Trả trạng thái cache còn mới hoặc dùng chung một Promise tải dữ liệu; khi upstream lỗi, lưu trạng thái không sẵn sàng thay vì nhân số yêu cầu.",
+      "tags": [
+        "service",
+        "forcad",
+        "scoreboard"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:services/arenaService.js:subscribe",
+      "type": "function",
+      "name": "subscribe",
+      "filePath": "services/arenaService.js",
+      "lineRange": [
+        129,
+        142
+      ],
+      "summary": "Thiết lập kết nối SSE có giới hạn số người xem, gửi trạng thái ban đầu, bật vòng cập nhật và dừng timer khi người xem cuối ngắt kết nối.",
+      "tags": [
+        "service",
+        "forcad",
+        "scoreboard"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:services/arenaService.js:sendState",
+      "type": "function",
+      "name": "sendState",
+      "filePath": "services/arenaService.js",
+      "lineRange": [
+        144,
+        149
+      ],
+      "summary": "Trả trạng thái JSON với ETag và thời gian máy chủ; trả HTTP 304 khi ETag từ trình duyệt khớp bản hiện tại.",
+      "tags": [
+        "service",
+        "forcad",
+        "scoreboard"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:config/arenaMap.js",
+      "type": "file",
+      "name": "arenaMap.js",
+      "filePath": "config/arenaMap.js",
+      "summary": "Định nghĩa hình học bản đồ World Arena, vị trí lãnh thổ đội và tên vùng đất. Xuất các hàm dựng đường cong đảo và các mặt núi, dùng chung khi tạo ảnh nền và hiển thị SVG.",
+      "tags": [
+        "configuration",
+        "geometry",
+        "arena",
+        "svg"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:config/arenaMap.js:blob",
+      "type": "function",
+      "name": "blob",
+      "filePath": "config/arenaMap.js",
+      "lineRange": [
+        33,
+        48
+      ],
+      "summary": "Sinh đường viền khép kín có độ gồ ghề ổn định theo seed, nội suy Catmull–Rom sang đường Bézier cho đảo hoặc mảng địa hình.",
+      "tags": [
+        "geometry",
+        "svg",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:config/arenaMap.js:mountain",
+      "type": "function",
+      "name": "mountain",
+      "filePath": "config/arenaMap.js",
+      "lineRange": [
+        51,
+        57
+      ],
+      "summary": "Tạo các đường SVG cho mặt tối, mặt sáng và tuyết trên đỉnh núi theo vị trí và tỉ lệ.",
+      "tags": [
+        "geometry",
+        "svg",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:config/arenaMap.js:islandPaths",
+      "type": "function",
+      "name": "islandPaths",
+      "filePath": "config/arenaMap.js",
+      "lineRange": [
+        59,
+        59
+      ],
+      "summary": "Ánh xạ các thông số đảo thành danh sách đường SVG bằng hàm blob.",
+      "tags": [
+        "geometry",
+        "svg",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:routes/scoreboard.js",
+      "type": "file",
+      "name": "scoreboard.js",
+      "filePath": "routes/scoreboard.js",
+      "summary": "Phục vụ trang World Arena, trạng thái JSON/SSE và các API đọc ForcAD cố định. Nộp flag bằng token lấy từ đội của phiên đăng nhập, giới hạn danh sách đầu vào và thời gian gọi upstream.",
+      "tags": [
+        "routing",
+        "forcad",
+        "validation",
+        "scoreboard"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/bake-map.js",
+      "type": "file",
+      "name": "bake-map.js",
+      "filePath": "scripts/bake-map.js",
+      "summary": "Render template địa hình EJS thành SVG rồi raster hóa bằng Resvg để tạo ảnh nền JPG ở nhiều độ phân giải và mặt nạ biển PNG. Chạy lại khi hình học bản đồ thay đổi.",
+      "tags": [
+        "script",
+        "asset-generation",
+        "svg",
+        "arena"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:public/css/admin.css",
+      "type": "file",
+      "name": "admin.css",
+      "filePath": "public/css/admin.css",
+      "summary": "Định dạng giao diện quản trị desktop trong phạm vi .admin-body: sidebar, điều hướng, thẻ thống kê, bảng đội và biểu mẫu; dùng cùng stylesheet chung.",
+      "tags": [
+        "stylesheet",
+        "admin",
+        "desktop"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:public/css/arena.css",
+      "type": "file",
+      "name": "arena.css",
+      "filePath": "public/css/arena.css",
+      "summary": "Định dạng bảng điểm Arena dạng bảng, đồng hồ tick, trạng thái kết nối và hiệu ứng đổi điểm; có tùy chọn giảm chuyển động.",
+      "tags": [
+        "stylesheet",
+        "scoreboard",
+        "animation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:public/css/style.css",
+      "type": "file",
+      "name": "style.css",
+      "filePath": "public/css/style.css",
+      "summary": "Chủ đề Mekong dùng chung cho trang công khai: màu sắc, nền tòa ATL, thanh điều hướng, nội dung, biểu mẫu và bảng. Bố cục chính hướng tới màn hình desktop.",
+      "tags": [
+        "stylesheet",
+        "theme",
+        "desktop"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:public/css/world.css",
+      "type": "file",
+      "name": "world.css",
+      "filePath": "public/css/world.css",
+      "summary": "Giao diện chiến trường World Arena: HUD, đồng hồ, lãnh thổ, linh thú, hiệu ứng tấn công/phòng thủ và bảng sự kiện; ẩn khung trang công khai khi vào scoreboard.",
+      "tags": [
+        "stylesheet",
+        "arena",
+        "animation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Hướng dẫn cài đặt website MekoDataCTF, cấu trúc MVC, quản trị cuộc thi và kết nối bảng điểm ForcAD.",
+      "tags": [
+        "documentation",
+        "overview",
+        "setup"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "table:config/schema.sql",
+      "type": "table",
+      "name": "schema.sql",
+      "filePath": "config/schema.sql",
+      "summary": "Khởi tạo schema SQLite cho tài khoản, đội, thành viên, cấu hình và nội dung song ngữ; khai báo khóa ngoại và ràng buộc duy nhất.",
+      "tags": [
+        "database",
+        "schema-definition",
+        "sqlite"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:locales/en.json",
+      "type": "config",
+      "name": "en.json",
+      "filePath": "locales/en.json",
+      "summary": "Từ điển tiếng Anh cho điều hướng, đăng nhập, thông tin đội, quản trị và thông báo lỗi.",
+      "tags": [
+        "configuration",
+        "i18n",
+        "localization"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:locales/vi.json",
+      "type": "config",
+      "name": "vi.json",
+      "filePath": "locales/vi.json",
+      "summary": "Từ điển tiếng Việt dùng chung cho giao diện công khai, quản trị, đăng ký đội và thông báo lỗi.",
+      "tags": [
+        "configuration",
+        "i18n",
+        "localization"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "Khai báo thư viện Express/EJS/SQLite và các lệnh khởi động, seed, dựng ảnh bản đồ, đồng bộ token ForcAD.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "dependencies"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:public/js/arena.js",
+      "type": "file",
+      "name": "arena.js",
+      "filePath": "public/js/arena.js",
+      "summary": "Nhận trạng thái ForcAD qua SSE, chuyển sang polling ETag khi kết nối lỗi; cập nhật bảng xếp hạng, đồng hồ tick và phát sự kiện cho World Arena.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "javascript"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Các hàm nằm trong IIFE; bộ trích xuất nhận được call graph nhưng không liệt kê declarations lồng nhau. Các hàm đáng kể được bổ sung bằng đọc mã nguồn và đối chiếu số dòng."
+    },
+    {
+      "id": "function:public/js/arena.js:setConnected",
+      "type": "function",
+      "name": "setConnected",
+      "filePath": "public/js/arena.js",
+      "lineRange": [
+        19,
+        28
+      ],
+      "summary": "Cập nhật trạng thái kết nối, phát sự kiện arena-connection và làm mới đồng hồ khi trạng thái thay đổi.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:public/js/arena.js:timer",
+      "type": "function",
+      "name": "timer",
+      "filePath": "public/js/arena.js",
+      "lineRange": [
+        40,
+        50
+      ],
+      "summary": "Hiển thị giai đoạn hoặc thời gian còn lại của tick theo giờ máy chủ và cập nhật thanh tiến độ.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:public/js/arena.js:renderRanking",
+      "type": "function",
+      "name": "renderRanking",
+      "filePath": "public/js/arena.js",
+      "lineRange": [
+        52,
+        85
+      ],
+      "summary": "Sắp xếp bảng điểm, xử lý đồng hạng, đánh dấu biến động và chỉ dựng lại bảng khi dữ liệu đổi.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:public/js/arena.js:poll",
+      "type": "function",
+      "name": "poll",
+      "filePath": "public/js/arena.js",
+      "lineRange": [
+        99,
+        108
+      ],
+      "summary": "Lấy trạng thái bằng AJAX với ETag, timeout và nhịp polling tùy trạng thái hiển thị tab.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:public/js/arena.js:stream",
+      "type": "function",
+      "name": "stream",
+      "filePath": "public/js/arena.js",
+      "lineRange": [
+        111,
+        123
+      ],
+      "summary": "Mở SSE nhận trạng thái/ping và chuyển sang polling sau ba lỗi liên tiếp.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:public/js/main.js",
+      "type": "file",
+      "name": "main.js",
+      "filePath": "public/js/main.js",
+      "summary": "Xử lý xác nhận thao tác, hiện/ẩn và sao chép token đội, đồng hồ đếm ngược cùng việc thêm/xóa thành viên trên biểu mẫu.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "javascript"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Các hàm nằm trong IIFE; bộ trích xuất nhận được call graph nhưng không liệt kê declarations lồng nhau. Các hàm đáng kể được bổ sung bằng đọc mã nguồn và đối chiếu số dòng."
+    },
+    {
+      "id": "function:public/js/main.js:tick",
+      "type": "function",
+      "name": "tick",
+      "filePath": "public/js/main.js",
+      "lineRange": [
+        48,
+        61
+      ],
+      "summary": "Cập nhật đồng hồ đếm ngược theo ngày, giờ, phút, giây và chuyển sang thông báo khi cuộc thi bắt đầu hoặc kết thúc.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:public/js/main.js:reindex",
+      "type": "function",
+      "name": "reindex",
+      "filePath": "public/js/main.js",
+      "lineRange": [
+        77,
+        90
+      ],
+      "summary": "Đánh lại chỉ số trường thành viên, nhãn đội trưởng và trạng thái nút thêm/xóa sau khi danh sách thay đổi.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:public/js/world.js",
+      "type": "file",
+      "name": "world.js",
+      "filePath": "public/js/world.js",
+      "summary": "Dựng bản đồ World Arena, căn cứ linh thú, hiệu ứng tấn công/phòng thủ và nhật ký theo dữ liệu đã chấm; gửi flag qua máy chủ của website.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "javascript"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Các hàm nằm trong IIFE; bộ trích xuất nhận được call graph nhưng không liệt kê declarations lồng nhau. Các hàm đáng kể được bổ sung bằng đọc mã nguồn và đối chiếu số dòng."
+    },
+    {
+      "id": "function:public/js/world.js:blobPath",
+      "type": "function",
+      "name": "blobPath",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        63,
+        76
+      ],
+      "summary": "Tạo đường cong SVG khép kín quanh căn cứ để mô phỏng lãnh thổ có biên tự nhiên.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:public/js/world.js:sparkles",
+      "type": "function",
+      "name": "sparkles",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        92,
+        103
+      ],
+      "summary": "Tạo các ngôi sao lấp lánh trên mặt biển với vị trí và nhịp chuyển động ngẫu nhiên.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:public/js/world.js:layoutTeams",
+      "type": "function",
+      "name": "layoutTeams",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        115,
+        189
+      ],
+      "summary": "Sắp xếp đội vào các vị trí trên bản đồ, gán linh thú/màu/lãnh thổ, tạo danh sách đội và cập nhật lựa chọn hiệu ứng.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:public/js/world.js:floatText",
+      "type": "function",
+      "name": "floatText",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        209,
+        218
+      ],
+      "summary": "Tạo nhãn số điểm nổi trên căn cứ và tự gỡ nhãn sau khi hiệu ứng kết thúc.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:public/js/world.js:confetti",
+      "type": "function",
+      "name": "confetti",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        220,
+        237
+      ],
+      "summary": "Tạo pháo giấy theo màu đội khi hiệu ứng động được bật và dọn phần tử sau hoạt cảnh.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:public/js/world.js:burst",
+      "type": "function",
+      "name": "burst",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        239,
+        248
+      ],
+      "summary": "Tạo tia lửa, vòng sáng và ánh chớp tại vị trí va chạm của đạn rồi dọn các phần tử SVG.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:public/js/world.js:fire",
+      "type": "function",
+      "name": "fire",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        251,
+        322
+      ],
+      "summary": "Mô phỏng đạn bay theo đường cong giữa hai đội và dựng hiệu ứng trúng đích hoặc bị khiên chặn, tôn trọng chế độ giảm chuyển động.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:public/js/world.js:paintScores",
+      "type": "function",
+      "name": "paintScores",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        328,
+        352
+      ],
+      "summary": "Hiển thị điểm và hạng trên căn cứ, đánh dấu đội dẫn đầu và tô màu đội trong bảng xếp hạng.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:public/js/world.js:scoreDeltas",
+      "type": "function",
+      "name": "scoreDeltas",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        355,
+        373
+      ],
+      "summary": "So sánh hai lần cập nhật điểm thật để phát số nổi ATK/SLA/DEF và hiệu ứng khiên theo biến động.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:public/js/world.js:renderFeed",
+      "type": "function",
+      "name": "renderFeed",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        387,
+        400
+      ],
+      "summary": "Hợp nhất capture, phòng thủ và sự kiện mô phỏng tại chỗ thành nhật ký theo thời gian; bỏ qua lần dựng lại không cần thiết.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:public/js/world.js:renderServices",
+      "type": "function",
+      "name": "renderServices",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        403,
+        426
+      ],
+      "summary": "Cập nhật trạng thái service từng đội, trạng thái căn cứ và tổng số đội có toàn bộ service UP.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:public/js/world.js:renderChecks",
+      "type": "function",
+      "name": "renderChecks",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        429,
+        440
+      ],
+      "summary": "Dựng nhật ký kết quả checker theo tick, trạng thái và điểm với kiểm tra dữ liệu có thay đổi.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:public/js/world.js:classify",
+      "type": "function",
+      "name": "classify",
+      "filePath": "public/js/world.js",
+      "lineRange": [
+        491,
+        500
+      ],
+      "summary": "Phân loại phản hồi nộp flag thành accepted, duplicate, own, invalid, expired hoặc rejected để hiển thị nhất quán.",
+      "tags": [
+        "browser",
+        "event-handler",
+        "ui-rendering"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:views/admin/contents.ejs",
+      "type": "file",
+      "name": "contents.ejs",
+      "filePath": "views/admin/contents.ejs",
+      "summary": "Biểu mẫu quản trị để chỉnh tiêu đề và nội dung từng mục trang chủ đồng thời bằng tiếng Việt và tiếng Anh.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/admin/dashboard.ejs",
+      "type": "file",
+      "name": "dashboard.ejs",
+      "filePath": "views/admin/dashboard.ejs",
+      "summary": "Trang tổng quan ban tổ chức với thống kê đăng ký, lịch thi, liên kết xuất dữ liệu và các đội đăng ký gần nhất.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/admin/schedule.ejs",
+      "type": "file",
+      "name": "schedule.ejs",
+      "filePath": "views/admin/schedule.ejs",
+      "summary": "Biểu mẫu thiết lập trạng thái đăng ký, hạn đăng ký, giờ thi, số thành viên tối thiểu và địa điểm sự kiện.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/admin/team.ejs",
+      "type": "file",
+      "name": "team.ejs",
+      "filePath": "views/admin/team.ejs",
+      "summary": "Trang chi tiết đội dành cho ban tổ chức, hiển thị thành viên, token và tên ForcAD; cung cấp thao tác xóa đội, tạo lại token và lưu tên đồng bộ.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/admin/teams.ejs",
+      "type": "file",
+      "name": "teams.ejs",
+      "filePath": "views/admin/teams.ejs",
+      "summary": "Danh sách đội có tìm kiếm, liên kết xem chi tiết, xuất dữ liệu và biểu mẫu xóa đội được bảo vệ CSRF.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/auth/login.ejs",
+      "type": "file",
+      "name": "login.ejs",
+      "filePath": "views/auth/login.ejs",
+      "summary": "Trang đăng nhập với hai biểu mẫu: đội trưởng dùng email/mật khẩu, thành viên dùng token đội; giữ đường dẫn chuyển tiếp sau đăng nhập.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/auth/register.ejs",
+      "type": "file",
+      "name": "register.ejs",
+      "filePath": "views/auth/register.ejs",
+      "summary": "Biểu mẫu tạo tài khoản đội trưởng bằng email và mật khẩu, hiển thị lỗi kiểm tra và trạng thái đóng đăng ký.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/error.ejs",
+      "type": "file",
+      "name": "error.ejs",
+      "filePath": "views/error.ejs",
+      "summary": "Mẫu thông báo lỗi chung với tiêu đề và nội dung do máy chủ cung cấp.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/home.ejs",
+      "type": "file",
+      "name": "home.ejs",
+      "filePath": "views/home.ejs",
+      "summary": "Trang giới thiệu cuộc thi gồm banner, đồng hồ, nội dung giới thiệu, lịch thi, thể lệ, giải thưởng, hỏi đáp và liên hệ.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/layouts/admin.ejs",
+      "type": "file",
+      "name": "admin.ejs",
+      "filePath": "views/layouts/admin.ejs",
+      "summary": "Khung giao diện quản trị với điều hướng theo mục, trạng thái cuộc thi, thông báo flash và vùng nội dung của từng trang.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/layouts/main.ejs",
+      "type": "file",
+      "name": "main.ejs",
+      "filePath": "views/layouts/main.ejs",
+      "summary": "Khung HTML công khai với thanh điều hướng, thông báo flash, chân trang và tài nguyên CSS/JavaScript; đặt viewport cố định cho desktop.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/partials/countdown.ejs",
+      "type": "file",
+      "name": "countdown.ejs",
+      "filePath": "views/partials/countdown.ejs",
+      "summary": "Các ô ngày/giờ/phút/giây và thuộc tính dữ liệu thời gian để JavaScript vận hành đồng hồ đếm ngược cuộc thi.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/partials/errors.ejs",
+      "type": "file",
+      "name": "errors.ejs",
+      "filePath": "views/partials/errors.ejs",
+      "summary": "Khối lỗi kiểm tra biểu mẫu dùng chung, chỉ hiển thị khi danh sách lỗi có nội dung.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/partials/flash.ejs",
+      "type": "file",
+      "name": "flash.ejs",
+      "filePath": "views/partials/flash.ejs",
+      "summary": "Khối thông báo thành công hoặc lỗi dùng chung sau các thao tác và chuyển hướng.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/partials/map-terrain.ejs",
+      "type": "file",
+      "name": "map-terrain.ejs",
+      "filePath": "views/partials/map-terrain.ejs",
+      "summary": "Mẫu SVG tạo địa hình tĩnh và mặt nạ biển cho World Arena; được script bake-map dựng thành ảnh thay vì nhúng trực tiếp vào scoreboard.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/partials/members-table.ejs",
+      "type": "file",
+      "name": "members-table.ejs",
+      "filePath": "views/partials/members-table.ejs",
+      "summary": "Bảng thành viên của đội gồm thứ tự, họ tên, mã sinh viên và nhãn đội trưởng.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/partials/navbar.ejs",
+      "type": "file",
+      "name": "navbar.ejs",
+      "filePath": "views/partials/navbar.ejs",
+      "summary": "Thanh điều hướng công khai, đổi liên kết theo tài khoản admin/đội trưởng/thành viên và cung cấp chuyển ngôn ngữ, đăng xuất.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "table:config/schema.sql:users",
+      "type": "table",
+      "name": "users",
+      "filePath": "config/schema.sql",
+      "lineRange": [
+        3,
+        9
+      ],
+      "summary": "Tài khoản theo email duy nhất, hash mật khẩu, vai trò contestant/admin và thời điểm tạo.",
+      "tags": [
+        "database",
+        "sqlite",
+        "schema-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:config/schema.sql:teams",
+      "type": "table",
+      "name": "teams",
+      "filePath": "config/schema.sql",
+      "lineRange": [
+        11,
+        23
+      ],
+      "summary": "Đội gắn duy nhất với tài khoản đội trưởng, chứa tên, thông tin liên hệ, token và tên tương ứng trên ForcAD.",
+      "tags": [
+        "database",
+        "sqlite",
+        "schema-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:config/schema.sql:members",
+      "type": "table",
+      "name": "members",
+      "filePath": "config/schema.sql",
+      "lineRange": [
+        25,
+        32
+      ],
+      "summary": "Thành viên thuộc đội, mã sinh viên duy nhất, cờ đội trưởng và thứ tự hiển thị.",
+      "tags": [
+        "database",
+        "sqlite",
+        "schema-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:config/schema.sql:settings",
+      "type": "table",
+      "name": "settings",
+      "filePath": "config/schema.sql",
+      "lineRange": [
+        34,
+        37
+      ],
+      "summary": "Kho cấu hình cuộc thi dưới dạng cặp khóa và giá trị.",
+      "tags": [
+        "database",
+        "sqlite",
+        "schema-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:config/schema.sql:contents",
+      "type": "table",
+      "name": "contents",
+      "filePath": "config/schema.sql",
+      "lineRange": [
+        39,
+        46
+      ],
+      "summary": "Nội dung trang chủ theo khóa và ngôn ngữ vi/en, gồm tiêu đề, nội dung và thời điểm cập nhật.",
+      "tags": [
+        "database",
+        "sqlite",
+        "schema-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:views/scoreboard.ejs",
+      "type": "file",
+      "name": "scoreboard.ejs",
+      "filePath": "views/scoreboard.ejs",
+      "summary": "Giao diện World Arena gồm bản đồ, căn cứ đội, bảng điểm trực tiếp, nhật ký checker và biểu mẫu nộp flag cho đội đang đăng nhập.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/team/form.ejs",
+      "type": "file",
+      "name": "form.ejs",
+      "filePath": "views/team/form.ejs",
+      "summary": "Biểu mẫu tạo hoặc sửa đội với tên, trường, điện thoại và danh sách thành viên động theo giới hạn được cấu hình.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    },
+    {
+      "id": "file:views/team/show.ejs",
+      "type": "file",
+      "name": "show.ejs",
+      "filePath": "views/team/show.ejs",
+      "summary": "Trang thông tin đội hiển thị token có nút ẩn/hiện/sao chép, thông tin liên hệ, danh sách thành viên và liên kết sửa khi còn được phép.",
+      "tags": [
+        "component",
+        "template",
+        "ejs"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Mẫu EJS kết hợp HTML với dữ liệu do controller truyền vào; quan hệ include được đối chiếu trực tiếp từ mã nguồn."
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:models/Content.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:models/Member.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:models/Setting.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:models/Team.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:models/User.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:services/exportService.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:middlewares/locals.js",
+      "target": "file:models/Team.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:middlewares/locals.js",
+      "target": "file:models/User.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:models/Content.js",
+      "target": "file:config/database.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:models/User.js",
+      "target": "file:config/database.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:routes/admin.js",
+      "target": "file:controllers/adminController.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:routes/admin.js",
+      "target": "file:middlewares/auth.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/seed.js",
+      "target": "file:config/defaultContent.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/seed.js",
+      "target": "file:models/Content.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/seed.js",
+      "target": "file:models/Setting.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/seed.js",
+      "target": "file:models/User.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:services/exportService.js",
+      "target": "function:services/exportService.js:toRows",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:services/exportService.js",
+      "target": "function:services/exportService.js:buildXlsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:services/exportService.js",
+      "target": "function:services/exportService.js:buildXlsx",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:services/exportService.js",
+      "target": "function:services/exportService.js:buildCsv",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:services/exportService.js",
+      "target": "function:services/exportService.js:buildCsv",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:services/exportService.js:buildXlsx",
+      "target": "function:services/exportService.js:toRows",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:services/exportService.js:buildCsv",
+      "target": "function:services/exportService.js:toRows",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:controllers/teamController.js",
+      "target": "file:middlewares/auth.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/teamController.js",
+      "target": "file:models/Member.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/teamController.js",
+      "target": "file:models/Setting.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/teamController.js",
+      "target": "file:models/Team.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/teamController.js",
+      "target": "function:controllers/teamController.js:parseForm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:controllers/teamController.js",
+      "target": "function:controllers/teamController.js:validate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:controllers/teamController.js",
+      "target": "function:controllers/teamController.js:formView",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "file:models/Team.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:sessionTeam",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:sessionTeam",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireLogin",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireLogin",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireCaptain",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireCaptain",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireTeamAccess",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireTeamAccess",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireAdmin",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireAdmin",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireGuest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireGuest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireSession",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:middlewares/auth.js",
+      "target": "function:middlewares/auth.js:requireSession",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:models/Member.js",
+      "target": "file:config/database.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:models/Team.js",
+      "target": "file:config/database.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:models/Team.js",
+      "target": "file:models/Member.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:routes/team.js",
+      "target": "file:controllers/teamController.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:routes/team.js",
+      "target": "file:middlewares/auth.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/sync-forcad-tokens.js",
+      "target": "file:models/Team.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/sync-forcad-tokens.js",
+      "target": "function:scripts/sync-forcad-tokens.js:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:middlewares/auth.js:requireCaptain",
+      "target": "function:middlewares/auth.js:requireLogin",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:middlewares/auth.js:requireTeamAccess",
+      "target": "function:middlewares/auth.js:requireLogin",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:middlewares/auth.js:requireAdmin",
+      "target": "function:middlewares/auth.js:requireLogin",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:config/database.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:helpers/format.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:middlewares/csrf.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:middlewares/i18n.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:middlewares/locals.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:routes/admin.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:routes/auth.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:routes/index.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:routes/scoreboard.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:routes/team.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/homeController.js",
+      "target": "file:models/Content.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/homeController.js",
+      "target": "file:models/Setting.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/homeController.js",
+      "target": "file:models/Team.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:helpers/format.js",
+      "target": "function:helpers/format.js:escapeHtml",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:helpers/format.js",
+      "target": "function:helpers/format.js:escapeHtml",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:helpers/format.js",
+      "target": "function:helpers/format.js:renderBody",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:helpers/format.js",
+      "target": "function:helpers/format.js:renderBody",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:helpers/format.js",
+      "target": "function:helpers/format.js:formatDateTime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:helpers/format.js",
+      "target": "function:helpers/format.js:formatDateTime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:routes/index.js",
+      "target": "file:controllers/homeController.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:helpers/format.js:renderBody",
+      "target": "function:helpers/format.js:escapeHtml",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:controllers/authController.js",
+      "target": "file:models/Setting.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/authController.js",
+      "target": "file:models/Team.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:controllers/authController.js",
+      "target": "file:models/User.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:models/Setting.js",
+      "target": "file:config/database.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:routes/auth.js",
+      "target": "file:controllers/authController.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:routes/auth.js",
+      "target": "file:middlewares/auth.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "file:config/zodiac.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "file:models/Setting.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "function:services/arenaService.js:load",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "function:services/arenaService.js:getState",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "function:services/arenaService.js:getState",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "function:services/arenaService.js:subscribe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "function:services/arenaService.js:subscribe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "function:services/arenaService.js:sendState",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "function:services/arenaService.js:sendState",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:controllers/authController.js",
+      "target": "file:views/auth/login.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "Hiển thị biểu mẫu đăng nhập email/token."
+    },
+    {
+      "source": "file:controllers/authController.js",
+      "target": "file:views/auth/register.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "Hiển thị biểu mẫu và lỗi đăng ký."
+    },
+    {
+      "source": "file:models/Setting.js",
+      "target": "file:controllers/authController.js",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6,
+      "description": "Cấu hình hạn và cờ mở đăng ký."
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "file:models/Setting.js",
+      "type": "reads_from",
+      "direction": "forward",
+      "weight": 0.6,
+      "description": "Đọc seed gán con giáp đã lưu."
+    },
+    {
+      "source": "file:services/arenaService.js",
+      "target": "file:models/Setting.js",
+      "type": "writes_to",
+      "direction": "forward",
+      "weight": 0.6,
+      "description": "Lưu seed ngẫu nhiên cho giải khi chưa có."
+    },
+    {
+      "source": "function:services/arenaService.js:subscribe",
+      "target": "function:services/arenaService.js:getState",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:services/arenaService.js:sendState",
+      "target": "function:services/arenaService.js:getState",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:services/arenaService.js:getState",
+      "target": "function:services/arenaService.js:load",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:config/arenaMap.js",
+      "target": "function:config/arenaMap.js:blob",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:config/arenaMap.js",
+      "target": "function:config/arenaMap.js:blob",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:config/arenaMap.js",
+      "target": "function:config/arenaMap.js:mountain",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:config/arenaMap.js",
+      "target": "function:config/arenaMap.js:mountain",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:config/arenaMap.js",
+      "target": "function:config/arenaMap.js:islandPaths",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:config/arenaMap.js",
+      "target": "function:config/arenaMap.js:islandPaths",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:routes/scoreboard.js",
+      "target": "file:config/arenaMap.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:routes/scoreboard.js",
+      "target": "file:middlewares/auth.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:routes/scoreboard.js",
+      "target": "file:models/Team.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:routes/scoreboard.js",
+      "target": "file:services/arenaService.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/bake-map.js",
+      "target": "file:config/arenaMap.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:routes/scoreboard.js",
+      "target": "file:views/scoreboard.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "Render trang World Arena với hình học bản đồ và đội của phiên."
+    },
+    {
+      "source": "file:scripts/bake-map.js",
+      "target": "file:views/partials/map-terrain.ejs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6,
+      "description": "Đọc template EJS để dựng SVG địa hình."
+    },
+    {
+      "source": "function:config/arenaMap.js:islandPaths",
+      "target": "function:config/arenaMap.js:blob",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:views/layouts/admin.ejs",
+      "target": "file:public/css/admin.css",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/layouts/main.ejs",
+      "target": "file:public/css/style.css",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/layouts/admin.ejs",
+      "target": "file:public/css/style.css",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/scoreboard.ejs",
+      "target": "file:public/css/world.css",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:public/css/admin.css",
+      "target": "file:public/css/style.css",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:public/js/arena.js",
+      "target": "function:public/js/arena.js:setConnected",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/arena.js",
+      "target": "function:public/js/arena.js:timer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/arena.js",
+      "target": "function:public/js/arena.js:renderRanking",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/arena.js",
+      "target": "function:public/js/arena.js:poll",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/arena.js",
+      "target": "function:public/js/arena.js:stream",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/main.js",
+      "target": "function:public/js/main.js:tick",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/main.js",
+      "target": "function:public/js/main.js:reindex",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:blobPath",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:sparkles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:layoutTeams",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:floatText",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:confetti",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:burst",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:fire",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:paintScores",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:scoreDeltas",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:renderFeed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:renderServices",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:renderChecks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "function:public/js/world.js:classify",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:views/layouts/main.ejs",
+      "target": "file:views/partials/navbar.ejs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/layouts/main.ejs",
+      "target": "file:views/partials/flash.ejs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/layouts/admin.ejs",
+      "target": "file:views/partials/flash.ejs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/home.ejs",
+      "target": "file:views/partials/countdown.ejs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/auth/login.ejs",
+      "target": "file:views/partials/errors.ejs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/auth/register.ejs",
+      "target": "file:views/partials/errors.ejs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/admin/schedule.ejs",
+      "target": "file:views/partials/errors.ejs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/layouts/main.ejs",
+      "target": "file:public/js/main.js",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/layouts/admin.ejs",
+      "target": "file:public/js/main.js",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/partials/map-terrain.ejs",
+      "target": "file:config/arenaMap.js",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:public/js/world.js",
+      "target": "file:public/js/arena.js",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:app.js",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:scripts/seed.js",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:scripts/sync-forcad-tokens.js",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:scripts/bake-map.js",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:views/scoreboard.ejs",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:package.json",
+      "target": "file:app.js",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:package.json",
+      "target": "file:scripts/seed.js",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:package.json",
+      "target": "file:scripts/bake-map.js",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:package.json",
+      "target": "file:scripts/sync-forcad-tokens.js",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:locales/en.json",
+      "target": "file:middlewares/i18n.js",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:locales/vi.json",
+      "target": "file:middlewares/i18n.js",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "table:config/schema.sql",
+      "target": "table:config/schema.sql:users",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "table:config/schema.sql",
+      "target": "table:config/schema.sql:teams",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "table:config/schema.sql",
+      "target": "table:config/schema.sql:members",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "table:config/schema.sql",
+      "target": "table:config/schema.sql:settings",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "table:config/schema.sql",
+      "target": "table:config/schema.sql:contents",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "table:config/schema.sql:users",
+      "target": "file:models/User.js",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "table:config/schema.sql:teams",
+      "target": "file:models/Team.js",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "table:config/schema.sql:members",
+      "target": "file:models/Member.js",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "table:config/schema.sql:settings",
+      "target": "file:models/Setting.js",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "table:config/schema.sql:contents",
+      "target": "file:models/Content.js",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:public/js/arena.js:setConnected",
+      "target": "function:public/js/arena.js:timer",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:public/js/arena.js:poll",
+      "target": "function:public/js/arena.js:setConnected",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:public/js/arena.js:stream",
+      "target": "function:public/js/arena.js:poll",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:public/js/arena.js:stream",
+      "target": "function:public/js/arena.js:setConnected",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:public/js/world.js:layoutTeams",
+      "target": "function:public/js/world.js:blobPath",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:public/js/world.js:layoutTeams",
+      "target": "function:public/js/world.js:renderServices",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:public/js/world.js:layoutTeams",
+      "target": "function:public/js/world.js:paintScores",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:public/js/world.js:scoreDeltas",
+      "target": "function:public/js/world.js:floatText",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:views/team/form.ejs",
+      "target": "file:views/partials/errors.ejs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/team/show.ejs",
+      "target": "file:views/partials/members-table.ejs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/scoreboard.ejs",
+      "target": "file:public/css/arena.css",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/scoreboard.ejs",
+      "target": "file:public/js/arena.js",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:views/scoreboard.ejs",
+      "target": "file:public/js/world.js",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:config/database.js",
+      "target": "table:config/schema.sql",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6,
+      "description": "Đọc config/schema.sql và thực thi schema khi mở SQLite."
+    },
+    {
+      "source": "file:app.js",
+      "target": "file:views/error.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Render template error bằng res.render."
+    },
+    {
+      "source": "file:controllers/teamController.js",
+      "target": "file:views/team/form.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Render template team/form bằng res.render."
+    },
+    {
+      "source": "file:controllers/teamController.js",
+      "target": "file:views/team/show.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Render template team/show bằng res.render."
+    },
+    {
+      "source": "file:controllers/homeController.js",
+      "target": "file:views/home.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Render template home bằng res.render."
+    },
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:views/admin/dashboard.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Render template admin/dashboard bằng res.render."
+    },
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:views/admin/contents.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Render template admin/contents bằng res.render."
+    },
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:views/admin/schedule.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Render template admin/schedule bằng res.render."
+    },
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:views/admin/teams.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Render template admin/teams bằng res.render."
+    },
+    {
+      "source": "file:controllers/adminController.js",
+      "target": "file:views/admin/team.ejs",
+      "type": "serves",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Render template admin/team bằng res.render."
+    }
+  ],
+  "version": "1.0.0",
+  "kind": "codebase",
+  "project": {
+    "name": "mekodatactf-website",
+    "description": "Website giới thiệu và đăng ký cuộc thi MekoDataCTF, tổ chức theo mô hình MVC với Express và EJS. Hỗ trợ quản trị nội dung, quản lý đội thi, bảng điểm và tích hợp ForcAD.",
+    "languages": [
+      "css",
+      "ejs",
+      "javascript",
+      "json",
+      "markdown",
+      "sql"
+    ],
+    "frameworks": [
+      "Express",
+      "EJS"
+    ],
+    "analyzedAt": "2026-11-01T10:36:49.822Z",
+    "gitCommitHash": "9dda0dd6f8de7659804a2ba4deb00118d4971f27"
+  },
+  "layers": [
+    {
+      "id": "layer:config",
+      "name": "Khởi động và cấu hình",
+      "description": "Khởi tạo Express/EJS và cấu hình nội dung mặc định, linh thú, địa hình World Arena, thư viện cùng hướng dẫn vận hành website MekoDataCTF.",
+      "nodeIds": [
+        "file:config/defaultContent.js",
+        "file:app.js",
+        "file:config/zodiac.js",
+        "file:config/arenaMap.js",
+        "document:README.md",
+        "config:package.json"
+      ]
+    },
+    {
+      "id": "layer:api",
+      "name": "Tầng API và controller",
+      "description": "Ánh xạ các tuyến HTTP tới xử lý trang chủ, đăng nhập, đội thi, quản trị và bảng điểm ForcAD, đồng thời kiểm tra dữ liệu đầu vào.",
+      "nodeIds": [
+        "file:controllers/adminController.js",
+        "file:routes/admin.js",
+        "file:controllers/teamController.js",
+        "file:routes/team.js",
+        "file:controllers/homeController.js",
+        "file:routes/index.js",
+        "file:controllers/authController.js",
+        "file:routes/auth.js",
+        "file:routes/scoreboard.js"
+      ]
+    },
+    {
+      "id": "layer:middleware",
+      "name": "Middleware và tiện ích dùng chung",
+      "description": "Kiểm soát session và quyền truy cập, kiểm tra CSRF, cung cấp ngôn ngữ Việt/Anh và định dạng nội dung cho các trang EJS.",
+      "nodeIds": [
+        "file:middlewares/locals.js",
+        "file:middlewares/auth.js",
+        "file:helpers/format.js",
+        "file:middlewares/csrf.js",
+        "file:middlewares/i18n.js",
+        "config:locales/en.json",
+        "config:locales/vi.json"
+      ]
+    },
+    {
+      "id": "layer:data",
+      "name": "Tầng dữ liệu SQLite",
+      "description": "Kết nối và nâng cấp SQLite, định nghĩa schema cùng các bảng tài khoản, đội, thành viên, cài đặt và nội dung, rồi cung cấp các thao tác dữ liệu qua model.",
+      "nodeIds": [
+        "file:models/Content.js",
+        "file:models/User.js",
+        "file:config/database.js",
+        "file:models/Member.js",
+        "file:models/Team.js",
+        "file:models/Setting.js",
+        "table:config/schema.sql",
+        "table:config/schema.sql:users",
+        "table:config/schema.sql:teams",
+        "table:config/schema.sql:members",
+        "table:config/schema.sql:settings",
+        "table:config/schema.sql:contents"
+      ]
+    },
+    {
+      "id": "layer:service",
+      "name": "Tầng dịch vụ",
+      "description": "Xuất dữ liệu đội thi sang Excel/CSV và tổng hợp trạng thái ForcAD thành dữ liệu World Arena với cache, ETag và SSE.",
+      "nodeIds": [
+        "file:services/exportService.js",
+        "file:services/arenaService.js"
+      ]
+    },
+    {
+      "id": "layer:ui",
+      "name": "Tầng giao diện",
+      "description": "Dựng các trang EJS, layout và partial cho thí sinh, ban tổ chức và World Arena, kết hợp CSS cùng JavaScript tương tác trên trình duyệt.",
+      "nodeIds": [
+        "file:public/css/admin.css",
+        "file:public/css/arena.css",
+        "file:public/css/style.css",
+        "file:public/css/world.css",
+        "file:public/js/arena.js",
+        "file:public/js/main.js",
+        "file:public/js/world.js",
+        "file:views/admin/contents.ejs",
+        "file:views/admin/dashboard.ejs",
+        "file:views/admin/schedule.ejs",
+        "file:views/admin/team.ejs",
+        "file:views/admin/teams.ejs",
+        "file:views/auth/login.ejs",
+        "file:views/auth/register.ejs",
+        "file:views/error.ejs",
+        "file:views/home.ejs",
+        "file:views/layouts/admin.ejs",
+        "file:views/layouts/main.ejs",
+        "file:views/partials/countdown.ejs",
+        "file:views/partials/errors.ejs",
+        "file:views/partials/flash.ejs",
+        "file:views/partials/map-terrain.ejs",
+        "file:views/partials/members-table.ejs",
+        "file:views/partials/navbar.ejs",
+        "file:views/scoreboard.ejs",
+        "file:views/team/form.ejs",
+        "file:views/team/show.ejs"
+      ]
+    },
+    {
+      "id": "layer:operations",
+      "name": "Công cụ vận hành",
+      "description": "Khởi tạo tài khoản và nội dung, dựng ảnh địa hình World Arena và lập kế hoạch hoặc thực hiện đồng bộ token đội với ForcAD.",
+      "nodeIds": [
+        "file:scripts/seed.js",
+        "file:scripts/sync-forcad-tokens.js",
+        "file:scripts/bake-map.js"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "MekoDataCTF giải quyết bài toán gì?",
+      "description": "Bắt đầu với README để nắm vai trò của website: giới thiệu cuộc thi, đăng ký đội, quản trị và kết nối bảng điểm ForcAD. Sau đó đọc package.json để thấy Express, EJS, SQLite và các lệnh khởi động, seed, đồng bộ token hay dựng ảnh bản đồ.",
+      "nodeIds": [
+        "document:README.md",
+        "config:package.json"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Một request đi vào ứng dụng như thế nào?",
+      "description": "Từ các công cụ ở bước đầu, chuyển sang app.js để xem Express được khởi tạo và các nhóm route được gắn vào máy chủ. Theo thứ tự middleware để hiểu session, ngôn ngữ, dữ liệu dùng chung và CSRF được chuẩn bị trước khi controller dựng EJS; routes/index.js là ví dụ nhỏ nhất của luồng này.",
+      "nodeIds": [
+        "file:app.js",
+        "file:routes/index.js"
+      ],
+      "languageLesson": "Trong Express, middleware được thực thi theo thứ tự đăng ký. Một middleware có thể bổ sung dữ liệu vào req/res rồi gọi next(), hoặc kết thúc request bằng phản hồi."
+    },
+    {
+      "order": 3,
+      "title": "Dữ liệu được lưu ở đâu?",
+      "description": "app.js dùng kết nối SQLite từ config/database.js, nơi bật WAL, khóa ngoại và chạy schema khi ứng dụng khởi động. Đọc schema để thấy quan hệ tài khoản–đội–thành viên cùng hai kho cấu hình và nội dung; script seed tạo tài khoản ban tổ chức và nạp dữ liệu mặc định khi cần.",
+      "nodeIds": [
+        "file:config/database.js",
+        "table:config/schema.sql",
+        "file:scripts/seed.js"
+      ],
+      "languageLesson": "Khóa ngoại liên kết thành viên với đội và đội với tài khoản; ràng buộc UNIQUE giữ các danh tính quan trọng không bị trùng ngay ở tầng dữ liệu."
+    },
+    {
+      "order": 4,
+      "title": "Session, quyền truy cập và CSRF",
+      "description": "Khi đã hiểu dữ liệu, đọc locals.js để thấy phiên được nối lại với tài khoản hoặc đội đăng nhập bằng token, và phiên token cũ bị vô hiệu hóa khi token thay đổi. auth.js phân biệt khách, đội trưởng, thành viên và admin; csrf.js kiểm tra token theo session trước các thao tác thay đổi dữ liệu. Đây là nền tảng quyền truy cập cho các luồng tiếp theo.",
+      "nodeIds": [
+        "file:middlewares/locals.js",
+        "file:middlewares/auth.js",
+        "file:middlewares/csrf.js"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "Hai cách đăng nhập vào cùng website",
+      "description": "Dựa trên các chốt quyền vừa đọc, theo routes/auth.js tới authController để phân biệt tài khoản email/mật khẩu của đội trưởng với token dùng chung cho thành viên đội. User.js lưu hash và kiểm tra mật khẩu bằng bcrypt, còn controller quản lý đăng ký, đăng xuất, tái tạo phiên và giới hạn nhập sai token theo IP.",
+      "nodeIds": [
+        "file:routes/auth.js",
+        "file:controllers/authController.js",
+        "file:models/User.js",
+        "file:views/auth/login.ejs"
+      ]
+    },
+    {
+      "order": 6,
+      "title": "Đăng ký và cập nhật đội thi",
+      "description": "Sau khi có phiên đội trưởng, teamController chuẩn hóa biểu mẫu rồi kiểm tra tên đội, liên hệ, số thành viên và MSSV. Setting quyết định đăng ký còn mở hay không và giới hạn thành viên; Team cùng Member ghi đội và danh sách thành viên bằng transaction để giữ dữ liệu nhất quán. Thành viên đăng nhập bằng token chỉ có quyền xem thông tin đội.",
+      "nodeIds": [
+        "file:controllers/teamController.js",
+        "file:models/Team.js",
+        "file:models/Member.js",
+        "file:models/Setting.js",
+        "file:routes/team.js"
+      ],
+      "languageLesson": "Transaction gộp nhiều câu lệnh SQL thành một thao tác thống nhất: khi tạo hoặc sửa đội, dữ liệu đội và thành viên được cập nhật cùng nhau."
+    },
+    {
+      "order": 7,
+      "title": "Trang chủ và nội dung song ngữ",
+      "description": "Quay lại luồng công khai từ bước 2: homeController lấy nội dung theo ngôn ngữ và trạng thái đăng ký rồi dựng views/home.ejs. Content lưu các mục trang chủ theo vi/en, còn middleware i18n chọn ngôn ngữ từ query hoặc cookie và cung cấp hàm dịch cho controller lẫn template.",
+      "nodeIds": [
+        "file:controllers/homeController.js",
+        "file:models/Content.js",
+        "file:middlewares/i18n.js",
+        "file:views/home.ejs"
+      ]
+    },
+    {
+      "order": 8,
+      "title": "Ban tổ chức vận hành cuộc thi",
+      "description": "Từ các model đội và nội dung đã biết, đọc routes/admin.js để thấy toàn bộ khu quản trị nằm sau requireAdmin và dùng layout riêng. adminController nối các model với màn hình thống kê, sửa nội dung/lịch thi và quản lý token; exportService tạo Excel hoặc CSV cho danh sách đội và thí sinh. CSV có BOM tiếng Việt và xử lý dữ liệu có thể bị Excel hiểu thành công thức.",
+      "nodeIds": [
+        "file:routes/admin.js",
+        "file:controllers/adminController.js",
+        "file:services/exportService.js",
+        "file:views/admin/dashboard.ejs"
+      ]
+    },
+    {
+      "order": 9,
+      "title": "EJS, khung trang và hành vi trình duyệt",
+      "description": "Sau khi theo các controller, mở hai layout để thấy phần khung chung của trang công khai và trang quản trị, cùng các khối nội dung được ghép vào. helpers/format.js biến văn bản thành HTML đã escape, còn public/js/main.js phụ trách biểu mẫu thành viên, đếm ngược và thao tác ẩn/hiện hoặc sao chép token. Cách tách này giúp phân biệt xử lý dữ liệu trên máy chủ với tương tác trong trình duyệt.",
+      "nodeIds": [
+        "file:views/layouts/main.ejs",
+        "file:views/layouts/admin.ejs",
+        "file:helpers/format.js",
+        "file:public/js/main.js"
+      ]
+    },
+    {
+      "order": 10,
+      "title": "Website kết nối ForcAD như thế nào?",
+      "description": "Từ website đăng ký, chuyển sang routes/scoreboard.js để thấy trang World Arena, các API đọc dữ liệu ForcAD và đường nộp flag qua máy chủ. arenaService tổng hợp dữ liệu, gộp yêu cầu bằng cache và cung cấp JSON có ETag cùng SSE khi có người xem. Việc nộp flag lấy token từ đội của phiên hiện tại để gắn thao tác với đúng đội.",
+      "nodeIds": [
+        "file:routes/scoreboard.js",
+        "file:services/arenaService.js",
+        "file:views/scoreboard.ejs"
+      ]
+    },
+    {
+      "order": 11,
+      "title": "Từ trạng thái thi đến World Arena trực tiếp",
+      "description": "Tiếp nối dữ liệu máy chủ ở bước trước, public/js/arena.js nhận SSE và chuyển sang polling có ETag khi kết nối gặp lỗi. public/js/world.js dùng trạng thái đó để cập nhật bản đồ, linh thú, hiệu ứng và nhật ký; CSS world định hình giao diện chiến trường. Bước này cho thấy vòng cập nhật từ ForcAD qua máy chủ website tới màn hình người xem.",
+      "nodeIds": [
+        "file:public/js/arena.js",
+        "file:public/js/world.js",
+        "file:public/css/world.css"
+      ]
+    },
+    {
+      "order": 12,
+      "title": "Hai công việc bảo trì riêng của Arena",
+      "description": "Khép lại bằng script sync-forcad-tokens: website cấp token đội, script ghép đội theo tên và mặc định chỉ in kế hoạch; chỉ cờ --apply mới ghi token sang ForcAD. Đây là thao tác cần xem xét lại sau khi cấp token mới để hai hệ thống dùng cùng giá trị. Riêng bake-map đọc hình học arenaMap và template địa hình để tạo ảnh nền, nên chạy lại khi bản đồ thay đổi.",
+      "nodeIds": [
+        "file:scripts/sync-forcad-tokens.js",
+        "file:scripts/bake-map.js",
+        "file:config/arenaMap.js",
+        "file:views/partials/map-terrain.ejs"
+      ]
+    }
+  ]
+}

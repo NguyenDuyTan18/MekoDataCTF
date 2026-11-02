@@ -1,0 +1,569 @@
+{
+  "project": "atk_def_platform",
+  "scope": "all first-party projects and folders",
+  "outputLanguage": "vi",
+  "source": "Official scan-project.mjs / extract-import-map.mjs / compute-batches.mjs",
+  "analyzedFiles": 401,
+  "byCategory": {
+    "config": 41,
+    "infra": 11,
+    "code": 284,
+    "script": 14,
+    "docs": 34,
+    "data": 5,
+    "markup": 12
+  },
+  "byLanguage": {
+    "json": 16,
+    "unknown": 7,
+    "yaml": 26,
+    "batch": 3,
+    "makefile": 1,
+    "markdown": 18,
+    "sql": 5,
+    "python": 160,
+    "txt": 16,
+    "example": 1,
+    "shell": 10,
+    "dockerfile": 9,
+    "template": 1,
+    "conf": 2,
+    "html": 6,
+    "css": 6,
+    "javascript": 45,
+    "vue": 24,
+    "service": 16,
+    "nft": 4,
+    "svg": 2,
+    "ejs": 20,
+    "mdj": 2,
+    "powershell": 1
+  },
+  "byTopLevelDirectory": {
+    ".claude": 1,
+    "ForcAD-demo": 209,
+    "MekoDataCTF-review": 22,
+    "MekoDataCTF_Website": 64,
+    "(root files)": 2,
+    "artifacts": 1,
+    "checker-update": 44,
+    "docs": 7,
+    "mekodata-publish": 22,
+    "models": 2,
+    "ops": 2,
+    "round1-lab": 7,
+    "service-checker": 8,
+    "tools": 10
+  },
+  "directories": [
+    {
+      "directory": ".claude",
+      "analyzedFiles": 1,
+      "listedSourceCandidates": 1,
+      "status": "included"
+    },
+    {
+      "directory": "artifacts",
+      "analyzedFiles": 1,
+      "listedSourceCandidates": 3,
+      "status": "included"
+    },
+    {
+      "directory": "assets",
+      "analyzedFiles": 0,
+      "listedSourceCandidates": 1,
+      "status": "binary-only or excluded local state"
+    },
+    {
+      "directory": "checker-update",
+      "analyzedFiles": 44,
+      "listedSourceCandidates": 46,
+      "status": "included"
+    },
+    {
+      "directory": "docs",
+      "analyzedFiles": 7,
+      "listedSourceCandidates": 8,
+      "status": "included"
+    },
+    {
+      "directory": "ForcAD-demo",
+      "analyzedFiles": 209,
+      "listedSourceCandidates": 287,
+      "status": "included"
+    },
+    {
+      "directory": "mekodata-publish",
+      "analyzedFiles": 22,
+      "listedSourceCandidates": 23,
+      "status": "included"
+    },
+    {
+      "directory": "MekoDataCTF-review",
+      "analyzedFiles": 22,
+      "listedSourceCandidates": 23,
+      "status": "included"
+    },
+    {
+      "directory": "MekoDataCTF_Website",
+      "analyzedFiles": 64,
+      "listedSourceCandidates": 91,
+      "status": "included"
+    },
+    {
+      "directory": "models",
+      "analyzedFiles": 2,
+      "listedSourceCandidates": 2,
+      "status": "included"
+    },
+    {
+      "directory": "ops",
+      "analyzedFiles": 2,
+      "listedSourceCandidates": 2,
+      "status": "included"
+    },
+    {
+      "directory": "round1-lab",
+      "analyzedFiles": 7,
+      "listedSourceCandidates": 8,
+      "status": "included"
+    },
+    {
+      "directory": "service-checker",
+      "analyzedFiles": 8,
+      "listedSourceCandidates": 8,
+      "status": "included"
+    },
+    {
+      "directory": "tools",
+      "analyzedFiles": 10,
+      "listedSourceCandidates": 10,
+      "status": "included"
+    }
+  ],
+  "exclusionPolicies": [
+    "Credentials: .env/.env.*, .aws/.secrets, private keys.",
+    "Runtime: databases, PostgreSQL .dump backups, Python caches, node_modules, virtualenv and Docker volumes.",
+    "ForcAD bridge latest/request/responses runtime outputs; config_backup*.yml backups.",
+    "Nested Understand-Anything generated analysis; installed external tool checkout.",
+    "Binary media, office artifacts, archives, compiled objects, lockfiles, minified bundles."
+  ],
+  "excludedListedPaths": [
+    ".understandignore",
+    "MekoDataCTF_Website/.understandignore",
+    ".gitignore",
+    "ForcAD-demo/.gitignore",
+    "ForcAD-demo/LICENSE",
+    "ForcAD-demo/checkers/mekodata_bridge/collector.lock",
+    "ForcAD-demo/checkers/mekodata_bridge/latest.json",
+    "ForcAD-demo/checkers/mekodata_bridge/request.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/04075167555c4e889e205c6505ac5e41.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/0adb03d22a874e7bba1680a0c0772bca.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/153016a97a904d6d82401e5f03017369.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/1d8042b38c32439b810d384248f7588d.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/2497032a217d478ab8f3182e6e4af624.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/2c554fd169644471bcb2498c51b0d8d7.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/2cec86f0cba84cb5899d6a32f3f8cb54.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/30af602dee11439b94327b9ecb9d14c4.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/3322d187908a4b068277ea19e0b84c67.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/33d3eb76964041839dada543fd176b66.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/42a206423f4a417fb863ea05b7cb74de.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/49fbf79bcc9a401c99b743b1717a99e6.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/4b33f1eac5254756b27d1dfbcb5a1319.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/5764b60efc8a4cea89d380d1d165890c.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/58aaea4c14694be79c035d0f98a2d444.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/61ac5225e1374537a3b0e436a330078a.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/63d779a468cb43d8aee0609daed5c3a8.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/7fba560c001140ce95bb6b8942db912b.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/90a4e45b5fb94dea861284aae4b6c370.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/9c25620e0b344a1798ddd425a84bb238.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/aca4a0aaa5f14b54b32ec5443e1012da.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/adde9fbd2dc541c099172f2936db09c6.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/afccf9964b1f49e18b11e19f2dd86ca5.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/b38aea0147f44bf0a8edbf1f2ff04537.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/c06dc6408b8c431c80864c585f84826f.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/cce180e85abd4a3a961732176e86f329.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/cd6284f874ab45d6ad981633d793021c.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/cefd832a5cc543eea5224aa4f3fc739e.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/d010a3d2dda34392ae18ac8335d1f84f.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/d606f27c87a94b07aa9b8fbc7dc668d9.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/e48b1fab93384152b65378a6963b856c.json",
+    "ForcAD-demo/checkers/mekodata_bridge/responses/f74f8648ac7e4819be977c918144d05c.json",
+    "ForcAD-demo/cloudflared.exe",
+    "ForcAD-demo/collector-error.log",
+    "ForcAD-demo/collector.log",
+    "ForcAD-demo/config_backup_1793090224.yml",
+    "ForcAD-demo/forcad-before-30-ticks.dump",
+    "ForcAD-demo/forcad-before-checker-fix.dump",
+    "ForcAD-demo/forcad-before-round1.dump",
+    "ForcAD-demo/front/.eslintrc.js",
+    "ForcAD-demo/front/.prettierrc",
+    "ForcAD-demo/front/dist/arena.css",
+    "ForcAD-demo/front/dist/arena.js",
+    "ForcAD-demo/front/dist/assets/AdminLogin.e55c5928.js",
+    "ForcAD-demo/front/dist/assets/AdminScoreboard.11dc61ab.js",
+    "ForcAD-demo/front/dist/assets/AdminScoreboard.bde033ad.css",
+    "ForcAD-demo/front/dist/assets/AdminTeamTaskLog.740b49c3.js",
+    "ForcAD-demo/front/dist/assets/AdminTeamTaskLog.87c094f6.css",
+    "ForcAD-demo/front/dist/assets/ErrorBox.a00b3fe5.css",
+    "ForcAD-demo/front/dist/assets/ErrorBox.f60076bb.js",
+    "ForcAD-demo/front/dist/assets/FormWrapper.9f09155b.css",
+    "ForcAD-demo/front/dist/assets/FormWrapper.d3ee64e1.js",
+    "ForcAD-demo/front/dist/assets/LiveScoreboard.15205b73.js",
+    "ForcAD-demo/front/dist/assets/LiveScoreboard.8bd6f821.css",
+    "ForcAD-demo/front/dist/assets/ScoreTable.263282e6.js",
+    "ForcAD-demo/front/dist/assets/ScoreTable.2f0e4652.css",
+    "ForcAD-demo/front/dist/assets/Scoreboard.8eca6b47.js",
+    "ForcAD-demo/front/dist/assets/Statuses.0f20a95c.css",
+    "ForcAD-demo/front/dist/assets/Statuses.e74c7720.js",
+    "ForcAD-demo/front/dist/assets/TaskAdmin.48742551.js",
+    "ForcAD-demo/front/dist/assets/TeamAdmin.53ef7e07.js",
+    "ForcAD-demo/front/dist/assets/TeamScoreboard.1b0a70de.css",
+    "ForcAD-demo/front/dist/assets/TeamScoreboard.c496e545.js",
+    "ForcAD-demo/front/dist/assets/colors.d518300d.js",
+    "ForcAD-demo/front/dist/assets/index.6106e346.js",
+    "ForcAD-demo/front/dist/assets/index.6b40d0ff.css",
+    "ForcAD-demo/front/dist/index.html",
+    "ForcAD-demo/front/dist/round-control.js",
+    "ForcAD-demo/front/dist/submit.html",
+    "ForcAD-demo/front/dist/tick-display.js",
+    "ForcAD-demo/front/package-lock.json",
+    "ForcAD-demo/front/yarn.lock",
+    "ForcAD-demo/static/front_page.png",
+    "MekoDataCTF-review/.gitignore",
+    "MekoDataCTF_Website/.env.example",
+    "MekoDataCTF_Website/.gitignore",
+    "MekoDataCTF_Website/package-lock.json",
+    "MekoDataCTF_Website/public/images/ctu-atl.png",
+    "MekoDataCTF_Website/public/images/map/sea-mask.png",
+    "MekoDataCTF_Website/public/images/map/terrain-1280.jpg",
+    "MekoDataCTF_Website/public/images/map/terrain-1920.jpg",
+    "MekoDataCTF_Website/public/images/map/terrain-2560.jpg",
+    "MekoDataCTF_Website/public/images/map/terrain-3840.jpg",
+    "MekoDataCTF_Website/public/images/zodiac/dan-ho.png",
+    "MekoDataCTF_Website/public/images/zodiac/dau-ga.png",
+    "MekoDataCTF_Website/public/images/zodiac/hoi-lon.png",
+    "MekoDataCTF_Website/public/images/zodiac/mao-meo.png",
+    "MekoDataCTF_Website/public/images/zodiac/mui-de.png",
+    "MekoDataCTF_Website/public/images/zodiac/ngo-ngua.png",
+    "MekoDataCTF_Website/public/images/zodiac/suu-trau.png",
+    "MekoDataCTF_Website/public/images/zodiac/than-khi.png",
+    "MekoDataCTF_Website/public/images/zodiac/thin-rong.png",
+    "MekoDataCTF_Website/public/images/zodiac/tuat-cho.png",
+    "MekoDataCTF_Website/public/images/zodiac/ty-chuot.png",
+    "MekoDataCTF_Website/public/images/zodiac/ty-ran.png",
+    "artifacts/releases/mekodata-publish.tar",
+    "artifacts/reports/qa-render.pdf",
+    "assets/references/bullet.png",
+    "checker-update/idor-c-main/.gitignore",
+    "checker-update/idor-c-main/.publish-MekoDataCTF/.gitignore",
+    "docs/references/Thuc hanh 2-Bullet-Numbering.docx",
+    "mekodata-publish/.gitignore",
+    "round1-lab/.gitignore"
+  ],
+  "builtInDefaultNote": "The official scanner also applies its built-in defaults; binary-only asset directories are represented in this report rather than parsed as source.",
+  "batches": [
+    {
+      "batchIndex": 1,
+      "files": 29,
+      "lines": 1682,
+      "directories": [
+        "MekoDataCTF_Website"
+      ]
+    },
+    {
+      "batchIndex": 2,
+      "files": 23,
+      "lines": 1893,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 3,
+      "files": 19,
+      "lines": 1572,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 4,
+      "files": 19,
+      "lines": 721,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 5,
+      "files": 11,
+      "lines": 460,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 6,
+      "files": 7,
+      "lines": 303,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 7,
+      "files": 5,
+      "lines": 67,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 8,
+      "files": 4,
+      "lines": 298,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 9,
+      "files": 3,
+      "lines": 104,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 10,
+      "files": 3,
+      "lines": 249,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 11,
+      "files": 3,
+      "lines": 443,
+      "directories": [
+        "round1-lab"
+      ]
+    },
+    {
+      "batchIndex": 12,
+      "files": 1,
+      "lines": 54,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 13,
+      "files": 1,
+      "lines": 26,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 14,
+      "files": 1,
+      "lines": 13,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 15,
+      "files": 1,
+      "lines": 28,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 16,
+      "files": 1,
+      "lines": 13,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 17,
+      "files": 13,
+      "lines": 802,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 18,
+      "files": 3,
+      "lines": 252,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 19,
+      "files": 3,
+      "lines": 52,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 20,
+      "files": 5,
+      "lines": 94,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 21,
+      "files": 5,
+      "lines": 227,
+      "directories": [
+        "MekoDataCTF-review"
+      ]
+    },
+    {
+      "batchIndex": 22,
+      "files": 4,
+      "lines": 1143,
+      "directories": [
+        "MekoDataCTF_Website"
+      ]
+    },
+    {
+      "batchIndex": 23,
+      "files": 5,
+      "lines": 209,
+      "directories": [
+        "checker-update"
+      ]
+    },
+    {
+      "batchIndex": 24,
+      "files": 5,
+      "lines": 227,
+      "directories": [
+        "checker-update"
+      ]
+    },
+    {
+      "batchIndex": 25,
+      "files": 3,
+      "lines": 566,
+      "directories": [
+        "docs"
+      ]
+    },
+    {
+      "batchIndex": 26,
+      "files": 5,
+      "lines": 227,
+      "directories": [
+        "mekodata-publish"
+      ]
+    },
+    {
+      "batchIndex": 27,
+      "files": 4,
+      "lines": 75,
+      "directories": [
+        "service-checker"
+      ]
+    },
+    {
+      "batchIndex": 28,
+      "files": 25,
+      "lines": 1137,
+      "directories": [
+        ".claude",
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 29,
+      "files": 25,
+      "lines": 1831,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 30,
+      "files": 25,
+      "lines": 1319,
+      "directories": [
+        "ForcAD-demo"
+      ]
+    },
+    {
+      "batchIndex": 31,
+      "files": 25,
+      "lines": 1526,
+      "directories": [
+        "ForcAD-demo",
+        "MekoDataCTF-review"
+      ]
+    },
+    {
+      "batchIndex": 32,
+      "files": 25,
+      "lines": 2399,
+      "directories": [
+        "MekoDataCTF-review",
+        "MekoDataCTF_Website"
+      ]
+    },
+    {
+      "batchIndex": 33,
+      "files": 25,
+      "lines": 1526,
+      "directories": [
+        "MekoDataCTF_Website",
+        "README.md",
+        "adjust_settings.md",
+        "artifacts",
+        "checker-update"
+      ]
+    },
+    {
+      "batchIndex": 34,
+      "files": 25,
+      "lines": 2356,
+      "directories": [
+        "checker-update",
+        "docs"
+      ]
+    },
+    {
+      "batchIndex": 35,
+      "files": 25,
+      "lines": 122481,
+      "directories": [
+        "docs",
+        "mekodata-publish",
+        "models",
+        "ops",
+        "round1-lab"
+      ]
+    },
+    {
+      "batchIndex": 36,
+      "files": 15,
+      "lines": 921,
+      "directories": [
+        "round1-lab",
+        "service-checker",
+        "tools"
+      ]
+    }
+  ]
+}

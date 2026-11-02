@@ -1,0 +1,1005 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "9dda0dd6f8de7659804a2ba4deb00118d4971f27",
+  "generatedAt": "2026-11-01T10:32:19.805Z",
+  "files": {
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "e8123ff3521b565490fcb8906384b5e11346f913acd8d2bc8e5fcc229fbf960b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 106,
+      "hasStructuralAnalysis": false
+    },
+    "app.js": {
+      "filePath": "app.js",
+      "contentHash": "ab4bf961c7c8c29a4126d7b80584c41d5439292ac4cf5bd0ed61ce0acf0010cb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 85,
+      "hasStructuralAnalysis": true
+    },
+    "config/arenaMap.js": {
+      "filePath": "config/arenaMap.js",
+      "contentHash": "e926f2d5691d5bc42877725c0fe1bf01c93ed3f6da513de6769240ff56a68588",
+      "functions": [
+        {
+          "name": "blob",
+          "params": [
+            "cx",
+            "cy",
+            "rx",
+            "ry",
+            "seed"
+          ],
+          "exported": false,
+          "lineCount": 16
+        },
+        {
+          "name": "mountain",
+          "params": [
+            "x",
+            "y",
+            "s"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "islandPaths",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 62,
+      "hasStructuralAnalysis": true
+    },
+    "config/database.js": {
+      "filePath": "config/database.js",
+      "contentHash": "49b19bc46e601bdffc28e8e04ef0e532df34c1d392a059b0241e429542e33c18",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 29,
+      "hasStructuralAnalysis": true
+    },
+    "config/defaultContent.js": {
+      "filePath": "config/defaultContent.js",
+      "contentHash": "be3f99b5b8e44f01c63e4e5353d164894b21d17ff4374fb681dd3d4260271d54",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 136,
+      "hasStructuralAnalysis": true
+    },
+    "config/schema.sql": {
+      "filePath": "config/schema.sql",
+      "contentHash": "295397d6ae34c5b277fb27c50c7354ac1a8440138cc0ca40a24f9d8aef741be3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 47,
+      "hasStructuralAnalysis": false
+    },
+    "config/zodiac.js": {
+      "filePath": "config/zodiac.js",
+      "contentHash": "4ac3810a02fc274879c916efb17178d54b3ed90ce25ff258e1a7534daa9a13ed",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "controllers/adminController.js": {
+      "filePath": "controllers/adminController.js",
+      "contentHash": "d4eb194d6bbd13c2fed61b45021e7e7b53dbd1436744f055cd5c1ba121f673f2",
+      "functions": [
+        {
+          "name": "stamp",
+          "params": [],
+          "exported": false,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 143,
+      "hasStructuralAnalysis": true
+    },
+    "controllers/authController.js": {
+      "filePath": "controllers/authController.js",
+      "contentHash": "61153fdcf09b5de9ba03bbd902190500e9851eb0570e742a1ca33ad6d452a95b",
+      "functions": [
+        {
+          "name": "tokenBlocked",
+          "params": [
+            "ip"
+          ],
+          "exported": false,
+          "lineCount": 9
+        },
+        {
+          "name": "recordTokenFail",
+          "params": [
+            "ip"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "safeNext",
+          "params": [
+            "next"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "loginView",
+          "params": [
+            "res",
+            "req"
+          ],
+          "exported": false,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 126,
+      "hasStructuralAnalysis": true
+    },
+    "controllers/homeController.js": {
+      "filePath": "controllers/homeController.js",
+      "contentHash": "6f9c47e311981e10b1813e47deb8d83ba2525fe2a47c559dd69d7b9209bf3521",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "controllers/teamController.js": {
+      "filePath": "controllers/teamController.js",
+      "contentHash": "3b871f2dce95c51f0f70c4cf88ae8211d645073a35be1abf878274c8fb5b8524",
+      "functions": [
+        {
+          "name": "parseForm",
+          "params": [
+            "body"
+          ],
+          "exported": false,
+          "lineCount": 14
+        },
+        {
+          "name": "validate",
+          "params": [
+            "req",
+            "data",
+            "settings"
+          ],
+          "exported": false,
+          "lineCount": 27
+        },
+        {
+          "name": "formView",
+          "params": [
+            "req",
+            "res"
+          ],
+          "exported": false,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 122,
+      "hasStructuralAnalysis": true
+    },
+    "helpers/format.js": {
+      "filePath": "helpers/format.js",
+      "contentHash": "5a2ba5ea8b4f0dd2c8fa2400e4073d73ec5cd4cfd448c3ff4341949af2bac43f",
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "params": [
+            "str"
+          ],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "renderBody",
+          "params": [
+            "text"
+          ],
+          "exported": false,
+          "lineCount": 28
+        },
+        {
+          "name": "formatDateTime",
+          "params": [
+            "value"
+          ],
+          "exported": false,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 55,
+      "hasStructuralAnalysis": true
+    },
+    "locales/en.json": {
+      "filePath": "locales/en.json",
+      "contentHash": "3cfae40f788d8622a85b7cd7137d357435657dff1be38354d72aef2f1f9db870",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 207,
+      "hasStructuralAnalysis": false
+    },
+    "locales/vi.json": {
+      "filePath": "locales/vi.json",
+      "contentHash": "ce3759c2bad28cfb58e938f63429de2e0b23d11293997baeeb4c295be647f574",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 207,
+      "hasStructuralAnalysis": false
+    },
+    "middlewares/auth.js": {
+      "filePath": "middlewares/auth.js",
+      "contentHash": "e840086360fbcaa489ee6895e04773663f845ad960f38bcf9758a43a07c172c1",
+      "functions": [
+        {
+          "name": "sessionTeam",
+          "params": [
+            "req"
+          ],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "requireLogin",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "requireCaptain",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "requireTeamAccess",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "exported": false,
+          "lineCount": 4
+        },
+        {
+          "name": "requireAdmin",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "requireGuest",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "requireSession",
+          "params": [
+            "req",
+            "res",
+            "next"
+          ],
+          "exported": false,
+          "lineCount": 4
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 54,
+      "hasStructuralAnalysis": true
+    },
+    "middlewares/csrf.js": {
+      "filePath": "middlewares/csrf.js",
+      "contentHash": "d30f2521d7f30c168b7a3561592b197021791144ccb253399887a55e8b50c164",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 19,
+      "hasStructuralAnalysis": true
+    },
+    "middlewares/i18n.js": {
+      "filePath": "middlewares/i18n.js",
+      "contentHash": "bedef51d672189c70256be605ef99a8e468ca84e99026ab51981862cad3bc53b",
+      "functions": [
+        {
+          "name": "lookup",
+          "params": [
+            "dict",
+            "key"
+          ],
+          "exported": false,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 33,
+      "hasStructuralAnalysis": true
+    },
+    "middlewares/locals.js": {
+      "filePath": "middlewares/locals.js",
+      "contentHash": "c5298e08bb1577c123d757c102281180ea3a868b1f70d2d3a171c91fb9da5e59",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 38,
+      "hasStructuralAnalysis": true
+    },
+    "models/Content.js": {
+      "filePath": "models/Content.js",
+      "contentHash": "08bd158c5a9ce41cc3f4a09da7408633fbc4214f863b56c4f56f5f815b17cd9b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 37,
+      "hasStructuralAnalysis": true
+    },
+    "models/Member.js": {
+      "filePath": "models/Member.js",
+      "contentHash": "264116138e711ae1fc6931779aa5ba9db2d63ebd9a7e0dbe19c4f615d91af452",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 36,
+      "hasStructuralAnalysis": true
+    },
+    "models/Setting.js": {
+      "filePath": "models/Setting.js",
+      "contentHash": "dc0024bd8a677f6cd0180182121831bcd1482aa17884d85cd2cf740b1ef5a633",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 50,
+      "hasStructuralAnalysis": true
+    },
+    "models/Team.js": {
+      "filePath": "models/Team.js",
+      "contentHash": "8ae452ecd1671780a567a3b4804a2401cdce2ee8d4a72018d942b76271542e6f",
+      "functions": [
+        {
+          "name": "newToken",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 109,
+      "hasStructuralAnalysis": true
+    },
+    "models/User.js": {
+      "filePath": "models/User.js",
+      "contentHash": "ab2bf477a3f655724498a319ba61e4ee28c58df033cf5925b9cc01b12c7c1d05",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 35,
+      "hasStructuralAnalysis": true
+    },
+    "package.json": {
+      "filePath": "package.json",
+      "contentHash": "8d71c48d62d3fe76a291d6799f20a69ea5c67148011bdfce385d605af5e601e8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 35,
+      "hasStructuralAnalysis": false
+    },
+    "public/css/admin.css": {
+      "filePath": "public/css/admin.css",
+      "contentHash": "ef56f5af070cea1e8a67ca353cf9cd32b6e62ddaa2a16ca4875216c480ca10e2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 441,
+      "hasStructuralAnalysis": false
+    },
+    "public/css/arena.css": {
+      "filePath": "public/css/arena.css",
+      "contentHash": "c65e2c654b374a29d9d1e79b0f6f32d117e3a4ed9447f5f49238d7a1fd4f19ed",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": false
+    },
+    "public/css/style.css": {
+      "filePath": "public/css/style.css",
+      "contentHash": "e204f33f1b5b0bd036eb4f96e336d37c3a3ee700e6c6f0e3ad9c85feebca894e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 401,
+      "hasStructuralAnalysis": false
+    },
+    "public/css/world.css": {
+      "filePath": "public/css/world.css",
+      "contentHash": "a911749b90a481c847e973f1bef787153d5a2a64c04cc49ba86981716911e2a5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 303,
+      "hasStructuralAnalysis": false
+    },
+    "public/js/arena.js": {
+      "filePath": "public/js/arena.js",
+      "contentHash": "2086ba28223eb001f972de1bf86ad3608028fce6e87415edffe607a7ea293b07",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 128,
+      "hasStructuralAnalysis": true
+    },
+    "public/js/main.js": {
+      "filePath": "public/js/main.js",
+      "contentHash": "1da1f1bbc9e4af8fc8b942cca78d1ef05205b5c18a7fef34cf115aa74079cbc1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 110,
+      "hasStructuralAnalysis": true
+    },
+    "public/js/world.js": {
+      "filePath": "public/js/world.js",
+      "contentHash": "9c771dced87c1d28ceeb216fd1c1a6e5b1f6271e127f8b04f998f5092e885ee2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 540,
+      "hasStructuralAnalysis": true
+    },
+    "routes/admin.js": {
+      "filePath": "routes/admin.js",
+      "contentHash": "03b7b55ad74041940ef39a84b6b1f1e5489f47350c98dd9adca6e0185393eee7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 27,
+      "hasStructuralAnalysis": true
+    },
+    "routes/auth.js": {
+      "filePath": "routes/auth.js",
+      "contentHash": "6513b73406266ecbf1a83befc4dcd925b555f659c453c96205168f97858e538f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 13,
+      "hasStructuralAnalysis": true
+    },
+    "routes/index.js": {
+      "filePath": "routes/index.js",
+      "contentHash": "d47845a472be4bcc96eb2af4878f88dfa4d9f0d3e25e664ab16f712e78c273d3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 7,
+      "hasStructuralAnalysis": true
+    },
+    "routes/scoreboard.js": {
+      "filePath": "routes/scoreboard.js",
+      "contentHash": "10c85f178a4353f3d99d8ddc4cb46ca43d66d5aa91cf3ea2949ed410af9d38d7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 44,
+      "hasStructuralAnalysis": true
+    },
+    "routes/team.js": {
+      "filePath": "routes/team.js",
+      "contentHash": "ec8439ea51bb4dbdd9a7c349911adc19797088684f0feede8b004434154a5b14",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 10,
+      "hasStructuralAnalysis": true
+    },
+    "scripts/bake-map.js": {
+      "filePath": "scripts/bake-map.js",
+      "contentHash": "91ee4078cf7cbbf2c49dbab614d2de55f8a2bd8f08a95a4b85e138f707073531",
+      "functions": [
+        {
+          "name": "render",
+          "params": [
+            "mode",
+            "width"
+          ],
+          "exported": false,
+          "lineCount": 5
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 34,
+      "hasStructuralAnalysis": true
+    },
+    "scripts/seed.js": {
+      "filePath": "scripts/seed.js",
+      "contentHash": "978993c6954f7555dfa81de443183ae94a0c8a85266d69e2bc6e3790169ffcad",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 38,
+      "hasStructuralAnalysis": true
+    },
+    "scripts/sync-forcad-tokens.js": {
+      "filePath": "scripts/sync-forcad-tokens.js",
+      "contentHash": "928191315efc6077407dae6801c7bdff466a1ef2931dc1b47e8f1504af035070",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": false,
+          "lineCount": 87
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 116,
+      "hasStructuralAnalysis": true
+    },
+    "services/arenaService.js": {
+      "filePath": "services/arenaService.js",
+      "contentHash": "9ec9599ae4ac8bde8b8140a40ed6d9eeae4a5ce544ce651110f5c1ce1cf79ca7",
+      "functions": [
+        {
+          "name": "fetchJson",
+          "params": [
+            "path"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "seed",
+          "params": [],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "shuffled",
+          "params": [
+            "n",
+            "s"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "withZodiac",
+          "params": [
+            "teams"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "pick",
+          "params": [
+            "o",
+            "keys"
+          ],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "list",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "loadTeams",
+          "params": [],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "load",
+          "params": [],
+          "exported": false,
+          "lineCount": 20
+        },
+        {
+          "name": "store",
+          "params": [
+            "state"
+          ],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "getState",
+          "params": [],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "withNow",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "write",
+          "params": [
+            "res",
+            "event",
+            "data",
+            "id"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "broadcast",
+          "params": [
+            "event",
+            "entry"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "startLoop",
+          "params": [],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "stopLoop",
+          "params": [],
+          "exported": false,
+          "lineCount": 4
+        },
+        {
+          "name": "subscribe",
+          "params": [
+            "req",
+            "res"
+          ],
+          "exported": false,
+          "lineCount": 14
+        },
+        {
+          "name": "sendState",
+          "params": [
+            "req",
+            "res"
+          ],
+          "exported": false,
+          "lineCount": 6
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 152,
+      "hasStructuralAnalysis": true
+    },
+    "services/exportService.js": {
+      "filePath": "services/exportService.js",
+      "contentHash": "4c8e078fcd077f7a35eae4472534d907e8efdabb8aa0994101bd350beb089435",
+      "functions": [
+        {
+          "name": "toRows",
+          "params": [
+            "teams"
+          ],
+          "exported": false,
+          "lineCount": 19
+        },
+        {
+          "name": "buildXlsx",
+          "params": [
+            "teams"
+          ],
+          "exported": false,
+          "lineCount": 27
+        },
+        {
+          "name": "csvCell",
+          "params": [
+            "value"
+          ],
+          "exported": false,
+          "lineCount": 6
+        },
+        {
+          "name": "buildCsv",
+          "params": [
+            "teams"
+          ],
+          "exported": false,
+          "lineCount": 5
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 68,
+      "hasStructuralAnalysis": true
+    },
+    "views/admin/contents.ejs": {
+      "filePath": "views/admin/contents.ejs",
+      "contentHash": "faf75e900f62cb37af6c14ae1d4cb25ba36326d5e9b223ac0fb224a60e5d2357",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 42,
+      "hasStructuralAnalysis": false
+    },
+    "views/admin/dashboard.ejs": {
+      "filePath": "views/admin/dashboard.ejs",
+      "contentHash": "0a4d42ec31180cf470fc4709d64e69d2ef10bab2b1b4d19426d6484ef90c044f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 95,
+      "hasStructuralAnalysis": false
+    },
+    "views/admin/schedule.ejs": {
+      "filePath": "views/admin/schedule.ejs",
+      "contentHash": "d3a45e248a8db45e88ad65647d64d71bff66b148c2b106804d53fed07caa66ac",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 70,
+      "hasStructuralAnalysis": false
+    },
+    "views/admin/team.ejs": {
+      "filePath": "views/admin/team.ejs",
+      "contentHash": "9d412f2f24e5ef6dae4f1f04239970466655f75ca49037c2b036b3219fe7e545",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 92,
+      "hasStructuralAnalysis": false
+    },
+    "views/admin/teams.ejs": {
+      "filePath": "views/admin/teams.ejs",
+      "contentHash": "883538a5205775eee2762cd9a63b3a30cba886042d96f4bb46596d345821f316",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 71,
+      "hasStructuralAnalysis": false
+    },
+    "views/auth/login.ejs": {
+      "filePath": "views/auth/login.ejs",
+      "contentHash": "e20c5a76977365619e57d8c6eb2ced54cdbac14d0f0eca43dcd4245f36ad0d3a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 50,
+      "hasStructuralAnalysis": false
+    },
+    "views/auth/register.ejs": {
+      "filePath": "views/auth/register.ejs",
+      "contentHash": "7be1b8c5de9135602c95024f8daa20bbb9ceaed95cf137ab133f5d8bfb25ead4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": false
+    },
+    "views/error.ejs": {
+      "filePath": "views/error.ejs",
+      "contentHash": "8d62b5f0aad4d6c4f02b85d515f01f297a9dc551c0cc1530b862e7490e9194e3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": false
+    },
+    "views/home.ejs": {
+      "filePath": "views/home.ejs",
+      "contentHash": "1db716745b3ed0592ab0f7d3cf0168e5f08b3bdab8e82761f3c937de3b1bbfe5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 103,
+      "hasStructuralAnalysis": false
+    },
+    "views/layouts/admin.ejs": {
+      "filePath": "views/layouts/admin.ejs",
+      "contentHash": "3081bcb5d9dd5131375dd6708742cc23c9ff6b7694ab7360c7913d3539e219c1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 95,
+      "hasStructuralAnalysis": false
+    },
+    "views/layouts/main.ejs": {
+      "filePath": "views/layouts/main.ejs",
+      "contentHash": "73712fb3f725ca28da2e0cf2254bc9ce28c7848948e377e3df80697fc2dc6870",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 40,
+      "hasStructuralAnalysis": false
+    },
+    "views/partials/countdown.ejs": {
+      "filePath": "views/partials/countdown.ejs",
+      "contentHash": "d28b7ec38b39f6e88a4016ee59727f8e156694092eeac2f3331ed5fe7c0c2bcd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": false
+    },
+    "views/partials/errors.ejs": {
+      "filePath": "views/partials/errors.ejs",
+      "contentHash": "6390bbe57f8f542b95ba8baf6b20eb2f4021fcbbd490bfa808a008991643bced",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": false
+    },
+    "views/partials/flash.ejs": {
+      "filePath": "views/partials/flash.ejs",
+      "contentHash": "40f57e1c301dbd8847ee8e2d1ebecb99c7ba4111b261ef435a4aa0f53e279a39",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": false
+    },
+    "views/partials/map-terrain.ejs": {
+      "filePath": "views/partials/map-terrain.ejs",
+      "contentHash": "9b10b6ec4e1a422c39863ec176468589b6e040ef80c05ea86d5d30af226aa7c0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 100,
+      "hasStructuralAnalysis": false
+    },
+    "views/partials/members-table.ejs": {
+      "filePath": "views/partials/members-table.ejs",
+      "contentHash": "2552096471b5fb84bdb4266d73353ffa0bc77013f3d630e2b3eb96e5b48092dc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": false
+    },
+    "views/partials/navbar.ejs": {
+      "filePath": "views/partials/navbar.ejs",
+      "contentHash": "c59ec7dfc1da5f1892bfdd0b864ad81d8a3eb42c5c61851c258cb97bedfae4ec",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 44,
+      "hasStructuralAnalysis": false
+    },
+    "views/scoreboard.ejs": {
+      "filePath": "views/scoreboard.ejs",
+      "contentHash": "b77e2b5a9f82518581f46ad1ebf092604d1fd21d30a62e1a98345e84e911141a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 158,
+      "hasStructuralAnalysis": false
+    },
+    "views/team/form.ejs": {
+      "filePath": "views/team/form.ejs",
+      "contentHash": "1a58cacea7e9e3a888e868c1483c37b1acda2a5e76ecb84841a91a4e51eadc38",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 80,
+      "hasStructuralAnalysis": false
+    },
+    "views/team/show.ejs": {
+      "filePath": "views/team/show.ejs",
+      "contentHash": "425d89a72d4cd09c1509c5eacf824d730b3ae75382e2ce007e80ccde91c9ee97",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 40,
+      "hasStructuralAnalysis": false
+    }
+  }
+}

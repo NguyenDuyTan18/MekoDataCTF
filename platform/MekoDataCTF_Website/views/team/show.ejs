@@ -1,0 +1,39 @@
+<section class="section">
+  <div class="container narrow">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <p class="section-kicker mono"><%= isCaptain ? t('team.roleCaptain') : t('team.roleMember') %></p>
+          <h1><%= team.name %></h1>
+        </div>
+        <% if (canEdit) { %>
+          <a href="/team/edit" class="btn btn-primary"><%= t('team.edit') %></a>
+        <% } %>
+      </div>
+
+      <% if (isCaptain && !canEdit) { %><div class="alert alert-warning"><%= t('team.locked') %></div><% } %>
+
+      <div class="token-box">
+        <div class="token-box-head">
+          <h2 class="token-box-title"><%= t('team.tokenTitle') %></h2>
+          <div class="token-actions">
+            <button type="button" class="btn btn-ghost btn-sm" data-token-toggle data-show="<%= t('team.tokenShow') %>" data-hide="<%= t('team.tokenHide') %>"><%= t('team.tokenShow') %></button>
+            <button type="button" class="btn btn-outline btn-sm" data-token-copy data-copied="<%= t('team.tokenCopied') %>"><%= t('team.tokenCopy') %></button>
+          </div>
+        </div>
+        <code class="token-value mono" data-token-value="<%= team.token %>" aria-live="polite">••••••••••••••••</code>
+        <p class="token-note muted"><%= isCaptain ? t('team.tokenNoteCaptain') : t('team.tokenNoteMember') %></p>
+      </div>
+
+      <dl class="details">
+        <dt><%= t('team.email') %></dt><dd><%= team.email %></dd>
+        <dt><%= t('team.school') %></dt><dd><%= team.school || '—' %></dd>
+        <dt><%= t('team.phone') %></dt><dd><%= team.phone || '—' %></dd>
+        <dt><%= t('team.registeredAt') %></dt><dd class="mono"><%= team.created_at %> UTC</dd>
+      </dl>
+
+      <h2 class="form-section-title"><%= t('team.members') %> (<%= team.members.length %>)</h2>
+      <%- include('../partials/members-table', { members: team.members }) %>
+    </div>
+  </div>
+</section>

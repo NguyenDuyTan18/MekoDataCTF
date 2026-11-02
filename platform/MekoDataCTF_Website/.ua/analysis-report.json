@@ -1,0 +1,52 @@
+{
+  "tool": "Understand-Anything",
+  "skillVersion": "2.9.8",
+  "toolCommit": "4e6d3299017a7432da15957874992837a315c5b4",
+  "project": "MekoDataCTF_Website",
+  "language": "vi",
+  "analyzedAt": "2026-11-01T10:36:49.822Z",
+  "files": 61,
+  "totalNodes": 110,
+  "totalEdges": 193,
+  "totalLayers": 7,
+  "tourSteps": 12,
+  "nodeTypes": {
+    "file": 56,
+    "function": 44,
+    "document": 1,
+    "table": 6,
+    "config": 3
+  },
+  "edgeTypes": {
+    "imports": 54,
+    "contains": 49,
+    "exports": 18,
+    "calls": 18,
+    "serves": 12,
+    "configures": 7,
+    "reads_from": 1,
+    "writes_to": 1,
+    "depends_on": 23,
+    "documents": 5,
+    "defines_schema": 5
+  },
+  "validation": {
+    "issues": [],
+    "warnings": [],
+    "schema": "PASS",
+    "inventoryAndSourceRanges": "PASS",
+    "internalImports": 54,
+    "htmlStatus": 200,
+    "authenticatedGraphStatus": 200,
+    "authenticatedSourcePreviewStatus": 200,
+    "excludedEnvStatus": 404,
+    "unauthenticatedGraphStatus": 403,
+    "launcher": "PowerShell launcher started Vite on 127.0.0.1:5173",
+    "browser": "Verified project name and seven Vietnamese layers in in-app browser"
+  },
+  "limitations": [
+    "EJS/CSS were read from source; parser does not support them.",
+    "Some CommonJS handlers/object methods represented at file level, not exhaustive function inventory.",
+    "Uncommitted .understandignore is reported by dashboard freshness banner."
+  ]
+}

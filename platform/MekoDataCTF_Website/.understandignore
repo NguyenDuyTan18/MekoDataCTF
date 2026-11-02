@@ -1,0 +1,13 @@
+# Runtime state, credentials, dependencies, and generated assets
+.env
+.env.*
+data/
+node_modules/
+.ua/
+public/images/
+public/fonts/
+public/flags/
+*.min.js
+*.min.css
+*.map
+package-lock.json

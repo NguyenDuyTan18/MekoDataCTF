@@ -1,0 +1,2 @@
+docker_config/**/*.sh text eol=lf
+checkers/**/*.py text eol=lf
