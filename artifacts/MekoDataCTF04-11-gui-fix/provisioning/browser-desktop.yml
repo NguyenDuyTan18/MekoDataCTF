@@ -1,0 +1,43 @@
+---
+- name: Install the Apache desktop launcher
+  ansible.builtin.copy:
+    src: fashion-novnc.html
+    dest: /usr/share/novnc/fashion.html
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install the loopback WebSocket bridge
+  ansible.builtin.template:
+    src: '{{ playbook_dir }}/files/fashion-novnc.service'
+    dest: /etc/systemd/system/fashion-novnc.service
+    owner: root
+    group: root
+    mode: '0644'
+  register: fashion_novnc_unit
+
+- name: Start the browser desktop bridge
+  ansible.builtin.systemd:
+    name: fashion-novnc
+    enabled: true
+    daemon_reload: true
+    state: "{{ 'restarted' if fashion_novnc_unit.changed else 'started' }}"
+
+- name: Wait for the loopback WebSocket bridge
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: 6080
+    timeout: 30
+
+- name: Verify the Apache browser desktop page
+  ansible.builtin.uri:
+    url: http://127.0.0.1/desktop/vnc.html
+    status_code: 200
+    use_proxy: false
+    return_content: true
+  register: fashion_novnc_page
+  failed_when: fashion_novnc_page.status != 200 or 'noVNC' not in fashion_novnc_page.content
+
+- name: Show the browser desktop address without credentials
+  ansible.builtin.debug:
+    msg: 'Kali desktop: http://{{ fashion_team_addresses[inventory_hostname] }}/desktop/ (use this team VNC password).'

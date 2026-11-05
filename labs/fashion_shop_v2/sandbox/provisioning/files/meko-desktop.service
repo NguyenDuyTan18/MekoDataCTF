@@ -1,0 +1,25 @@
+[Unit]
+Description=Authenticated XFCE desktop for the sandbox GUI
+After=network.target
+
+[Service]
+Type=simple
+User={{ inventory_hostname }}
+Group=users
+WorkingDirectory=/home/{{ inventory_hostname }}
+Environment=HOME=/home/{{ inventory_hostname }}
+Environment=XDG_RUNTIME_DIR=/run/meko-desktop
+RuntimeDirectory=meko-desktop
+RuntimeDirectoryMode=0700
+UMask=0077
+ExecStartPre=/usr/bin/tigervncserver -list -cleanstale
+ExecStart=/usr/bin/tigervncserver -fg -autokill yes :{{ meko_vnc_display | default(9) | int }} -rfbport {{ meko_vnc_port | default(5900) | int }} -localhost {{ 'yes' if (meko_vnc_localhost | default(false)) else 'no' }} -SecurityTypes VncAuth -PasswordFile /home/{{ inventory_hostname }}/.vnc/passwd -geometry 1440x900 -depth 24 -xstartup /usr/local/libexec/meko-xfce
+ExecStop=/usr/bin/tigervncserver -kill :{{ meko_vnc_display | default(9) | int }}
+Restart=on-failure
+RestartSec=3
+KillMode=control-group
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

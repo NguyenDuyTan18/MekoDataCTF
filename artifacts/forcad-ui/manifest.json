@@ -1,0 +1,94 @@
+[
+  {
+    "id": "01-scoreboard",
+    "title": "Bảng điểm công khai",
+    "url": "http://127.0.0.1:18080/",
+    "loaded": true
+  },
+  {
+    "id": "02-live",
+    "title": "Màn hình Live",
+    "url": "http://127.0.0.1:18080/live/",
+    "loaded": true
+  },
+  {
+    "id": "04-login",
+    "title": "Đăng nhập quản trị",
+    "url": "http://127.0.0.1:18080/admin/login/",
+    "loaded": true,
+    "length": 142,
+    "height": 1050
+  },
+  {
+    "id": "05-submit",
+    "title": "Nộp flag",
+    "url": "http://127.0.0.1:18080/submit.html",
+    "loaded": true,
+    "length": 1051,
+    "height": 1074
+  },
+  {
+    "id": "06-round-control",
+    "title": "Điều khiển round",
+    "url": "http://127.0.0.1:18080/",
+    "loaded": true,
+    "length": 2575,
+    "height": 1749
+  },
+  {
+    "id": "07-admin",
+    "title": "Bảng điểm quản trị",
+    "url": "http://127.0.0.1:18080/admin/",
+    "loaded": true,
+    "length": 767,
+    "height": 1050
+  },
+  {
+    "id": "08-create-team",
+    "title": "Thêm đội",
+    "url": "http://127.0.0.1:18080/admin/create_team/",
+    "loaded": true,
+    "length": 155,
+    "height": 1050
+  },
+  {
+    "id": "09-edit-team",
+    "title": "Chỉnh sửa đội",
+    "url": "http://127.0.0.1:18080/admin/team/1/",
+    "loaded": true,
+    "length": 165,
+    "height": 1050
+  },
+  {
+    "id": "10-create-task",
+    "title": "Thêm dịch vụ",
+    "url": "http://127.0.0.1:18080/admin/create_task/",
+    "loaded": true,
+    "length": 240,
+    "height": 1050
+  },
+  {
+    "id": "11-edit-task",
+    "title": "Chỉnh sửa dịch vụ",
+    "url": "http://127.0.0.1:18080/admin/task/1/",
+    "loaded": true,
+    "length": 262,
+    "height": 1050
+  },
+  {
+    "id": "12-checker-log",
+    "title": "Nhật ký checker",
+    "url": "http://127.0.0.1:18080/admin/teamtask_log/team/1/task/1/",
+    "loaded": false,
+    "length": 261,
+    "height": 1050
+  },
+  {
+    "id": "13-flower",
+    "title": "Theo dõi worker (Flower)",
+    "url": "http://127.0.0.1:18080/flower/",
+    "loaded": true,
+    "length": 261,
+    "height": 1050
+  }
+]

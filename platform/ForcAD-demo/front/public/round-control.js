@@ -15,6 +15,9 @@
   const prepare = document.createElement('button');
   prepare.textContent = 'Chuẩn bị Round 1 (3 task)'; prepare.hidden = true;
   panel.appendChild(prepare);
+  const prepareMeko = document.createElement('button');
+  prepareMeko.textContent = 'Chuẩn bị Meko Boutique (5 task)'; prepareMeko.hidden = true;
+  panel.appendChild(prepareMeko);
   // Bắt đầu lại sau khi dừng/kết thúc: lưu hồ sơ, đưa tick/điểm/flag về 0, giữ đội, token và VM, rồi chạy luôn.
   const restart = document.createElement('button');
   restart.type = 'button'; restart.textContent = 'Bắt đầu lại từ tick 0'; restart.hidden = true;
@@ -38,7 +41,7 @@
       const res = await fetch('/api/admin/round-control/', {credentials:'same-origin', cache:'no-store'});
       if (res.status === 403 || res.status === 401) {
         state.textContent = '— cần đăng nhập quản trị';
-        login.hidden = false; start.hidden = stop.hidden = reset.hidden = prepare.hidden = archive.hidden = download.hidden = restart.hidden = previous.hidden = true; return;
+        login.hidden = false; start.hidden = stop.hidden = reset.hidden = prepare.hidden = prepareMeko.hidden = archive.hidden = download.hidden = restart.hidden = previous.hidden = true; return;
       }
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
@@ -53,7 +56,7 @@
         : ['archived', 'recreating'].includes(r1.phase));
       previous.hidden = !lastArchive || ['archived', 'recreating'].includes(r1.phase);
       if (lastArchive) previous.href = '/api/admin/round1/archive/' + encodeURIComponent(lastArchive) + '/';
-      prepare.hidden = data.running || r1.configured || ['archived','recreating'].includes(r1.phase);
+      prepareMeko.hidden = prepare.hidden = data.running || r1.configured || ['archived','recreating'].includes(r1.phase);
       archive.hidden = data.running || !r1.configured || !['ready','paused','finished'].includes(r1.phase) || !!r1.archive_id;
       download.hidden = !['archived','recreating'].includes(r1.phase) || !r1.archive_id;
       if (download.hidden === false) {
@@ -63,20 +66,24 @@
       if (data.round1?.configured) {
         reset.hidden = true;
         if (data.round1.phase === 'finished') start.hidden = true;
-        state.textContent += ` — Round 1: ${data.round1.phase}, tick ${data.round1.tick}/15`;
+        const labName = r1.lab === 'meko_boutique' ? 'Meko Boutique' : 'Round 1';
+        state.textContent += ` — ${labName}: ${data.round1.phase}, tick ${data.round1.tick}/${data.ticks_per_round}`;
       }
       if (r1.phase === 'archived') {
-        start.hidden = stop.hidden = reset.hidden = prepare.hidden = true;
+        start.hidden = stop.hidden = reset.hidden = true;
+        // Đã lưu hồ sơ: cho phép chuyển sang lab khác, dữ liệu lượt cũ được xóa khỏi bảng thi.
+        prepare.hidden = (r1.lab || 'round1') === 'round1';
+        prepareMeko.hidden = r1.lab === 'meko_boutique';
         state.textContent = '— Đã đóng; dữ liệu thi được lưu';
       }
       if (r1.phase === 'recreating') {
-        start.hidden = stop.hidden = reset.hidden = prepare.hidden = archive.hidden = restart.hidden = true;
+        start.hidden = stop.hidden = reset.hidden = prepare.hidden = prepareMeko.hidden = archive.hidden = restart.hidden = true;
         download.hidden = false;
         state.textContent = '— Đang hoàn tất tái tạo; chạy lại script cùng archive ID nếu cần';
       }
     } catch (err) {
       state.textContent = '— Không kết nối được bộ điều khiển';
-      start.hidden = stop.hidden = reset.hidden = prepare.hidden = archive.hidden = download.hidden = restart.hidden = true;
+      start.hidden = stop.hidden = reset.hidden = prepare.hidden = prepareMeko.hidden = archive.hidden = download.hidden = restart.hidden = true;
     }
   }
   async function post(url, body) {
@@ -114,17 +121,19 @@
   }
   start.addEventListener('click', () => setRunning(true));
   stop.addEventListener('click', () => setRunning(false));
-  prepare.addEventListener('click', async () => {
-    if (!confirm('Chuẩn bị Round 1 với ba task IDOR, SQLi, Upload? Chỉ thực hiện khi bản health đã dừng và reset về 0. Chưa sinh flag cho đến khi bấm Bắt đầu.')) return;
-    busy = true; prepare.disabled = true;
+  async function prepareLab(button, lab, question) {
+    if (!confirm(question)) return;
+    busy = true; button.disabled = true;
     try {
-      const res = await fetch('/api/admin/round1/prepare/', {method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirm:'PREPARE ROUND1'})});
+      const res = await fetch('/api/admin/round1/prepare/', {method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirm:'PREPARE ROUND1',lab})});
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || 'HTTP '+res.status);
       location.reload();
     } catch (err) { alert(err.message); }
-    finally { busy = false; prepare.disabled = false; }
-  });
+    finally { busy = false; button.disabled = false; }
+  }
+  prepare.addEventListener('click', () => prepareLab(prepare, 'round1', 'Chuẩn bị Round 1 với ba task IDOR, SQLi, Upload? Chỉ thực hiện khi bản health đã dừng và reset về 0, hoặc lab khác đã đóng và lưu hồ sơ (điểm, flag lượt đó sẽ bị xóa khỏi bảng thi, hồ sơ vẫn giữ). Chưa sinh flag cho đến khi bấm Bắt đầu.'));
+  prepareMeko.addEventListener('click', () => prepareLab(prepareMeko, 'meko_boutique', 'Chuẩn bị Meko Boutique với năm task IDOR, SQLi, Upload, JWT, Backup? Chỉ thực hiện khi bản health đã dừng và reset về 0, hoặc lab khác đã đóng và lưu hồ sơ (điểm, flag lượt đó sẽ bị xóa khỏi bảng thi, hồ sơ vẫn giữ). Chưa sinh flag cho đến khi bấm Bắt đầu.'));
   archive.addEventListener('click', async () => {
     if (!confirm('Đóng Round 1 và tạo hồ sơ lưu trong PostgreSQL? Hành động này không xóa flag hay điểm. Sau đó tải JSON về máy trước khi tái tạo.')) return;
     busy = true; archive.disabled = true;

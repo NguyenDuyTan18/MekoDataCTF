@@ -1,0 +1,149 @@
+- name: Provision an isolated Meko Boutique V2 shop per team
+  hosts: 'team1:team2:team3:team4'
+  become: true
+  vars:
+    meko_addresses: {team1: '10.93.0.11', team2: '10.93.0.12', team3: '10.93.0.13', team4: '10.93.0.14'}
+    meko_team_addresses: "{{ meko_addresses }}"
+  pre_tasks:
+    - name: Configure stable per-team trainee access
+      ansible.builtin.include_tasks: trainee-access.yml
+    - name: Start Open GUI before shop deployment can fail
+      ansible.builtin.include_tasks: desktop.yml
+      when: meko_desktop_enabled | default(true) | bool
+    - name: Apply the SSH configuration before web deployment
+      ansible.builtin.meta: flush_handlers
+  tasks:
+    - name: Install Apache and application runtime
+      ansible.builtin.apt:
+        name: [apache2, python3-flask, python3-waitress]
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+    - name: Copy standalone app source to the VM
+      ansible.builtin.copy:
+        src: '{{ playbook_dir }}/../app/'
+        dest: /opt/meko-boutique/
+        owner: root
+        group: root
+        mode: 'u=rwX,go=rX'
+      notify: Restart Meko Boutique
+    - name: Create restricted service account
+      ansible.builtin.user:
+        name: meko-web
+        system: true
+        shell: /usr/sbin/nologin
+        create_home: false
+    - name: Persist checker and tick configuration
+      ansible.builtin.shell: |
+        set -eu
+        if [ ! -s /etc/meko-boutique/checker.env ]; then printf 'MEKO_CHECKER_KEY=%s\n' "$(openssl rand -hex 32)" > /etc/meko-boutique/checker.env; fi
+        chmod 0600 /etc/meko-boutique/checker.env
+      args: {executable: /bin/sh}
+      changed_when: false
+      no_log: true
+    - name: Generate a stable staff password for the operations console
+      ansible.builtin.shell: |
+        set -eu
+        if [ ! -s /etc/meko-boutique/staff.env ]; then printf 'MEKO_STAFF_PASSWORD=%s\n' "$(openssl rand -hex 24)" > /etc/meko-boutique/staff.env; fi
+        chmod 0600 /etc/meko-boutique/staff.env
+      args: {executable: /bin/sh}
+      changed_when: false
+      no_log: true
+    - name: Create systemd service
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/meko-boutique.service
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Meko Boutique V2 training shop
+          After=network.target
+          [Service]
+          User=meko-web
+          Group=meko-web
+          WorkingDirectory=/opt/meko-boutique
+          Environment=TEAM_ID={{ inventory_hostname }}
+          Environment=MEKO_DATA=/var/lib/meko-boutique
+          Environment=MEKO_TICK_SECONDS={{ meko_tick_seconds | int }}
+          EnvironmentFile=/etc/meko-boutique/checker.env
+          EnvironmentFile=/etc/meko-boutique/staff.env
+          StateDirectory=meko-boutique
+          StateDirectoryMode=0700
+          UMask=0077
+          ExecStart=/usr/bin/python3 /opt/meko-boutique/app.py
+          Restart=on-failure
+          NoNewPrivileges=true
+          PrivateTmp=true
+          ProtectSystem=strict
+          ProtectHome=true
+          ReadWritePaths=/var/lib/meko-boutique
+          [Install]
+          WantedBy=multi-user.target
+      notify: Restart Meko Boutique
+    - name: Configure Apache reverse proxy
+      ansible.builtin.copy:
+        dest: /etc/apache2/sites-available/000-meko-boutique.conf
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          <VirtualHost *:80>
+            ServerName 127.0.0.1
+            ProxyPreserveHost On
+            ProxyPass / http://127.0.0.1:8080/
+            ProxyPassReverse / http://127.0.0.1:8080/
+            ErrorLog ${APACHE_LOG_DIR}/meko-error.log
+            CustomLog ${APACHE_LOG_DIR}/meko-access.log combined
+          </VirtualHost>
+      notify: Reload Apache
+    - name: Enable Apache proxy modules and site
+      ansible.builtin.shell: |
+        a2enmod proxy proxy_http >/dev/null
+        a2dissite 000-default >/dev/null 2>&1 || true
+        a2ensite 000-meko-boutique >/dev/null
+      args: {executable: /bin/sh}
+      changed_when: false
+      notify: Reload Apache
+    - name: Validate Apache configuration
+      ansible.builtin.command: apache2ctl configtest
+      changed_when: false
+    - name: Enable and start web service
+      ansible.builtin.systemd:
+        name: meko-boutique
+        daemon_reload: true
+        enabled: true
+        state: started
+    - name: Enable Apache service
+      ansible.builtin.systemd:
+        name: apache2
+        enabled: true
+        state: started
+    - name: Flush restarts before health checks
+      ansible.builtin.meta: flush_handlers
+    - name: Check local service health over Apache
+      ansible.builtin.uri:
+        url: http://127.0.0.1/health
+        return_content: true
+        use_proxy: false
+      register: meko_health
+      until: meko_health.status | default(0) == 200
+      retries: 12
+      delay: 2
+    - name: Check cross-team HTTP connectivity
+      ansible.builtin.uri:
+        url: 'http://{{ item.value }}/health'
+        return_content: true
+        use_proxy: false
+      loop: '{{ meko_addresses | dict2items }}'
+      register: meko_peer
+      until: meko_peer.status | default(0) == 200
+      retries: 6
+      delay: 2
+  handlers:
+    - name: Restart Meko Boutique
+      ansible.builtin.systemd: {name: meko-boutique, daemon_reload: true, state: restarted}
+    - name: Reload Apache
+      ansible.builtin.systemd: {name: apache2, state: reloaded}
+    - name: Reload SSH
+      ansible.builtin.service: {name: ssh, state: reloaded}

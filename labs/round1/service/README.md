@@ -3,10 +3,10 @@
 ## Thiết kế
 
 - Bốn đội: `10.80.0.11`–`10.80.0.14`, webservice cổng 80.
-- Ba task dùng chung webservice, mỗi task một flag mới/đội/tick. Tổng 180 flag sau 15 tick thành công.
+- Ba task dùng chung webservice, mỗi task một flag mới/đội/tick. Tổng 180 flag sau 10 tick thành công.
 - ForcAD sinh flag bằng `Flag.generate`, lưu flag đặt thành công bằng `storage.flags.add_flag`, dùng bảng `Flags`, `StolenFlags`, xác minh bài nộp và protocol checker có sẵn.
-- Bộ điều phối Round 1 thay lịch health-only: đặt đủ 12 flag, mở cửa thi 120 giây, xác minh chức năng và các flag còn hiệu lực, chấm SLA một lần/đội rồi mở tick sau. Thời gian chuẩn bị/xác minh là khoảng chuyển tick, không tính vào 120 giây làm bài.
-- Flag có hiệu lực ở tick tạo và hai tick tiếp theo. Sau tick 15 có 240 giây nhận flag cuối round, không sinh flag mới. Round 2 chưa được tự kích hoạt.
+- Bộ điều phối Round 1 thay lịch health-only: đặt đủ 12 flag, mở cửa thi 300 giây, xác minh chức năng và các flag còn hiệu lực, chấm SLA một lần/đội rồi mở tick sau. Thời gian chuẩn bị/xác minh là khoảng chuyển tick, không tính vào 300 giây làm bài.
+- Flag có hiệu lực ở tick tạo và hai tick tiếp theo. Sau tick 10 có 600 giây nhận flag cuối round, không sinh flag mới. Round 2 chưa được tự kích hoạt.
 - Attack +1 khi nộp flag hợp lệ; Defense -1 cho đội mất flag; SLA +1 nếu cả ba chức năng và các flag cần kiểm tra đều còn đúng. Tổng = Attack + Defense + SLA. Defense/tổng được phép âm.
 - Một đội được nộp một flag của đội khác một lần. Ba đội khác nhau nộp cùng một flag tạo ba lần cộng/trừ điểm.
 
@@ -25,9 +25,9 @@ Upload ở bản này là lỗi xử lý ZIP/symlink dẫn tới đọc file tro
 1. Mở `http://127.0.0.1:18080/` và đăng nhập quản trị.
 2. Nếu bản health cũ còn tick/điểm, bấm Dừng, đợi worker hoàn tất, rồi dùng Reset cũ về tick 0. Hệ thống không tự xóa dữ liệu cuộc thi có flag.
 3. Bấm **Chuẩn bị Round 1 (3 task)**. Hành động này tạo task, bật ba task round 1 và tắt bài mẫu/health cũ; chưa sinh flag.
-4. Bấm **Bắt đầu**. Hệ thống mới sinh và đặt flag. Đồng hồ 120 giây bắt đầu khi tất cả PUT đã thành công; chưa cộng SLA khi mở tick.
+4. Bấm **Bắt đầu**. Hệ thống mới sinh và đặt flag. Đồng hồ 300 giây bắt đầu khi tất cả PUT đã thành công; chưa cộng SLA khi mở tick.
 5. **Dừng** khóa nộp flag và tạm dừng đồng hồ. Tác vụ SSH đã gửi có thể hoàn tất, nhưng không tự chuyển sang tick mới. Bấm Bắt đầu để tiếp tục.
-6. Sau 15 tick và 240 giây nhận flag, hệ thống dừng. Nút reset health bị khóa đối với cuộc thi đã bật chế độ flag.
+6. Sau 10 tick và 600 giây nhận flag, hệ thống dừng. Nút reset health bị khóa đối với cuộc thi đã bật chế độ flag.
 
 Dashboard hiển thị cột Attack, Defense, SLA / 15 và Tổng điểm. Trang `/submit.html` cho phép nộp flag bằng team token và xem ID/path mục tiêu. Team token là token đội do website MekoDataCTF cấp khi đội trưởng tạo đội (đồng bộ sang ForcAD bằng `npm run sync:forcad -- --apply`); người chơi cũng có thể nộp ngay trên trang Scoreboard của website sau khi đăng nhập. Không dùng token quản trị web lab để nộp flag.
 
@@ -64,7 +64,7 @@ Tài khoản `user-access` trên VM được quyền sửa `/opt/round1/webservi
 python labs/round1/service/run_tests.py
 ```
 
-Bộ kiểm thử tạo database PostgreSQL và container Redis tạm riêng; không dùng database cuộc thi để chạy thử. Kiểm tra khai thác/vá ba lỗi qua HTTP, PUT có xác thực và idempotency, không sinh flag trước start, đủ 180 flag duy nhất sau 15 tick, cộng SLA sau 120 giây, dừng/tiếp tục, nộp trùng/flag của chính đội/flag hết hạn và điểm cố định. Lịch 15 tick được kiểm thử bằng đồng hồ giả lập; chưa chạy thi thật 30 phút.
+Bộ kiểm thử tạo database PostgreSQL và container Redis tạm riêng; không dùng database cuộc thi để chạy thử. Kiểm tra khai thác/vá ba lỗi qua HTTP, PUT có xác thực và idempotency, không sinh flag trước start, đủ 120 flag duy nhất sau 10 tick, cộng SLA sau 300 giây, dừng/tiếp tục, nộp trùng/flag của chính đội/flag hết hạn và điểm cố định. Lịch 10 tick được kiểm thử bằng đồng hồ giả lập; chưa chạy thi thật 30 phút.
 
 ## Hoàn tác webservice
 
@@ -72,7 +72,7 @@ Trên từng VM, xóa đúng file drop-in `/etc/systemd/system/attacker-http@att
 
 ## Thời lượng tick hiện tại
 
-Mỗi tick kéo dài **120 giây**. Sau tick 15, hệ thống nhận flag thêm **240 giây** rồi tự dừng. Cập nhật ngày 28/10/2026 khi đang tạm dừng tại tick 9: giữ nguyên điểm và flag; cộng thêm 60 giây vào phần thời gian còn lại để tick hiện tại cũng đủ 120 giây.
+Mỗi tick kéo dài **300 giây**. Sau tick 10, hệ thống nhận flag thêm **600 giây** rồi tự dừng. Cập nhật ngày 28/10/2026 khi đang tạm dừng tại tick 9: giữ nguyên điểm và flag; cộng thêm 60 giây vào phần thời gian còn lại để tick hiện tại cũng đủ 300 giây.
 
 ## Đóng cuộc thi và tái tạo cho lần thi mới
 
@@ -122,6 +122,6 @@ Sau thông báo **Đã tái tạo xong**, mở dashboard và kiểm tra điểm/
 
 ## PUT retry trong tick
 
-Tick mở ngay và chạy 120 giây dù tất cả service DOWN. Mỗi đội/task chỉ có một PUT đang xử lý. PUT thất bại được thử lại sau 10 giây kể từ khi nhận kết quả thất bại; PUT thành công không lặp lại trong tick. Nếu kết nối bị treo, phải đợi timeout của lượt trước trước khi thử lại. Đầu tick có thể chưa có vị trí mục tiêu; vị trí được cập nhật sau PUT thành công.
+Tick mở ngay và chạy 300 giây dù tất cả service DOWN. Mỗi đội/task chỉ có một PUT đang xử lý. PUT thất bại được thử lại sau 10 giây kể từ khi nhận kết quả thất bại; PUT thành công không lặp lại trong tick. Nếu kết nối bị treo, phải đợi timeout của lượt trước trước khi thử lại. Đầu tick có thể chưa có vị trí mục tiêu; vị trí được cập nhật sau PUT thành công.
 
-Hết 120 giây khóa nhận flag và ngừng lên lịch PUT. Hệ thống đợi các PUT đang xử lý kết thúc rồi kiểm tra cuối tick; kết quả PUT hết hạn hoặc khác tick không được ghi vào Flags. Khoảng chờ/chấm cuối tick là thời gian chuyển tiếp, không cộng vào thời gian làm bài và không chạy chồng sang tick kế tiếp. Service phục hồi và đủ ba task/flag cần kiểm tra hợp lệ vào cuối tick thì được +1 SLA.
+Hết 300 giây khóa nhận flag và ngừng lên lịch PUT. Hệ thống đợi các PUT đang xử lý kết thúc rồi kiểm tra cuối tick; kết quả PUT hết hạn hoặc khác tick không được ghi vào Flags. Khoảng chờ/chấm cuối tick là thời gian chuyển tiếp, không cộng vào thời gian làm bài và không chạy chồng sang tick kế tiếp. Service phục hồi và đủ ba task/flag cần kiểm tra hợp lệ vào cuối tick thì được +1 SLA.

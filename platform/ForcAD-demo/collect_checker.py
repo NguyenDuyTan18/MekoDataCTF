@@ -22,6 +22,9 @@ BRIDGE = ROOT / 'checkers' / 'mekodata_bridge'
 REQUEST = BRIDGE / 'request.json'
 REMOTE = 'sudo -n -u web-checker /usr/bin/python3 /opt/web-checker/web_health.py --config /etc/web-checker/web_targets.json --json --database /var/lib/web-checker/results.sqlite3'
 RPC_ROOT = ROOT / 'checkers' / LAB['name'] / 'rpc'
+# round1 keeps these defaults; other labs declare them in lab.json.
+AGENT_COMMAND = LAB.get('agent_command', 'sudo -n /usr/bin/python3 /opt/round1/agent.py --config /etc/round1/agent.json')
+AGENT_TIMEOUT = LAB.get('agent_timeout', 15)
 
 
 def process_rpc(path):
@@ -38,10 +41,9 @@ def process_rpc(path):
             return
         if data['payload']['ip'] not in TEAM_IPS or data['payload']['task'] not in LAB['tasks']:
             raise ValueError('Invalid action/team')
-        proc = subprocess.run(labconfig.ssh(LAB, LAB['checker_host'],
-                                            'sudo -n /usr/bin/python3 /opt/round1/agent.py --config /etc/round1/agent.json'),
+        proc = subprocess.run(labconfig.ssh(LAB, LAB['checker_host'], AGENT_COMMAND),
                               input=json.dumps(data['payload']), text=True, capture_output=True,
-                              timeout=15, cwd=labconfig.WORKSPACE,
+                              timeout=AGENT_TIMEOUT, cwd=labconfig.WORKSPACE,
                               creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         if proc.returncode:
             raise RuntimeError('SSH agent unavailable')

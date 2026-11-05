@@ -149,7 +149,7 @@ class LifecycleTest(unittest.TestCase):
                 self.assertTrue(all(s['total']==0 for s in round1.scores()))
                 with storage.utils.db_cursor() as (_,c):
                     c.execute('SELECT COUNT(*),COUNT(DISTINCT flag) FROM Flags'); self.assertEqual(c.fetchone(),(12,12))
-                clock[0]+=108.9; round1.pump(); self.assertEqual(len(put_calls),24)
+                clock[0]+=288.9; round1.pump(); self.assertEqual(len(put_calls),24)
                 self.assertTrue(all(s['sla']==0 for s in round1.scores()))
                 round_control.set_enabled(False); round1.pump()
                 remaining=round1.state()['remaining']
@@ -183,19 +183,19 @@ class LifecycleTest(unittest.TestCase):
                 round_control.set_enabled(False); round1.pump()
                 self.assertFalse(storage.attacks.handle_attack(3,flag.flag,2).submit_ok)
                 round_control.set_enabled(True); round1.pump(); round1.collect_puts(wait=True)
-                for tick in range(2,16):
+                for tick in range(2,11):
                     self.assertEqual(round1.state()['tick'],tick)
-                    clock[0]+=120.1; round1.pump()
-                    if tick<15: round1.pump(); round1.collect_puts(wait=True)
+                    clock[0]+=300.1; round1.pump()
+                    if tick<10: round1.pump(); round1.collect_puts(wait=True)
                 self.assertEqual(round1.state()['phase'],'draining')
-                self.assertTrue(all(s['sla']==15 for s in round1.scores()))
-                self.assertFalse(storage.attacks.handle_attack(3,flag.flag,15).submit_ok)
-                clock[0]+=240.1; round1.pump()
+                self.assertTrue(all(s['sla']==10 for s in round1.scores()))
+                self.assertFalse(storage.attacks.handle_attack(3,flag.flag,10).submit_ok)
+                clock[0]+=600.1; round1.pump()
                 self.assertEqual(round1.state()['phase'],'finished')
                 self.assertFalse(round_control.get_enabled())
                 with storage.utils.db_cursor() as (_,c):
-                    c.execute('SELECT COUNT(*),COUNT(DISTINCT flag) FROM Flags'); self.assertEqual(c.fetchone(),(180,180))
-                self.assertEqual(sorted((s['attack'],s['defense'],s['sla'],s['total']) for s in round1.scores()),[(0,-1,15,14),(0,0,15,15),(0,0,15,15),(1,0,15,16)])
+                    c.execute('SELECT COUNT(*),COUNT(DISTINCT flag) FROM Flags'); self.assertEqual(c.fetchone(),(120,120))
+                self.assertEqual(sorted((s['attack'],s['defense'],s['sla'],s['total']) for s in round1.scores()),[(0,-1,10,9),(0,0,10,10),(0,0,10,10),(1,0,10,11)])
                 # Bắt đầu lại: phải chờ đủ thời gian yên lặng, lưu hồ sơ, xóa điểm/flag nhưng giữ đội và token.
                 with self.assertRaises(ValueError):
                     round1.restart_competition()
@@ -203,7 +203,7 @@ class LifecycleTest(unittest.TestCase):
                     c.execute('SELECT id,token FROM Teams ORDER BY id'); tokens=c.fetchall()
                     c.execute("UPDATE MekodataRoundControl SET updated_at=now()-interval '60 seconds' WHERE id=1"); conn.commit()
                 archive_id=round1.restart_competition()
-                self.assertEqual(len(round1.get_archive(archive_id)['snapshot']['tables']['Flags']),180)
+                self.assertEqual(len(round1.get_archive(archive_id)['snapshot']['tables']['Flags']),120)
                 s=round1.state()
                 self.assertEqual((s['phase'],s['tick'],s['configured'],s['archive_id']),('ready',0,True,None))
                 self.assertTrue(all(x['total']==0 and x['sla']==0 for x in round1.scores()))

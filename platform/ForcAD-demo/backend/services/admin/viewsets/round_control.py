@@ -9,18 +9,20 @@ def round_control_status():
     check_session()
     round_control.ensure_table()
     from lib.storage import round1
-    return jsonify({'running': round_control.get_enabled(), 'round1': round1.state()})
+    return jsonify({'running': round_control.get_enabled(), 'round1': round1.state(),
+                    'ticks_per_round': round1.profile()['ticks_per_round']})
 
 
 def round1_prepare():
     check_session()
     if request.headers.get('Origin') != request.host_url.rstrip('/'):
         abort_with_error('Invalid origin', 403)
-    if (request.get_json(silent=True) or {}).get('confirm') != 'PREPARE ROUND1':
+    data = request.get_json(silent=True) or {}
+    if data.get('confirm') != 'PREPARE ROUND1':
         abort_with_error('Preparation confirmation required', 400)
     from lib.storage import round1
     try:
-        round1.prepare()
+        round1.prepare(data.get('lab', 'round1'))
     except ValueError as exc:
         abort_with_error(str(exc), 409)
     return jsonify({'status': 'prepared', 'running': False})

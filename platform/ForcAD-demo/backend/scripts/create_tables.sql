@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS Tasks
 CREATE TABLE IF NOT EXISTS Flags
 (
     id                SERIAL PRIMARY KEY,
-    flag              VARCHAR(32) UNIQUE NOT NULL DEFAULT '',
+    flag              VARCHAR(64) UNIQUE NOT NULL DEFAULT '',
     team_id           INTEGER            NOT NULL REFERENCES Teams ON DELETE RESTRICT,
     task_id           INTEGER            NOT NULL REFERENCES Tasks ON DELETE RESTRICT,
     round             INTEGER            NOT NULL,

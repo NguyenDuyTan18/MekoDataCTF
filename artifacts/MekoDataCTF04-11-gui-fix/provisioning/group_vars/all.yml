@@ -1,0 +1,22 @@
+---
+# Portal VNC endpoint; keep image GUI Access enabled on OpenStack separately.
+fashion_vnc_port: 5900
+fashion_vnc_display: 9
+fashion_vnc_localhost: false
+# Stop only approved owners verified through cgroups or socket Listen/Triggers.
+fashion_vnc_replace_units: [xvnc.socket, vncserver.socket, tigervnc.socket, x11vnc.socket, lightdm.service, x11vnc.service]
+
+# Deliberate training defaults. Edit these values before provisioning to change them.
+# SSH login username on all four VMs: user-access. The kali account stays locked.
+fashion_trainee_passwords:
+  team1: 'MekoTeam1@2026'
+  team2: 'MekoTeam2@2026'
+  team3: 'MekoTeam3@2026'
+  team4: 'MekoTeam4@2026'
+
+# TigerVNC passwords must contain exactly eight ASCII letters/digits.
+fashion_trainee_vnc_passwords:
+  team1: 'Meko1Vnc'
+  team2: 'Meko2Vnc'
+  team3: 'Meko3Vnc'
+  team4: 'Meko4Vnc'

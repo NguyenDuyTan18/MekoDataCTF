@@ -61,7 +61,8 @@ def tick_status():
         return jsonify({'mode': 'round1', 'round': 1, 'tick': s['tick'],
                         'phase': s['phase'], 'deadline': s['deadline'], 'error': s['error'],
                         'tick_seconds': storage.game.get_current_game_config().round_time,
-                        'max_rounds': 2, 'ticks_per_round': 15, 'scores': round1.scores()})
+                        'max_rounds': 2, 'ticks_per_round': round1.profile()['ticks_per_round'],
+                        'scores': round1.scores()})
     with storage.utils.db_cursor() as (_, curs):
         curs.execute('SELECT real_round FROM GameConfig WHERE id=1')
         tick = curs.fetchone()[0]

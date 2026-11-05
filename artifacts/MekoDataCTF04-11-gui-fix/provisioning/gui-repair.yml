@@ -1,0 +1,11 @@
+---
+- name: Repair CyberRange Open GUI independently of shop deployment
+  hosts: 'team1:team2:team3:team4'
+  become: true
+  vars:
+    fashion_team_addresses: {team1: '10.90.0.11', team2: '10.90.0.12', team3: '10.90.0.13', team4: '10.90.0.14'}
+  tasks:
+    - name: Configure the trainee account and stable credentials
+      ansible.builtin.include_tasks: trainee-access.yml
+    - name: Configure and verify the Open GUI endpoint
+      ansible.builtin.include_tasks: desktop.yml

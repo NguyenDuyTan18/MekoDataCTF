@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="vi">
+<meta charset="utf-8">
+<title>Kali Desktop</title>
+<p>Đang mở desktop Kali…</p>
+<noscript>Cần bật JavaScript để mở desktop.</noscript>
+<script>
+// Explicit host keeps the WebSocket path consistent across packaged noVNC versions.
+const options = new URLSearchParams({
+    host: location.hostname,
+    port: location.port || (location.protocol === 'https:' ? '443' : '80'),
+    encrypt: location.protocol === 'https:' ? 'true' : 'false',
+    path: 'desktop/websockify',
+    autoconnect: 'true',
+    resize: 'scale'
+});
+location.replace('vnc.html?' + options.toString());
+</script>
+</html>

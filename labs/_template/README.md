@@ -26,3 +26,19 @@ platform/ForcAD-demo/checkers/<ten-lab>/   # checker ForcAD (bắt buộc nằm 
 6. Chạy collector cho lab đó: `$env:MEKO_LAB = '<ten-lab>'; python platform/ForcAD-demo/collect_checker.py`. Nếu không đặt `MEKO_LAB` thì mặc định là `round1`.
 
 Nếu dùng file SSH khác `ops/pool101/management-config`, đặt `MEKO_SSH_CONFIG` (đường dẫn tương đối tính từ gốc workspace, hoặc đường dẫn tuyệt đối).
+
+## Khai báo lịch thi cho lab mới
+
+Thêm một mục vào `PROFILES` trong `platform/ForcAD-demo/backend/lib/storage/lab_profile.py`, thêm nút Chuẩn bị trong
+`front/public/round-control.js`, rồi build lại `nginx`. Không cần sửa `round1.py` hay `round_schedule.py`.
+
+| Trường | Ý nghĩa | Ví dụ Meko Boutique |
+|---|---|---|
+| `tasks` | Mỗi task một flag cho mỗi đội mỗi tick | 5 task, tức 5 flag |
+| `round_time` | Độ dài một tick, tính bằng giây | 300 |
+| `ticks_per_round` | Số tick trong round | 10 |
+| `check_seconds` | Lớn hơn 0: chạy `check` trong tick, round đúng giờ. Bằng 0: chạy sau tick | 60 |
+| `drain_ticks` | Số tick nhận flag thêm sau tick cuối | 0 |
+
+Thời lượng round là `round_time × (ticks_per_round + drain_ticks)`. `check_seconds` phải đủ cho `check` và `get`
+của mọi cặp đội, task, và nhỏ hơn `round_time` ít nhất 60 giây.

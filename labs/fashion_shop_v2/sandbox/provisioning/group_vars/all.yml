@@ -1,0 +1,8 @@
+# Public defaults. Put credentials in a private Ansible vars file or controller env.
+meko_trainee_passwords: {}
+meko_tick_seconds: 120
+meko_desktop_enabled: true
+meko_vnc_port: 5900
+meko_vnc_display: 9
+meko_vnc_localhost: false
+meko_vnc_replace_units: [xvnc.socket, vncserver.socket, tigervnc.socket, x11vnc.socket, lightdm.service, x11vnc.service]

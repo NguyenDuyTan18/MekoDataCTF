@@ -1,5 +1,7 @@
 # MEKOSHARING workspace
 
+Hướng dẫn vận hành: [Khởi động mã nguồn — file cần sửa, lệnh cần chạy và địa chỉ truy cập](docs/HUONG-DAN-KHOI-DONG.md).
+
 Workspace chia thành hai lớp. **platform** và **shared** dùng chung cho mọi bài lab. **labs** chứa riêng từng bài. Khi tạo lab mới, chỉ cần thêm một thư mục dưới `labs/`, xem [labs/_template/README.md](labs/_template/README.md). Thay đổi đợt sắp xếp lại, luồng gọi giữa các file và cách chạy từng file: [docs/TAI-CAU-TRUC-WORKSPACE.md](docs/TAI-CAU-TRUC-WORKSPACE.md). Token đội tự đồng bộ website → ForcAD: [docs/DONG-BO-TOKEN-FORCAD.md](docs/DONG-BO-TOKEN-FORCAD.md).
 
 ```

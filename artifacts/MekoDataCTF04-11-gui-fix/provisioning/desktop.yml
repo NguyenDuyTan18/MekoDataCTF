@@ -1,0 +1,356 @@
+---
+- name: Validate the portal VNC endpoint
+  ansible.builtin.assert:
+    that:
+      - fashion_vnc_port | default(5900) | int >= 5900
+      - fashion_vnc_port | default(5900) | int <= 5999
+      - fashion_vnc_display | default(9) | int >= 1
+      - fashion_vnc_display | default(9) | int <= 99
+      - not (fashion_vnc_localhost | default(false) | bool)
+    fail_msg: Use a VNC port from 5900 to 5999 and a free X display from 1 to 99.
+
+- name: Load private GUI passwords
+  ansible.builtin.set_fact:
+    fashion_gui_passwords: "{{ fashion_trainee_vnc_passwords | default({'team1': lookup('ansible.builtin.env', 'FASHION_TEAM1_VNC_PASSWORD'), 'team2': lookup('ansible.builtin.env', 'FASHION_TEAM2_VNC_PASSWORD'), 'team3': lookup('ansible.builtin.env', 'FASHION_TEAM3_VNC_PASSWORD'), 'team4': lookup('ansible.builtin.env', 'FASHION_TEAM4_VNC_PASSWORD')}) }}"
+  no_log: true
+
+- name: Use this VM's generated GUI password
+  ansible.builtin.set_fact:
+    fashion_gui_passwords: '{{ {inventory_hostname: fashion_generated_access.vnc_password} }}'
+  when: fashion_auto_gui
+  no_log: true
+
+- name: Check GUI credential settings without exposing secrets
+  block:
+    - name: Validate GUI password mapping
+      ansible.builtin.assert:
+        that:
+          - fashion_gui_passwords is mapping
+          - fashion_gui_passwords.keys() | list | sort == ([inventory_hostname] if (fashion_auto_gui | default(false)) else ['team1', 'team2', 'team3', 'team4'])
+          - fashion_gui_passwords.values() | list | unique | list | length == (1 if (fashion_auto_gui | default(false)) else 4)
+          - inventory_hostname in fashion_gui_passwords
+      no_log: true
+    - name: Validate each GUI password
+      ansible.builtin.assert:
+        that:
+          - item is string
+          - item | length == 8
+          - item.isascii()
+          - item.isalnum()
+      loop: '{{ fashion_gui_passwords.values() | list }}'
+      no_log: true
+  rescue:
+    - name: Explain invalid GUI secret configuration
+      ansible.builtin.fail:
+        msg: >-
+          Invalid GUI credential settings. Manual configuration requires four distinct
+          eight-character ASCII alphanumeric VNC passwords for team1 through team4.
+          Check fashion_trainee_vnc_passwords or all FASHION_TEAMn_VNC_PASSWORD worker
+          variables. To use persistent random credentials, remove the manual mapping
+          and unset all four variables. No secrets have been printed. See HUONG-DAN-KALI-GUI.md.
+
+- name: Install Kali XFCE desktop and VNC runtime
+  ansible.builtin.apt:
+    # Use the XFCE runtime directly; the Kali branding metapackage is optional.
+    name: [xfce4, xfce4-terminal, tigervnc-standalone-server, tigervnc-tools, xauth, xfonts-base, dbus-x11, firefox-esr, acl, iproute2, python3-pycryptodome, novnc, websockify]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Check the hostname required by TigerVNC
+  ansible.builtin.command:
+    argv: [/bin/hostname, '-f']
+  register: fashion_hostname_check
+  changed_when: false
+  failed_when: false
+
+- name: Resolve the local hostname on minimal cloud images
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: '# {mark} FASHION SHOP HOSTNAME'
+    block: '127.0.1.1 {{ ansible_hostname }}'
+  when: fashion_hostname_check.rc != 0 or fashion_hostname_check.stdout | trim == ''
+
+- name: Verify the hostname before launching the VNC wrapper
+  ansible.builtin.command:
+    argv: [/bin/hostname, '-f']
+  register: fashion_hostname_ready
+  changed_when: false
+  failed_when: fashion_hostname_ready.rc != 0 or fashion_hostname_ready.stdout | trim == ''
+
+- name: Create desktop helper directory
+  ansible.builtin.file:
+    path: /usr/local/libexec
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install desktop helpers
+  ansible.builtin.copy:
+    src: '{{ item.src }}'
+    dest: '/usr/local/libexec/{{ item.dest }}'
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - {src: fashion-xfce, dest: fashion-xfce}
+    - {src: set-vnc-password.py, dest: fashion-set-vnc-password}
+    - {src: vnc-listener.py, dest: fashion-vnc-listener}
+    - {src: check-vnc.py, dest: fashion-check-vnc}
+  register: fashion_desktop_helpers
+
+- name: Create the private VNC directory
+  ansible.builtin.file:
+    path: /home/user-access/.vnc
+    state: directory
+    owner: user-access
+    group: user-access
+    mode: '0700'
+
+- name: Create the trainee XDG configuration directory
+  ansible.builtin.file:
+    path: /home/user-access/.config
+    state: directory
+    owner: user-access
+    group: user-access
+    mode: '0700'
+
+- name: Create the modern TigerVNC configuration directory
+  ansible.builtin.file:
+    path: /home/user-access/.config/tigervnc
+    state: directory
+    owner: user-access
+    group: user-access
+    mode: '0700'
+
+- name: Store the private VNC password
+  become: true
+  become_user: user-access
+  ansible.builtin.command:
+    argv: [/usr/bin/python3, /usr/local/libexec/fashion-set-vnc-password]
+    stdin: '{{ fashion_gui_passwords[inventory_hostname] }}'
+  register: fashion_vnc_password_result
+  changed_when: fashion_vnc_password_result.stdout == 'changed'
+  no_log: true
+
+- name: Create the trainee desktop directory
+  ansible.builtin.file:
+    path: /home/user-access/Desktop
+    state: directory
+    owner: user-access
+    group: user-access
+    mode: '0700'
+
+- name: Add the shop shortcut to the desktop
+  ansible.builtin.copy:
+    dest: /home/user-access/Desktop/shop.desktop
+    owner: user-access
+    group: user-access
+    mode: '0700'
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Name=Meko Atelier - {{ inventory_hostname }}
+      Exec=firefox-esr http://127.0.0.1/
+      Icon=web-browser
+      Terminal=false
+
+- name: Install the unprivileged desktop service
+  ansible.builtin.template:
+    src: '{{ playbook_dir }}/files/fashion-desktop.service'
+    dest: /etc/systemd/system/fashion-desktop.service
+    owner: root
+    group: root
+    mode: '0644'
+  register: fashion_desktop_unit
+
+- name: Identify the current VNC listener without stopping it
+  ansible.builtin.command:
+    argv: [/usr/bin/python3, /usr/local/libexec/fashion-vnc-listener, '--port', '{{ fashion_vnc_port | default(5900) | int }}']
+    stdin: "{{ fashion_vnc_replace_units | default(['xvnc.socket', 'vncserver.socket', 'tigervnc.socket', 'x11vnc.socket', 'lightdm.service', 'x11vnc.service']) | to_json }}"
+  register: fashion_vnc_listener_result
+  changed_when: false
+
+- name: Keep the verified VNC migration plan
+  ansible.builtin.set_fact:
+    fashion_vnc_listener_plan: '{{ fashion_vnc_listener_result.stdout | from_json }}'
+
+- name: Refuse to replace an unknown or protected listener
+  ansible.builtin.assert:
+    that:
+      - fashion_vnc_listener_plan.unknown | length == 0
+    fail_msg: 'VNC port owner requires review: {{ fashion_vnc_listener_plan.unknown }}. No service has been stopped.'
+
+- name: Start and verify the desktop with failure diagnostics
+  block:
+    - name: Remember the startup policy of verified native GUI services
+      ansible.builtin.command:
+        argv: [/usr/bin/systemctl, is-enabled, '{{ item }}']
+      loop: '{{ fashion_vnc_listener_plan.stop_units }}'
+      register: fashion_native_vnc_policy
+      changed_when: false
+      failed_when: false
+
+    - name: Stop only verified native VNC services
+      ansible.builtin.systemd:
+        name: '{{ item }}'
+        state: stopped
+        enabled: false
+      loop: '{{ fashion_vnc_listener_plan.stop_units }}'
+      register: fashion_native_vnc_stopped
+
+    - name: Require the VNC port to be free on first start
+      ansible.builtin.wait_for:
+        host: 127.0.0.1
+        port: '{{ fashion_vnc_port | default(5900) | int }}'
+        state: stopped
+        timeout: 3
+      when: not fashion_vnc_listener_plan.own_listener
+
+    - name: Start the desktop service
+      ansible.builtin.systemd:
+        name: fashion-desktop
+        daemon_reload: true
+        enabled: true
+        state: "{{ 'restarted' if (fashion_desktop_helpers.changed or fashion_vnc_password_result.changed or fashion_desktop_unit.changed) else 'started' }}"
+
+    - name: Verify the VNC listener
+      ansible.builtin.wait_for:
+        host: 127.0.0.1
+        port: '{{ fashion_vnc_port | default(5900) | int }}'
+        search_regex: '^RFB '
+        timeout: 60
+
+    - name: Verify the XFCE desktop session
+      ansible.builtin.command:
+        argv: [/usr/bin/pgrep, '-u', user-access, '-x', xfce4-session]
+      register: fashion_xfce_session
+      changed_when: false
+      retries: 15
+      delay: 2
+      until: fashion_xfce_session.rc == 0
+
+    - name: Authenticate VNC and receive a desktop frame
+      ansible.builtin.command:
+        argv: [/usr/bin/python3, /usr/local/libexec/fashion-check-vnc, '--port', '{{ fashion_vnc_port | default(5900) | int }}']
+        stdin: '{{ fashion_gui_passwords[inventory_hostname] }}'
+      register: fashion_vnc_frame
+      changed_when: false
+      retries: 3
+      delay: 3
+      until: fashion_vnc_frame.rc == 0
+      no_log: true
+    - name: Authenticate VNC from gateway and receive a desktop frame
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/python3
+          - '-c'
+          - "{{ lookup('ansible.builtin.file', playbook_dir + '/files/check-vnc.py') }}"
+          - '--host'
+          - '{{ fashion_team_addresses[inventory_hostname] }}'
+          - '--port'
+          - '{{ fashion_vnc_port | default(5900) | int }}'
+        stdin: '{{ fashion_gui_passwords[inventory_hostname] }}'
+      delegate_to: gateway
+      become: false
+      register: fashion_gateway_frame
+      changed_when: false
+      retries: 3
+      delay: 3
+      until: fashion_gateway_frame.rc == 0
+      no_log: true
+  rescue:
+    - name: Read desktop systemd failure details
+      ansible.builtin.command:
+        argv: [/usr/bin/systemctl, show, fashion-desktop, '--property=Result,ActiveState,ExecMainStatus,ExecStartPre']
+      register: fashion_desktop_failure
+      changed_when: false
+      failed_when: false
+
+    - name: Read recent desktop journal
+      ansible.builtin.command:
+        argv: [/usr/bin/journalctl, '-u', fashion-desktop, '-n', '80', '--no-pager', '-o', cat]
+      register: fashion_desktop_journal
+      changed_when: false
+      failed_when: false
+
+    - name: Stop the failed lab GUI before restoring the native listener
+      ansible.builtin.systemd:
+        name: fashion-desktop
+        state: stopped
+      when: fashion_native_vnc_stopped is defined and fashion_native_vnc_stopped.changed
+      failed_when: false
+
+    - name: Restore the verified native GUI services after a failed migration
+      ansible.builtin.systemd:
+        name: '{{ item.item }}'
+        state: started
+        enabled: '{{ true if (item.stdout | trim == "enabled") else omit }}'
+      loop: '{{ fashion_native_vnc_policy.results | default([]) }}'
+      register: fashion_native_vnc_restore
+      failed_when: false
+
+    - name: Explain the desktop failure without hiding it
+      ansible.builtin.fail:
+        msg: |
+          Desktop startup or verification failed on {{ inventory_hostname }}.
+          {{ fashion_desktop_failure.stdout | default('No systemd status available') }}
+          Recent journal:
+          {{ fashion_desktop_journal.stdout | default('No journal available') }}
+          VNC authentication/frame check: {{ fashion_vnc_frame.stderr | default('Not reached') }}
+          Gateway authentication/frame: {{ fashion_gateway_frame.stderr | default('Not reached') }}
+          Native GUI rollback: {{ fashion_native_vnc_restore.results | default([]) | map(attribute='item.item') | list }}.
+          Review the restore task results if a native GUI service did not restart.
+          This GUI step runs before web deployment and can also be invoked independently.
+
+- name: Install the gateway VNC probe runtime
+  ansible.builtin.apt:
+    name: [python3, python3-pycryptodome]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  delegate_to: gateway
+  become: true
+  run_once: true
+
+- name: Verify the external VNC path without rolling back a healthy desktop
+  block:
+    - name: Verify VNC is reachable over the sandbox network
+      ansible.builtin.wait_for:
+        host: '{{ fashion_team_addresses[inventory_hostname] }}'
+        port: '{{ fashion_vnc_port | default(5900) | int }}'
+        search_regex: '^RFB '
+        timeout: 30
+      delegate_to: gateway
+      become: false
+
+    - name: Authenticate VNC from gateway and receive a desktop frame
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/python3
+          - '-c'
+          - "{{ lookup('ansible.builtin.file', playbook_dir + '/files/check-vnc.py') }}"
+          - '--host'
+          - '{{ fashion_team_addresses[inventory_hostname] }}'
+          - '--port'
+          - '{{ fashion_vnc_port | default(5900) | int }}'
+        stdin: '{{ fashion_gui_passwords[inventory_hostname] }}'
+      delegate_to: gateway
+      become: false
+      register: fashion_gateway_frame
+      changed_when: false
+      retries: 3
+      delay: 3
+      until: fashion_gateway_frame.rc == 0
+      no_log: true
+  rescue:
+    - name: Report network failure while retaining the verified desktop
+      ansible.builtin.fail:
+        msg: >-
+          VNC authentication and framebuffer work locally on {{ inventory_hostname }}.
+          The gateway-to-team VNC check failed; the desktop has been left running.
+          Check routing, firewall, port, and the actual guacd connection target.
+          Gateway probe: {{ fashion_gateway_frame.stderr | default('TCP/banner check failed before authentication') }}

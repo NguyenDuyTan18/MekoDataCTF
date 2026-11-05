@@ -1,0 +1,19 @@
+[Unit]
+Description=Fashion desktop WebSocket bridge for Apache
+After=network.target fashion-desktop.service
+Requires=fashion-desktop.service
+
+[Service]
+Type=simple
+User=user-access
+Group=user-access
+ExecStart=/usr/bin/websockify 127.0.0.1:6080 127.0.0.1:{{ fashion_vnc_port | default(5900) | int }}
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

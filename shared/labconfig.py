@@ -16,7 +16,8 @@ def load(lab=None):
     for team in config['teams']:
         team.setdefault('host', team['name'])
     # Relative to the workspace root; $MEKO_SSH_CONFIG overrides for another machine.
-    config['ssh_config'] = str(WORKSPACE / os.environ.get('MEKO_SSH_CONFIG', config['ssh_config']))
+    # Dấu / vì ssh của Git làm mất dấu \ khi truyền đường dẫn cho ProxyJump.
+    config['ssh_config'] = (WORKSPACE / os.environ.get('MEKO_SSH_CONFIG', config['ssh_config'])).as_posix()
     return config
 
 

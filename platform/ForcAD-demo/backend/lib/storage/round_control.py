@@ -47,9 +47,10 @@ def set_enabled(enabled):
                     raise ResetUnavailable('Cuộc thi đã đóng hoặc đang tái tạo; hoàn tất quy trình lưu hồ sơ trước khi bắt đầu mới.')
                 if s['phase'] == 'finished':
                     raise ResetUnavailable('Round 1 đã kết thúc. Round 2 chưa triển khai.')
-                curs.execute("SELECT COUNT(*) FROM Tasks WHERE active AND checker LIKE '/checkers/round1/%'")
-                if curs.fetchone()[0] != 3:
-                    raise ResetUnavailable('Round 1 cần đủ ba task IDOR, SQLi, Upload.')
+                lab = round1.profile()
+                curs.execute('SELECT COUNT(*) FROM Tasks WHERE active AND checker LIKE %s', (lab['prefix'] + '%',))
+                if curs.fetchone()[0] != len(lab['tasks']):
+                    raise ResetUnavailable('Cuộc thi cần đủ task: ' + ', '.join(t.upper() for t in lab['tasks']) + '.')
                 curs.execute("UPDATE MekodataRoundControl SET enabled=true,updated_at=now() WHERE id=1 AND NOT resetting AND NOT EXISTS (SELECT 1 FROM MekodataRound1 WHERE id=1 AND phase IN ('archived','recreating'))")
                 if not curs.rowcount:
                     conn.rollback()
