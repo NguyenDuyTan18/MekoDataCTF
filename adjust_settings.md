@@ -38,7 +38,7 @@ Tài liệu này chỉ ra **chức năng nào được cấu hình ở đâu** t
 | **Số lượng đội** | Nhiều tầng: ForcAD, sandbox, lab, checker, bản đồ | [8.1](#81-thay-đổi-số-lượng-đội) |
 | Thời lượng tick, số tick Round 1 | `platform/ForcAD-demo/backend/lib/storage/round1.py` | [4.4](#44-round-1-3-task-ctf-attackdefense) |
 | Luật điểm Attack/Defense/SLA thật | `platform/ForcAD-demo/backend/lib/storage/round1.py` | [4.4](#44-round-1-3-task-ctf-attackdefense) |
-| Chú giải luật điểm trên bản đồ (+100…) | `platform/MekoDataCTF_Website/public/js/world.js` → `RULES` | [3.7](#37-world-arena--scoreboard) |
+| Chú giải luật điểm trên thẻ scoreboard (+100…) | `platform/MekoDataCTF_Website/public/js/scoreboard-ui.js` → `RULES` | [3.7](#37-world-arena--scoreboard) |
 | Cổng scoreboard ForcAD (18080) | `platform/ForcAD-demo/docker-compose.yml` | [4.2](#42-docker-và-cổng) |
 | Mật khẩu admin ForcAD | 🔒 `platform/ForcAD-demo/config.yml` → `admin.*` | [4.1](#41-forcad-democonfigyml) |
 | Màu trạng thái UP/DOWN… trên bảng điểm ForcAD | `platform/ForcAD-demo/front/src/config/index.js` | [4.7](#47-giao-diện-bảng-điểm-forcad-vue) |
@@ -165,7 +165,7 @@ Chạy lại sau khi: thêm đội trên ForcAD, cấp token mới, đổi "Tên
 | Bảng màu, font, bo góc trang công khai | `public/css/style.css` → `:root` (`--river-*`, `--rice-*`, `--sun-*`, `--radius`, `--font`, `--mono`) |
 | Ảnh nền tòa ATL | `public/images/ctu-atl.jpg` (≈1920×1080); dự phòng `.png`/`.webp`/`.svg` theo thứ tự trong `style.css` → `.site-bg` |
 | Logo / favicon | `public/images/favicon.svg`; scoreboard dùng `public/images/world.svg` |
-| Chỉ hỗ trợ desktop: bề ngang tối thiểu | `public/css/style.css` → `body { min-width: 1200px }`; `admin.css` → `.admin-body { min-width: 1180px }`; `world.css` → `.arena.war { min-width: 1080px }` |
+| Chỉ hỗ trợ desktop: bề ngang tối thiểu | `public/css/style.css` → `body { min-width: 1200px }`; `admin.css` → `.admin-body { min-width: 1180px }`. Trang `/scoreboard` không dùng các file này: giao diện tự co theo màn hình |
 | Viewport | `views/layouts/main.ejs`, `views/layouts/admin.ejs` → `<meta name="viewport" content="width=1280">` |
 | Giao diện khu quản trị (sidebar, thẻ, bảng, form) | `views/layouts/admin.ejs`, `public/css/admin.css` (token màu ở `.admin-body { --brand…; --gold…; }`) |
 | Thứ tự/biểu tượng menu quản trị | `views/layouts/admin.ejs` → mảng `nav`, `icons` |
@@ -187,20 +187,20 @@ Lưu ý: CSP chặn `style="..."` và `<script>` nội tuyến — luôn dùng c
 
 **Trình duyệt** — `public/js/arena.js`: hỏi lại mỗi 3000 ms (tab ẩn 15000 ms); SSE lỗi 3 lần liên tiếp thì chuyển sang AJAX.
 
-**Hiển thị bản đồ** — `public/js/world.js`:
+**Hiển thị** — `public/js/scoreboard-ui.js` và `public/arena-ui/` (mô tả thay đổi: [docs/SCOREBOARD-GIAO-DIEN-DASHBOARD.md](docs/SCOREBOARD-GIAO-DIEN-DASHBOARD.md)):
 
 | Nội dung | Hằng số / vị trí | Hiện tại |
 |---|---|---|
-| Chú giải luật điểm | `RULES` | `{ flag: 100, sla: 100, down: 100 }` — **chỉ là chữ chú giải**, điểm thật do ForcAD tính (xem 4.4). |
-| Màu từng đội | `COLORS` | 12 màu, đội thứ 13 trở đi lặp lại. |
-| Ngưỡng "nhiều đội" (thu nhỏ linh thú/lãnh thổ) | `layoutTeams()` → `teams.length > 8` | > 8 đội; bán kính lãnh thổ 104 → 76. |
-| Số đạn tối đa mỗi lần cập nhật | `slice(-12)` | 12. |
-| Số điểm lấp lánh mặt biển | `sparkles()` → `i < 90` | 90. |
-| Cỡ linh thú | `public/css/world.css` → `--emb` | 8cqi (≤ 8 đội), 5.6cqi (> 8 đội). |
-| 4 căn cứ hiển thị trước khi có dữ liệu | `views/scoreboard.ejs` → `defaultTeams` | Team01–Team04. |
-| Hiệu ứng động mặc định | Nút "Hiệu ứng động" trên trang | Theo `prefers-reduced-motion` của máy, nhớ trong `localStorage`. |
+| Chú giải luật điểm | `scoreboard-ui.js` → `RULES` | `{ flag: 100, sla: 100, down: 100 }` — **chỉ là chữ chú giải**, điểm thật do ForcAD tính (xem 4.4). |
+| Số đòn tối đa mỗi lần cập nhật | `scoreboard-ui.js` → `MAX_FX` | 12. |
+| Chữ điểm khi bắn trên sân đấu | `arena3d/scene.js`, `arena.js` → `'+1 ATK'`, `'−1 DEF'` | Khớp +1/−1 của `record_attack`; đổi backend thì sửa theo. |
+| Tàu và màu từng đội | `arena3d/scene.js` → `SHIPS` | 3 tàu, đội thứ 4 trở đi lặp lại. |
+| Vị trí tàu | `arena3d/scene.js` → `SLOTS` | 7 vị trí, đội thứ 8 trở đi lặp lại. |
+| Đội hiển thị trước khi có dữ liệu | `arena3d/scene.js` → lệnh `syncTeams([...])` trước `ResizeObserver` | Team 01–Team 03. |
+| Tên lỗ hổng trên sân đấu | `arena3d/scene.js`, `arena.js` → `TASK_LABEL` | Của Meko Boutique; lab khác hiện tên service gốc. |
+| Chọn sân đấu 3D hay 2D | `arena3d/main.js` | 3D khi rộng từ 900 px và có WebGL2; `?arena=2d` ép bản 2D. |
 
-**Bản đồ & linh thú:**
+**Bản đồ & linh thú:** trang `/scoreboard` hiện không hiển thị phần này. Bảng dưới chỉ áp dụng khi quay về giao diện cũ.
 
 | Nội dung | Nơi chỉnh | Ghi chú |
 |---|---|---|
@@ -472,7 +472,7 @@ Số đội **không** nằm ở một chỗ. Hiện cả hệ thống được 
 ### 8.3 Đổi luật điểm
 
 - **Điểm thật** (được cộng/trừ trong DB): `platform/ForcAD-demo/backend/lib/storage/round1.py` → `record_attack` (attack/defense) và đoạn ghi `MekodataSLA` (SLA). Điểm health-only: `platform/ForcAD-demo/backend/lib/storage/tasks.py`.
-- **Chú giải trên bản đồ** (+100 / −100 × số đội còn lại): `platform/MekoDataCTF_Website/public/js/world.js` → `RULES`. Số nổi trên bản đồ luôn là chênh lệch điểm thật lấy từ ForcAD, nên phải sửa backend thì số mới khớp chú giải.
+- **Chú giải trên thẻ scoreboard** (+100 / −100 × số đội còn lại): `platform/MekoDataCTF_Website/public/js/scoreboard-ui.js` → `RULES`. Số trên sân đấu theo điểm thật (+1/−1, SLA theo chênh lệch từ ForcAD), nên phải sửa backend thì số mới khớp chú giải. Đổi điểm tấn công thì sửa cả `'+1 ATK'`, `'−1 DEF'` trong `public/arena-ui/`.
 
 ### 8.4 Mở/đóng đăng ký, đổi lịch thi
 
@@ -528,7 +528,7 @@ docker compose up -d --no-deps nginx
 |---|---|---|
 | Giới hạn tổng số đội được đăng ký trên website | Không có giới hạn | `controllers/authController.js` (`register`) hoặc `controllers/teamController.js` (`save`) |
 | Đổi số tick, thời lượng tick Round 1 qua giao diện | Viết cứng | `platform/ForcAD-demo/backend/lib/storage/round1.py`, `backend/services/api/views.py` |
-| Luật điểm 100 / phạt theo số đội | Backend vẫn tính +1/−1/+1; 100 chỉ là chú giải | `round1.py` (`record_attack`, SLA), `public/js/world.js` (`RULES`) |
+| Luật điểm 100 / phạt theo số đội | Backend vẫn tính +1/−1/+1; 100 chỉ là chú giải | `round1.py` (`record_attack`, SLA), `public/js/scoreboard-ui.js` (`RULES`) |
 | Tự chạy Round 2 | Chưa có | `round1.py` |
 | Số đội khác 4 | Viết cứng ở nhiều nơi | Xem 8.1 |
 | Đội trưởng tự đổi mật khẩu / quên mật khẩu | Chưa có | `controllers/authController.js`, `routes/auth.js` |

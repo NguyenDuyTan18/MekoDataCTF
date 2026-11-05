@@ -36,6 +36,8 @@ app.use(
         'style-src': ["'self'", 'https://fonts.googleapis.com'],
         'font-src': ["'self'", 'https://fonts.gstatic.com'],
         'img-src': ["'self'", 'data:'],
+        // HTTP qua IP LAN: giữ chỉ thị này thì trình duyệt ép CSS/JS sang HTTPS và trang vỡ.
+        'upgrade-insecure-requests': isProd ? [] : null,
       },
     },
   })

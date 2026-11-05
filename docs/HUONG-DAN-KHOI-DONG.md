@@ -6,7 +6,7 @@ Tài liệu dành cho Windows/PowerShell, theo cấu trúc mã nguồn hiện t�
 
 | Thành phần | Chạy ở đâu / bằng gì | Kết quả |
 |---|---|---|
-| Website MekoDataCTF | Windows, `npm start` chạy `app.js` | `http://localhost:3000`: giới thiệu, đăng ký/đăng nhập, quản lý đội; `/admin` cho BTC; `/scoreboard` xem World Arena và nộp flag. Dữ liệu SQLite ở `platform/MekoDataCTF_Website/data/mekodata.db`. |
+| Website MekoDataCTF | Windows, `npm start` chạy `app.js` | `http://localhost:3000`: giới thiệu, đăng ký/đăng nhập, quản lý đội; `/admin` cho BTC; `/scoreboard` xem bảng điểm, sân đấu và nộp flag. Dữ liệu SQLite ở `platform/MekoDataCTF_Website/data/mekodata.db`. |
 | ForcAD | Docker Desktop, `docker compose up -d` | `http://127.0.0.1:18080/`: dashboard và điều khiển round; `/admin/`: quản trị ForcAD; `/flower/`: theo dõi worker; `/submit.html`: trang nộp flag riêng. |
 | Collector | Windows, `python platform/ForcAD-demo/collect_checker.py` | Tiến trình nền trong terminal, chuyển yêu cầu kiểm tra của ForcAD qua SSH tới VM checker; không mở trang web riêng. |
 | Lab Round 1 | Các VM CyberRange | Bốn web lab tại `http://10.80.0.11` đến `http://10.80.0.14`, cổng 80; máy checker kiểm tra dịch vụ và đặt/đọc flag qua agent. Chỉ truy cập được khi có đường mạng tới lab. |
@@ -129,43 +129,125 @@ npm start
 
 `seed` tạo/cập nhật tài khoản BTC và nạp nội dung mặc định khi cần. Chạy lại sẽ cập nhật mật khẩu theo `.env`; không cần seed mỗi lần bật website. `npm start` chạy `app.js` và giữ terminal hoạt động; khi phát triển có thể dùng `npm run dev` thay thế.
 
-## 4. Khởi động hằng ngày sau khi đã cài xong
+## 4. Khởi động hằng ngày, từ frontend đến backend
 
-Mở Docker Desktop, bảo đảm sandbox đang bật. Dùng ba terminal PowerShell:
+Áp dụng sau khi đã cài xong mục 3. Lệnh dưới đây dành cho lab **Meko Boutique**; với Round 1, xem cuối mục này.
 
-**Terminal 1 — ForcAD:**
+| Bước | Lớp | Chạy ở đâu | Địa chỉ |
+|---|---|---|---|
+| 1 | Website và scoreboard cho đội | Terminal 1 | `http://localhost:3000` |
+| 2 | Dashboard ForcAD cho BTC | Nginx trong Docker | `http://127.0.0.1:18080` |
+| 3 | Backend ForcAD | Docker | Không mở trang riêng |
+| 4 | Collector | Terminal 3 | Không mở trang riêng |
+| 5 | Lab trên VM | CyberRange | `10.90.0.11`–`10.90.0.13` |
 
-```powershell
-cd C:\Users\Admin\Desktop\MekoData_Ky\atk_def_platform\platform\ForcAD-demo
-docker compose up -d
-docker compose ps -a
-```
+Website có thể bật trước ForcAD: trang báo mất kết nối, rồi tự nối lại và đồng bộ token khi ForcAD lên.
 
-**Terminal 2 — collector, giữ chạy trong suốt buổi thi:**
+**Cách nhanh:** sau khi bật Docker Desktop, chạy `.\KHOI-DONG-LAI-MEKO.bat` ở thư mục gốc. File này làm bước 2–4 rồi mở trang điều khiển. Sau đó vẫn cần làm bước 1, 5, 6 và 7.
 
-```powershell
-cd C:\Users\Admin\Desktop\MekoData_Ky\atk_def_platform
-$env:MEKO_LAB = 'round1'
-python platform/ForcAD-demo/collect_checker.py
-```
+### Bước 1. Website (frontend cho các đội)
 
-Chỉ chạy một collector cho cấu hình này. `MEKO_LAB` mặc định đã là `round1`.
-
-**Terminal 3 — website, giữ chạy trong suốt buổi thi:**
+Mở **Terminal 1** và giữ chạy suốt buổi thi:
 
 ```powershell
 cd C:\Users\Admin\Desktop\MekoData_Ky\atk_def_platform\platform\MekoDataCTF_Website
 npm start
 ```
 
-Sau đó:
+Đúng khi terminal in `MekoDataCTF đang chạy tại http://localhost:3000`. Dòng `Không đồng bộ được: fetch failed` chỉ có nghĩa là ForcAD chưa lên.
 
-1. Mở `http://localhost:3000/` và `http://127.0.0.1:18080/`.
-2. Đăng nhập BTC tại website `/admin`; ở chi tiết từng đội, khai **Tên đội trên ForcAD** là `team01`…`team04` tương ứng. Website tự đồng bộ token khi khởi động, định kỳ và khi đội thay đổi. Có thể xem trước bằng `npm run sync:forcad` trong thư mục website; thêm `-- --apply` để đồng bộ ngay.
-3. Đăng nhập quản trị trên dashboard ForcAD. Với cuộc thi Round 1 mới chưa chuẩn bị, bấm **Chuẩn bị Round 1 (3 task)**, sau đó **Bắt đầu** khi sẵn sàng. Với round đang tạm dừng, kiểm tra trạng thái rồi bấm **Bắt đầu** để tiếp tục, không reset.
-4. Mở `http://localhost:3000/scoreboard` để xem World Arena. Người chơi đăng nhập website bằng tài khoản đội trưởng hoặc token đội để nộp flag.
+Các đội trong LAN truy cập bằng IP máy này. Lấy IP:
 
-**Bật container và mở trang web không đồng nghĩa bắt đầu một lượt thi mới.** Các file `BAT-ROUND.bat`, `DUNG-ROUND.bat`, `TRANG-THAI-ROUND.bat` chỉ mở dashboard; thao tác điều khiển nằm trên giao diện. Nếu database đang lưu round chạy dở, kiểm tra ngay trạng thái sau khi bật lại.
+```powershell
+Get-NetIPConfiguration | Where-Object IPv4DefaultGateway | ForEach-Object { $_.IPv4Address.IPAddress }
+```
+
+Rồi mở `http://<IP>:3000/scoreboard`. Nếu máy khác không vào được, chạy một lần trong PowerShell **Run as administrator**:
+
+```powershell
+New-NetFirewallRule -DisplayName "MekoDataCTF Website 3000" -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow -Profile Private
+```
+
+### Bước 2. Dashboard ForcAD (frontend cho BTC)
+
+Không cần chạy riêng: nginx phục vụ bản dựng sẵn trong `front/dist/` ở bước 3. Chỉ khi sửa mã trong `front/src/` mới dựng lại:
+
+```powershell
+cd C:\Users\Admin\Desktop\MekoData_Ky\atk_def_platform\platform\ForcAD-demo\front
+npm install
+npm run build
+```
+
+### Bước 3. Backend ForcAD
+
+Mở Docker Desktop, đợi Engine chạy, rồi mở **Terminal 2**:
+
+```powershell
+cd C:\Users\Admin\Desktop\MekoData_Ky\atk_def_platform\platform\ForcAD-demo
+docker version
+docker compose up -d --build
+docker compose ps -a
+docker compose exec -T postgres pg_isready -U forcad
+docker compose exec -T ticker python /app/scripts/setup_round1.py
+```
+
+- `docker compose up` bật PostgreSQL, Redis, RabbitMQ, initializer, ticker, Celery, Flower, API, events, HTTP receiver và nginx.
+- Đợi `pg_isready` báo `accepting connections` rồi mới chạy lệnh cuối.
+- `setup_round1.py` cập nhật schema, không bắt đầu thi và không sinh flag.
+
+Kiểm tra API:
+
+```powershell
+curl.exe -s http://127.0.0.1:18080/api/client/teams/
+```
+
+### Bước 4. Collector
+
+Mở **Terminal 3** và giữ chạy suốt buổi thi. Chỉ chạy một collector:
+
+```powershell
+cd C:\Users\Admin\Desktop\MekoData_Ky\atk_def_platform
+$env:MEKO_LAB = 'meko_boutique'
+py platform/ForcAD-demo/collect_checker.py
+```
+
+### Bước 5. Lab trên VM
+
+Bật sandbox trên CyberRange và kết nối mạng tới pool. Từ thư mục gốc:
+
+```powershell
+ssh -F .\ops\pool139\management-config checker "hostname"
+ssh -F .\ops\pool139\management-config team1 "hostname"
+ssh -F .\ops\pool139\management-config team2 "hostname"
+ssh -F .\ops\pool139\management-config team3 "hostname"
+```
+
+Mỗi lệnh phải in tên máy mà không hỏi mật khẩu. Nếu `Connection timed out`, máy này chưa tới được pool, collector sẽ không chấm được service.
+
+### Bước 6. Đồng bộ token đội
+
+Token tự đồng bộ khi website khởi động, mỗi 60 giây và khi đội thay đổi. Để xem đội nào ghép được, mở terminal thứ tư:
+
+```powershell
+cd C:\Users\Admin\Desktop\MekoData_Ky\atk_def_platform\platform\MekoDataCTF_Website
+npm run sync:forcad
+```
+
+Đội ForcAD của lab là `team1`–`team3`. Đội website có tên khác phải được khai **Tên đội trên ForcAD** trong `/admin`.
+
+### Bước 7. Chuẩn bị và bắt đầu round
+
+1. Mở `http://127.0.0.1:18080/` và đăng nhập quản trị.
+2. Nếu đang ở lab khác: bấm **Dừng**, rồi **Đóng và lưu hồ sơ**.
+3. Bấm **Chuẩn bị Meko Boutique (5 task)**. Bước này tự tạo `team1`–`team3` nếu chưa có.
+4. Bấm **Bắt đầu**. Đồng hồ 50 phút chạy và flag mới được sinh từ lúc này.
+5. Mở `http://localhost:3000/scoreboard`. Đội đăng nhập bằng tài khoản đội trưởng hoặc token đội để nộp flag.
+
+**Bật container và mở trang web không có nghĩa là đã bắt đầu một lượt thi mới.** Nếu database đang lưu round chạy dở, kiểm tra trạng thái trên dashboard trước khi bấm **Bắt đầu**.
+
+### Chạy Round 1 thay vì Meko Boutique
+
+Đặt `$env:MEKO_LAB = 'round1'` ở bước 4, kiểm tra SSH bằng `.\ops\pool101\management-config` ở bước 5 và bấm **Chuẩn bị Round 1 (3 task)** ở bước 7. Tên đội trên ForcAD là `team01`–`team04`.
 
 ## 5. Kiểm tra và dừng
 
@@ -188,5 +270,7 @@ Không dùng `control.py reset`, xóa `docker_volumes/postgres/data` hoặc ch�
 - [Đồng bộ token website → ForcAD](DONG-BO-TOKEN-FORCAD.md)
 - [Website: cài đặt và tính năng](../platform/MekoDataCTF_Website/README.md)
 - [Lab Round 1: triển khai, điều khiển và tái tạo](../labs/round1/service/README.md)
+- [Lab Meko Boutique với ForcAD](../labs/meko_boutique/docs/FORCAD.md)
+- [Giao diện dashboard của `/scoreboard`](SCOREBOARD-GIAO-DIEN-DASHBOARD.md)
 
-Tài liệu được đối chiếu với mã nguồn và cấu hình trong repo ngày 03/11/2026; việc viết hướng dẫn không thực hiện khởi động Docker hay thay đổi VM.
+Mục 4 được đối chiếu với mã nguồn và script trong repo ngày 05/11/2026. Lúc viết, Docker Desktop đang tắt và SSH tới pool 139 bị timeout, nên mới chạy thật `npm start` và kiểm tra các trang website; các lệnh Docker, collector và SSH chưa chạy lại trong đợt này.

@@ -19,10 +19,10 @@ Khôi phục nội dung mặc định: `npm run seed -- --reset-content`.
 
 ## Chỉ hỗ trợ desktop
 
-Toàn bộ website (trang công khai, khu quản trị, World Arena) chỉ nhắm **màn hình desktop**:
+Website (trang công khai, khu quản trị) chỉ nhắm **màn hình desktop**. Trang `/scoreboard` là ngoại lệ, có layout riêng và tự co theo màn hình:
 
 - `views/layouts/main.ejs` và `views/layouts/admin.ejs` đặt `<meta name="viewport" content="width=1280">`, nên điện thoại thu nhỏ trang thay vì xếp lại bố cục.
-- `body { min-width: 1200px }` trong `style.css`; khu quản trị 1180px, bản đồ arena 1080px.
+- `body { min-width: 1200px }` trong `style.css`; khu quản trị 1180px.
 - `style.css` không còn media query cho điện thoại/tablet, cũng không còn menu hamburger (`.nav-toggle`) — thanh điều hướng luôn hiện đầy đủ. Chỉ giữ `@media (prefers-reduced-motion: reduce)` vì đây là tùy chọn trợ năng.
 - Khi thêm giao diện mới, không cần viết breakpoint cho điện thoại.
 
@@ -81,7 +81,10 @@ Chạy ForcAD trước, rồi `npm start` website và mở `http://localhost:300
 - Chỉ chuyển tiếp danh sách trường công khai cố định; không trả flag, token hay dữ liệu checker riêng. `/scoreboard/data/{tick-status,teams,arena}` vẫn giữ để tương thích.
 - Nộp flag qua `POST /scoreboard/submit` (AJAX, CSRF của website), server chuyển tiếp tới PUT `/flags/` của ForcAD. Token chỉ nằm trong input và body/header.
 
-### Bản đồ & linh thú
+### Giao diện
+`/scoreboard` dùng giao diện dashboard tàu vũ trụ ở `public/arena-ui/` và `public/js/scoreboard-ui.js`. Chi tiết: [docs/SCOREBOARD-GIAO-DIEN-DASHBOARD.md](../../docs/SCOREBOARD-GIAO-DIEN-DASHBOARD.md).
+
+### Bản đồ & linh thú (giao diện cũ, không còn hiển thị)
 - **Nền 4K dựng sẵn**: `views/partials/map-terrain.ejs` (hình học trong `config/arenaMap.js`) được dựng thành `public/images/map/terrain-{1280,1920,2560,3840}.jpg` và `sea-mask.png` bằng `npm run bake:map` (dev: `@resvg/resvg-js`, `jpeg-js`). Trình duyệt chọn ảnh theo kích thước × mật độ điểm ảnh; không còn bộ lọc SVG nặng chạy lúc xem. Chỉ cần bake lại khi đổi hình học bản đồ.
 - Lớp động phía trên: sóng và lấp lánh (che phần đất bằng `sea-mask.png`), tia nắng, mây, radar, lãnh thổ từng đội, căn cứ, đạn.
 - **12 con giáp Việt Nam** (`config/zodiac.js`, ảnh `public/images/zodiac/`, Microsoft Fluent Emoji 3D — MIT, xem `LICENSE.txt` trong thư mục ảnh): Tý–Chuột, Sửu–Trâu, Dần–Hổ, Mão–Mèo, Thìn–Rồng, Tỵ–Rắn, Ngọ–Ngựa, Mùi–Dê, Thân–Khỉ, Dậu–Gà, Tuất–Chó, Hợi–Lợn.

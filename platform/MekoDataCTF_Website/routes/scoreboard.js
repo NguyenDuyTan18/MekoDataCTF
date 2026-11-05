@@ -10,7 +10,7 @@ router.get('/scoreboard', (req,res) => {
  // Trình duyệt khớp arenaKeys với danh sách đội ForcAD để khóa ô "Đội của bạn".
  const session = sessionTeam(req);
  const submitTeam = session ? {name:session.team.name, arenaKeys:Team.forcadCandidates(session.team), forcadName:Team.forcadNameOf(session.team)} : null;
- res.render('scoreboard',{title:'WORLD ARENA',worldGamePage:true,arenaMap,zodiac:arena.ZODIAC,submitTeam});
+ res.render('scoreboard',{layout:false,title:'WORLD ARENA',worldGamePage:true,arenaMap,zodiac:arena.ZODIAC,submitTeam});
 });
 // Trạng thái gộp (điểm, đội + con giáp, service, capture, checker): SSE đẩy trực tiếp, JSON + ETag làm dự phòng.
 router.get('/scoreboard/stream', (req,res) => arena.subscribe(req,res));
