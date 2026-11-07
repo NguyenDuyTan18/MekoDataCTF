@@ -1,6 +1,6 @@
 # Nhật ký thay đổi: Meko Boutique và ForcAD
 
-Cập nhật: 05/11/2026. Tài liệu ghi lại những gì đã đổi để nối lab Meko Boutique vào ForcAD,
+Cập nhật: 07/11/2026. Tài liệu ghi lại những gì đã đổi để nối lab Meko Boutique vào ForcAD,
 kết quả rà soát tick, và phần chưa được kiểm chứng. Chưa có thay đổi nào được commit.
 
 ## 1. Tick hoạt động thế nào
@@ -87,6 +87,34 @@ Sao từ `labs/fashion_shop`, source của thư mục đó không bị sửa.
 Chế độ health-only không đổi: vẫn 2 round × 15 tick, trần 30 tick.
 Đã sửa `labs/round1/service/README.md` và `test_round1.py` cho khớp.
 
+## 4b. Đổi cách chấm điểm sang công thức RuCTFE 2012 (07/11/2026)
+
+Thay toàn bộ cách tính điểm trong `platform/ForcAD-demo/backend/lib/storage/round1.py` theo công thức RuCTFE 2012.
+Trước đó: mỗi flag cướp được +1 cho đội tấn công, −1 cho đội bị mất; tổng = `attack − lost + sla`, không chuẩn hóa.
+
+**Điểm tấn công — `record_attack()`:**
+- Đội nộp flag **đầu tiên +2**, mọi đội nộp **cùng flag đó sau đó +1**.
+- First-blood được xác định bằng `COUNT(*) FROM StolenFlags WHERE flag_id=…` ngay sau khi INSERT. An toàn tương tranh
+  vì hàng `TeamTasks` của nạn nhân đã bị khóa `FOR UPDATE` phía trên, nên mọi đội tấn công cùng một flag bị tuần tự hóa.
+- **Bỏ hình phạt −1** khi mất flag (`victim_delta = 0`); cột `lost` vẫn tăng để thống kê nhưng không trừ điểm.
+
+**Điểm phòng thủ + chuẩn hóa — `scores()`:** tính lại hoàn toàn từ dữ liệu thô, không đọc `TeamTasks.score`.
+- Attack thô = số flag cướp được + số lần first-blood.
+- Defense thô = số flag **bảo vệ được** (`MekodataPlacements` có `flag_id` nhưng không nằm trong `StolenFlags`) **+ điểm SLA**.
+- **Chuẩn hóa về 100 chỉ ở bước hiển thị**: `attack_i/attack_max*100`, `defense_i/defense_max*100`,
+  `total = attack_norm + defense_norm`. Database vẫn giữ nguyên số đếm thô.
+
+| File | Thay đổi |
+|---|---|
+| `backend/lib/storage/round1.py` → `record_attack()` | first-blood +2/+1; bỏ phạt −1; `victim_delta=0`; thông điệp nêu first blood |
+| `backend/lib/storage/round1.py` → `scores()` | tính attack/defense/first-blood từ `StolenFlags`, `MekodataPlacements`, `MekodataSLA`; chuẩn hóa 100 khi đọc |
+
+**Chưa làm:** văn bản "Luật điểm" trên website vẫn ghi +100/−100 — `platform/MekoDataCTF_Website/public/js/scoreboard-ui.js`
+(`RULES = {flag:100, sla:100, down:100}`) và `views/scoreboard.ejs` (card ATTACK). Cần cập nhật riêng cho khớp engine.
+
+**Kiểm chứng:** mới kiểm cú pháp Python và xác nhận `MekodataPlacements.flag_id` được ghi sau mỗi PUT (dòng 241).
+Chưa chạy end-to-end vì Docker đang tắt.
+
 ## 5. Trạng thái kiểm chứng
 
 | Hạng mục | Trạng thái |
@@ -99,7 +127,7 @@ Chế độ health-only không đổi: vẫn 2 round × 15 tick, trần 30 tick.
 | Checker ngoài trong Docker → collector → SSH → agent → web đội, pool 139 | 15/15 đạt 05/11/2026: `check`, `put`, `get`, và `get` sai flag trả CORRUPT; trung bình 2,5 giây mỗi lệnh |
 | `leave_archived_lab()` và `prepare("meko_boutique")` trên database thật | Đạt 05/11/2026: 5 task, 3 đội, `round_time` 300 |
 | Tick thật trên pool 139 | Đạt từ tick 3 ngày 05/11/2026: 15/15 flag, 15/15 task UP, SLA +1 cho 3 đội |
-| Nộp flag của đội khác và chấm +1/-1 | **Chưa chạy** |
+| Nộp flag của đội khác và chấm điểm RuCTFE (first-blood +2/+1, defense + chuẩn hóa 100) | **Chưa chạy** — mới sửa 07/11/2026, chỉ kiểm cú pháp |
 | Nút trên trình duyệt | **Chưa chạy** |
 | `labs/meko_boutique/tests/test_lab.py` | 6 test fail, còn theo cấu trúc cũ; chưa có test khai thác cho cấu trúc mới |
 
@@ -107,4 +135,6 @@ Chế độ health-only không đổi: vẫn 2 round × 15 tick, trần 30 tick.
 
 1. Bật Docker, chạy `test_round1.py`, thử đổi lab.
 2. Chạy thử một round trên pool 139 và theo dõi pha `checking`.
-4. Viết lại `test_lab.py` theo luồng mới.
+3. Chạy thử nộp flag nhiều đội để kiểm điểm RuCTFE: first-blood +2, đội sau +1, defense theo flag bảo vệ được, chuẩn hóa 100 trên `/scoreboard`.
+4. Cập nhật văn bản "Luật điểm" trên website cho khớp công thức mới.
+5. Viết lại `test_lab.py` theo luồng mới.

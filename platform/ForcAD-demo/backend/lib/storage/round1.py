@@ -348,16 +348,71 @@ def pump():
 
 
 def scores():
+    """Bảng điểm theo RuCTFE 2012.
+
+    - Attack thô = số flag cướp được + số lần first-blood (đội đầu +2 = +1 cơ bản thêm +1).
+    - Defense thô = số flag bảo vệ được (đã đặt nhưng không bị cướp) + điểm SLA (service UP).
+    - Chuẩn hóa về 100 CHỈ ở bước hiển thị: attack_i/attack_max*100, defense_i/defense_max*100.
+      DB vẫn giữ nguyên số đếm thô (StolenFlags, MekodataPlacements, MekodataSLA).
+    """
     pattern = checker_pattern()
     with utils.db_cursor(dict_cursor=True) as (_, c):
-        c.execute('''SELECT t.id AS team_id,t.name,COALESCE(s.attack,0) AS attack,
-                  -COALESCE(s.lost,0) AS defense,COALESCE(l.sla,0) AS sla,
-                  COALESCE(s.attack,0)-COALESCE(s.lost,0)+COALESCE(l.sla,0) AS total
-                  FROM Teams t LEFT JOIN (SELECT tt.team_id,SUM(tt.stolen) attack,SUM(tt.lost) lost
-                  FROM TeamTasks tt JOIN Tasks k ON k.id=tt.task_id WHERE k.checker LIKE %s GROUP BY tt.team_id) s ON s.team_id=t.id
-                  LEFT JOIN (SELECT team_id,SUM(points) sla FROM MekodataSLA GROUP BY team_id) l ON l.team_id=t.id
-                  WHERE t.active ORDER BY total DESC,t.name''', (pattern,))
-        return [dict(row) for row in c.fetchall()]
+        c.execute('''
+            WITH lab_flags AS (
+                SELECT f.id AS flag_id
+                FROM Flags f JOIN Tasks k ON k.id = f.task_id
+                WHERE k.checker LIKE %(pattern)s
+            ),
+            first_blood AS (
+                SELECT DISTINCT ON (sf.flag_id) sf.flag_id, sf.attacker_id
+                FROM StolenFlags sf JOIN lab_flags lf ON lf.flag_id = sf.flag_id
+                ORDER BY sf.flag_id, sf.submit_time
+            ),
+            steals AS (
+                SELECT sf.attacker_id AS team_id, COUNT(*) AS n
+                FROM StolenFlags sf JOIN lab_flags lf ON lf.flag_id = sf.flag_id
+                GROUP BY sf.attacker_id
+            ),
+            bloods AS (
+                SELECT attacker_id AS team_id, COUNT(*) AS n
+                FROM first_blood GROUP BY attacker_id
+            ),
+            protected AS (
+                SELECT p.team_id, COUNT(*) AS n
+                FROM MekodataPlacements p JOIN Tasks k ON k.id = p.task_id
+                WHERE k.checker LIKE %(pattern)s AND p.flag_id IS NOT NULL
+                  AND NOT EXISTS (SELECT 1 FROM StolenFlags sf WHERE sf.flag_id = p.flag_id)
+                GROUP BY p.team_id
+            ),
+            sla AS (
+                SELECT team_id, SUM(points) AS n FROM MekodataSLA GROUP BY team_id
+            )
+            SELECT t.id AS team_id, t.name,
+                   COALESCE(st.n,0) + COALESCE(b.n,0) AS attack_raw,
+                   COALESCE(pr.n,0) AS defense_flags,
+                   COALESCE(sl.n,0) AS sla
+            FROM Teams t
+            LEFT JOIN steals st ON st.team_id = t.id
+            LEFT JOIN bloods b ON b.team_id = t.id
+            LEFT JOIN protected pr ON pr.team_id = t.id
+            LEFT JOIN sla sl ON sl.team_id = t.id
+            WHERE t.active
+        ''', {'pattern': pattern})
+        rows = [dict(r) for r in c.fetchall()]
+
+    for r in rows:
+        r['defense_raw'] = r['defense_flags'] + r['sla']
+    attack_max = max((r['attack_raw'] for r in rows), default=0)
+    defense_max = max((r['defense_raw'] for r in rows), default=0)
+    out = []
+    for r in rows:
+        attack = round(r['attack_raw'] / attack_max * 100, 2) if attack_max else 0.0
+        defense = round(r['defense_raw'] / defense_max * 100, 2) if defense_max else 0.0
+        out.append({'team_id': r['team_id'], 'name': r['name'],
+                    'attack': attack, 'defense': defense,
+                    'sla': r['sla'], 'total': round(attack + defense, 2)})
+    out.sort(key=lambda x: (-x['total'], x['name']))
+    return out
 
 
 def record_attack(result, flag):
@@ -382,8 +437,15 @@ def record_attack(result, flag):
             c.execute('INSERT INTO StolenFlags(attacker_id,flag_id) VALUES(%s,%s) ON CONFLICT DO NOTHING RETURNING flag_id', (result.attacker_id, flag.id))
             if c.fetchone() is None:
                 raise FlagExceptionEnum.FLAG_ALREADY_STOLEN
-            c.execute('UPDATE TeamTasks SET stolen=stolen+1,score=score+1 WHERE team_id=%s AND task_id=%s', (result.attacker_id, flag.task_id))
-            c.execute('UPDATE TeamTasks SET lost=lost+1,score=score-1 WHERE team_id=%s AND task_id=%s', (flag.team_id, flag.task_id))
+            # RuCTFE: đội nộp flag đầu tiên +2, mọi đội nộp cùng flag sau đó +1.
+            # Hàng TeamTasks của nạn nhân đã bị khóa FOR UPDATE ở trên nên mọi đội tấn công
+            # cùng một flag bị tuần tự hóa; đếm số dòng của flag ngay sau INSERT là an toàn.
+            c.execute('SELECT COUNT(*) FROM StolenFlags WHERE flag_id=%s', (flag.id,))
+            delta = 2.0 if c.fetchone()[0] == 1 else 1.0
+            c.execute('UPDATE TeamTasks SET stolen=stolen+1,score=score+%s WHERE team_id=%s AND task_id=%s', (delta, result.attacker_id, flag.task_id))
+            # RuCTFE: mất flag KHÔNG bị trừ điểm phòng thủ; chỉ giữ số đếm để thống kê.
+            c.execute('UPDATE TeamTasks SET lost=lost+1 WHERE team_id=%s AND task_id=%s', (flag.team_id, flag.task_id))
+            result.attacker_delta = delta
             conn.commit()
         except Exception:
             conn.rollback()
@@ -391,9 +453,9 @@ def record_attack(result, flag):
     result.submit_ok = True
     result.victim_id = flag.team_id
     result.task_id = flag.task_id
-    result.attacker_delta = 1.0
-    result.victim_delta = -1.0
-    result.message = 'Flag accepted! Attack +1; victim defense -1.'
+    result.victim_delta = 0.0
+    result.message = ('Flag accepted! Attack +2 (first blood!)' if result.attacker_delta >= 2
+                      else 'Flag accepted! Attack +1.')
     storage.game.update_game_state(for_round=state()['tick'])
     return result
 

@@ -1,0 +1,38 @@
+{
+  "final": "C:\\Users\\Admin\\Desktop\\MekoData_Ky\\atk_def_platform\\report\\Quy_trinh_trien_khai_MekoDataCTF_CTU.pptx",
+  "slides": 11,
+  "flow_slides": {
+    "3": {
+      "shapes": 16,
+      "connectors": 11,
+      "attached_ends": 22
+    },
+    "6": {
+      "shapes": 14,
+      "connectors": 5,
+      "attached_ends": 10
+    },
+    "8": {
+      "shapes": 10,
+      "connectors": 4,
+      "attached_ends": 8
+    }
+  },
+  "native_tables": 4,
+  "template": "D:/Subject/LuanVan/Bao_cao_Tuan4_Attack_Defense.pptx",
+  "source_word": "report/Quy_trinh_trien_khai_va_van_hanh_MekoDataCTF.docx",
+  "rendered_by": [
+    "Artifact Tool",
+    "Microsoft PowerPoint"
+  ],
+  "visually_reviewed_all_native_slides": true,
+  "self_evaluation": {
+    "accuracy": 4,
+    "completeness": 5,
+    "clarity": 4,
+    "actionability": 5,
+    "conciseness": 4,
+    "overall": 4.4,
+    "evidence": "11 slides follow actual CTU template; 3 native diagrams and 4 native tables; PowerPoint opened and rendered every slide. Source claims remain limited to the agreed Word report."
+  }
+}

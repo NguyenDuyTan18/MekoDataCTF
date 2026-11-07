@@ -1,0 +1,29 @@
+{
+  "status": "complete",
+  "docx_pages": 8,
+  "pptx_slides": 8,
+  "word_renderer": "Microsoft Word via isolated invisible COM instance",
+  "canonical_renderer_issue": "LibreOffice not installed",
+  "preview_recovery": "Word exported PDF; bundled Poppler rendered pages; all pages inspected",
+  "unchanged_after_title_polish": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "pptx_native_tables": 5,
+  "content_checks": "12 steps, access model, token distinctions, reuse classes",
+  "self_evaluation": {
+    "accuracy": 4,
+    "completeness": 5,
+    "clarity": 4,
+    "actionability": 5,
+    "conciseness": 4,
+    "evidence": "Compared with agreed workflow and source report; 8 Word pages and 8 slides inspected; no deployment performed",
+    "overall": 4.4,
+    "improvements": "Content remains source-based and requires pool-specific acceptance checks; report includes that limitation."
+  }
+}
