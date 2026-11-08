@@ -1,13 +1,11 @@
 const Team = require('../models/Team');
 
-// Đội của phiên hiện tại: đội trưởng (đăng nhập email) hoặc thành viên (đăng nhập token đội).
+// Đội của phiên hiện tại: { team, role: 'captain' | 'member' }, hoặc null nếu chưa vào đội (hoặc là admin).
+// Mọi thành viên đều đăng nhập bằng tài khoản email của riêng mình.
 function sessionTeam(req) {
-  if (req.memberTeam) return { team: req.memberTeam, role: 'member' };
-  if (req.user && req.user.role === 'contestant') {
-    const team = Team.findByUser(req.user.id);
-    if (team) return { team, role: 'captain' };
-  }
-  return null;
+  if (!req.user || req.user.role !== 'contestant') return null;
+  if (req.teamSession === undefined) req.teamSession = Team.findForUser(req.user.id);
+  return req.teamSession;
 }
 
 function requireLogin(req, res, next) {
@@ -16,20 +14,20 @@ function requireLogin(req, res, next) {
   res.redirect(`/login?next=${encodeURIComponent(req.originalUrl)}`);
 }
 
-// Chỉ đội trưởng (tài khoản email) mới được tạo/sửa đội; thành viên token chỉ được xem.
-function requireCaptain(req, res, next) {
-  if (req.user) return next();
-  if (req.memberTeam) {
-    req.flash('error', req.t('team.captainOnly'));
-    return res.redirect('/team');
-  }
-  return requireLogin(req, res, next);
+// Thí sinh (không phải admin) đã đăng nhập.
+function requireContestant(req, res, next) {
+  if (!req.user) return requireLogin(req, res, next);
+  if (req.user.role === 'contestant') return next();
+  res.redirect('/admin');
 }
 
-// Xem trang đội: đội trưởng hoặc thành viên đăng nhập bằng token.
-function requireTeamAccess(req, res, next) {
-  if (req.user || req.memberTeam) return next();
-  return requireLogin(req, res, next);
+// Chỉ đội trưởng được sửa đội, đổi mã mời, xóa thành viên, giải tán đội.
+function requireCaptain(req, res, next) {
+  if (!req.user) return requireLogin(req, res, next);
+  const session = sessionTeam(req);
+  if (session && session.role === 'captain') return next();
+  req.flash('error', req.t('team.captainOnly'));
+  res.redirect('/team');
 }
 
 function requireAdmin(req, res, next) {
@@ -39,15 +37,13 @@ function requireAdmin(req, res, next) {
 }
 
 function requireGuest(req, res, next) {
-  if (req.memberTeam) return res.redirect('/team');
   if (!req.user) return next();
   res.redirect(req.user.role === 'admin' ? '/admin' : '/team');
 }
 
-// Đăng xuất được cho cả tài khoản email lẫn phiên token.
 function requireSession(req, res, next) {
-  if (req.user || req.memberTeam) return next();
+  if (req.user) return next();
   res.redirect('/');
 }
 
-module.exports = { sessionTeam, requireLogin, requireCaptain, requireTeamAccess, requireAdmin, requireGuest, requireSession };
+module.exports = { sessionTeam, requireLogin, requireContestant, requireCaptain, requireAdmin, requireGuest, requireSession };

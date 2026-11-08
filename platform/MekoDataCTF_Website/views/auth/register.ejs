@@ -12,7 +12,15 @@
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <label>
             <span><%= t('auth.email') %></span>
-            <input type="email" name="email" value="<%= email %>" required autocomplete="email" autofocus>
+            <input type="email" name="email" value="<%= form.email %>" required autocomplete="email" autofocus>
+          </label>
+          <label>
+            <span><%= t('team.fullName') %></span>
+            <input type="text" name="fullName" value="<%= form.fullName %>" required minlength="2" maxlength="80" autocomplete="name">
+          </label>
+          <label>
+            <span><%= t('team.studentId') %></span>
+            <input type="text" name="studentId" value="<%= form.studentId %>" required pattern="[A-Za-z0-9]{4,15}" maxlength="15" class="mono" autocomplete="off">
           </label>
           <label>
             <span><%= t('auth.password') %></span>

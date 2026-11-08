@@ -9,7 +9,7 @@ const newToken = () => crypto.randomBytes(8).toString('hex');
 const Team = {
   TOKEN_RE,
 
-  // Đăng nhập thành viên bằng token đội (token 64 bit ngẫu nhiên; chống dò bằng giới hạn số lần thử ở controller).
+  // Vào đội bằng token đội (64 bit ngẫu nhiên; chống dò bằng giới hạn số lần thử ở teamController.join).
   findByToken(token) {
     const value = String(token || '').trim().toLowerCase();
     if (!TOKEN_RE.test(value)) return null;
@@ -17,7 +17,7 @@ const Team = {
     return row ? this.findById(row.id) : null;
   },
 
-  // Cấp token mới (BTC dùng khi token bị lộ). Token cũ mất hiệu lực ngay trên website;
+  // Cấp token mới (BTC dùng khi token bị lộ). Token cũ mất hiệu lực ngay khi nộp flag qua website;
   // cần chạy lại scripts/sync-forcad-tokens.js để ForcAD nhận token mới.
   regenerateToken(id) {
     const token = newToken();
@@ -56,35 +56,52 @@ const Team = {
     return team;
   },
 
-  // Bản rút gọn cho phiên đăng nhập bằng token (chạy ở mọi request nên không nạp thành viên).
+  // Bản rút gọn (không nạp thành viên), dùng ở trang quản trị.
   findBasic(id) {
     return db.prepare('SELECT id, name, token, forcad_name FROM teams WHERE id = ?').get(id);
   },
 
+  // Đội do tài khoản này làm đội trưởng.
   findByUser(userId) {
     const team = db.prepare('SELECT * FROM teams WHERE user_id = ?').get(userId);
     if (team) team.members = Member.listByTeam(team.id);
     return team;
   },
 
+  // Đội của một tài khoản: { team, role: 'captain' | 'member' } hoặc null nếu chưa vào đội nào.
+  findForUser(userId) {
+    const own = db.prepare('SELECT id FROM teams WHERE user_id = ?').get(userId);
+    if (own) return { team: this.findById(own.id), role: 'captain' };
+    const member = Member.findByUser(userId);
+    return member ? { team: this.findById(member.team_id), role: 'member' } : null;
+  },
+
   isNameTaken(name, excludeTeamId = 0) {
     return !!db.prepare('SELECT 1 FROM teams WHERE name = ? AND id != ?').get(name, excludeTeamId);
   },
 
-  createWithMembers: db.transaction((userId, { name, school, phone, members }) => {
+  // Tạo đội: người tạo là đội trưởng và là thành viên đầu tiên.
+  createForCaptain: db.transaction((captain, { name, school, phone }) => {
     const info = db
       .prepare('INSERT INTO teams (user_id, name, school, phone, token) VALUES (?, ?, ?, ?, ?)')
-      .run(userId, name, school, phone, newToken());
-    Member.replaceForTeam(info.lastInsertRowid, members);
+      .run(captain.id, name, school, phone, newToken());
+    Member.addUser(info.lastInsertRowid, captain, true);
     return info.lastInsertRowid;
   }),
 
-  updateWithMembers: db.transaction((teamId, { name, school, phone, members }) => {
+  // Vào đội bằng token đội; kiểm tra sĩ số trong cùng giao dịch để hai người vào cùng lúc không vượt giới hạn.
+  // Trả về null nếu thành công, hoặc mã lỗi 'full'.
+  join: db.transaction((teamId, user, maxMembers) => {
+    if (Member.countByTeam(teamId) >= maxMembers) return 'full';
+    Member.addUser(teamId, user, false);
+    return null;
+  }),
+
+  update(teamId, { name, school, phone }) {
     db.prepare(
       "UPDATE teams SET name = ?, school = ?, phone = ?, updated_at = datetime('now') WHERE id = ?"
     ).run(name, school, phone, teamId);
-    Member.replaceForTeam(teamId, members);
-  }),
+  },
 
   delete(id) {
     db.prepare('DELETE FROM teams WHERE id = ?').run(id);

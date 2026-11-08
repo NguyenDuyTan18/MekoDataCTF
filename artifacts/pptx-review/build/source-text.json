@@ -1,0 +1,680 @@
+[
+  {
+    "slide": 1,
+    "shapes": [
+      {
+        "text": "ĐẠI HỌC CẦN THƠ  / TRƯỜNG CÔNG NGHỆ THÔNG TIN & TRUYỀN THÔNG  / KHOA MẠNG MÁY TÍNH VÀ TRUYỀN THÔNG ",
+        "id": {
+          "id": "2",
+          "name": "Title 1"
+        }
+      },
+      {
+        "text": "Quy trình triển khai và vận hành bài thi / Attack–Defense trên CyberRangeCZ và ForcAD",
+        "id": {
+          "id": "3",
+          "name": "Subtitle 2"
+        }
+      },
+      {
+        "text": "GVHD: TS Ngô Bá Hùng",
+        "id": {
+          "id": "4",
+          "name": "Text Placeholder 3"
+        }
+      },
+      {
+        "text": "Luận văn ngành An toàn thông tin",
+        "id": {
+          "id": "6",
+          "name": "Subtitle 2"
+        }
+      },
+      {
+        "text": "MSSV: B2304080 / Khóa: K49",
+        "id": {
+          "id": "5",
+          "name": "Text Placeholder 3"
+        }
+      },
+      {
+        "text": "Sinh viên thực hiện: Nguyễn Duy Tân ",
+        "id": {
+          "id": "7",
+          "name": "Text Placeholder 3"
+        }
+      }
+    ]
+  },
+  {
+    "slide": 2,
+    "shapes": [
+      {
+        "text": "",
+        "id": {
+          "id": "2",
+          "name": "Rectangle 1"
+        }
+      },
+      {
+        "text": "",
+        "id": {
+          "id": "3",
+          "name": "Rectangle 2"
+        }
+      },
+      {
+        "text": "Nội dung",
+        "id": {
+          "id": "4",
+          "name": "TextBox 3"
+        }
+      },
+      {
+        "text": "1. Quy trình triển khai tổng thể",
+        "id": {
+          "id": "5",
+          "name": "Rectangle 4"
+        }
+      },
+      {
+        "text": "2. Chuẩn bị bài và cấp phát môi trường",
+        "id": {
+          "id": "6",
+          "name": "Rectangle 5"
+        }
+      },
+      {
+        "text": "3. Tích hợp ForcAD và quyền truy cập",
+        "id": {
+          "id": "7",
+          "name": "Rectangle 6"
+        }
+      },
+      {
+        "text": "4. Nghiệm thu và mở cuộc thi",
+        "id": {
+          "id": "8",
+          "name": "Rectangle 7"
+        }
+      },
+      {
+        "text": "5. Phần tái sử dụng và cách bật lại dự án",
+        "id": {
+          "id": "9",
+          "name": "Rectangle 8"
+        }
+      }
+    ]
+  },
+  {
+    "slide": 3,
+    "shapes": [
+      {
+        "text": "",
+        "id": {
+          "id": "2",
+          "name": "Rectangle 1"
+        }
+      },
+      {
+        "text": "",
+        "id": {
+          "id": "3",
+          "name": "Rectangle 2"
+        }
+      },
+      {
+        "text": "Quy trình triển khai tổng thể",
+        "id": {
+          "id": "4",
+          "name": "TextBox 3"
+        }
+      },
+      {
+        "text": "1. Chốt đội / Tên, số lượng và IP",
+        "id": {
+          "id": "5",
+          "name": "Rectangle 4"
+        }
+      },
+      {
+        "text": "2. Soạn gói bài / Ứng dụng và checker",
+        "id": {
+          "id": "6",
+          "name": "Rectangle 5"
+        }
+      },
+      {
+        "text": "3. Soạn cấu hình / Topology và Ansible",
+        "id": {
+          "id": "7",
+          "name": "Rectangle 6"
+        }
+      },
+      {
+        "text": "4. Git và định nghĩa / URL cùng revision",
+        "id": {
+          "id": "8",
+          "name": "Rectangle 7"
+        }
+      },
+      {
+        "text": "5. Tạo pool / Chọn định nghĩa",
+        "id": {
+          "id": "9",
+          "name": "Rectangle 8"
+        }
+      },
+      {
+        "text": "6. Allocate / Tạo VM và cài dịch vụ",
+        "id": {
+          "id": "10",
+          "name": "Rectangle 9"
+        }
+      },
+      {
+        "text": "7. Lấy truy cập / Tách quyền BTC và đội",
+        "id": {
+          "id": "11",
+          "name": "Rectangle 10"
+        }
+      },
+      {
+        "text": "8. Cấu hình ForcAD / Adapter và collector",
+        "id": {
+          "id": "12",
+          "name": "Rectangle 11"
+        }
+      },
+      {
+        "text": "9. Ghép đội / Đồng bộ token",
+        "id": {
+          "id": "13",
+          "name": "Rectangle 12"
+        }
+      },
+      {
+        "text": "10. Thi thử / Kiểm tra chấm điểm",
+        "id": {
+          "id": "14",
+          "name": "Rectangle 13"
+        }
+      },
+      {
+        "text": "11. Training / Xác minh quyền VM",
+        "id": {
+          "id": "15",
+          "name": "Rectangle 14"
+        }
+      },
+      {
+        "text": "12. Mở thi / Bắt đầu round và tick",
+        "id": {
+          "id": "16",
+          "name": "Rectangle 15"
+        }
+      },
+      {
+        "text": "Gói bài → Môi trường → Tích hợp → Nghiệm thu → Mở thi",
+        "id": {
+          "id": "28",
+          "name": "Rectangle 27"
+        }
+      }
+    ]
+  },
+  {
+    "slide": 4,
+    "shapes": [
+      {
+        "text": "",
+        "id": {
+          "id": "2",
+          "name": "Rectangle 1"
+        }
+      },
+      {
+        "text": "",
+        "id": {
+          "id": "3",
+          "name": "Rectangle 2"
+        }
+      },
+      {
+        "text": "Chuẩn bị đội và gói bài",
+        "id": {
+          "id": "4",
+          "name": "TextBox 3"
+        }
+      },
+      {
+        "text": "Checker phải đáp ứng: check · put · get",
+        "id": {
+          "id": "6",
+          "name": "Rectangle 5"
+        }
+      },
+      {
+        "text": "Dùng lại khung; nội dung đề và logic checker được chuẩn bị riêng.",
+        "id": {
+          "id": "7",
+          "name": "Rectangle 6"
+        }
+      }
+    ]
+  },
+  {
+    "slide": 5,
+    "shapes": [
+      {
+        "text": "",
+        "id": {
+          "id": "2",
+          "name": "Rectangle 1"
+        }
+      },
+      {
+        "text": "",
+        "id": {
+          "id": "3",
+          "name": "Rectangle 2"
+        }
+      },
+      {
+        "text": "Git và cấp phát môi trường",
+        "id": {
+          "id": "4",
+          "name": "TextBox 3"
+        }
+      },
+      {
+        "text": "Thay Git không tự cập nhật các VM đang chạy.",
+        "id": {
+          "id": "6",
+          "name": "Rectangle 5"
+        }
+      }
+    ]
+  },
+  {
+    "slide": 6,
+    "shapes": [
+      {
+        "text": "",
+        "id": {
+          "id": "2",
+          "name": "Rectangle 1"
+        }
+      },
+      {
+        "text": "",
+        "id": {
+          "id": "3",
+          "name": "Rectangle 2"
+        }
+      },
+      {
+        "text": "Luồng kết nối ForcAD và website",
+        "id": {
+          "id": "4",
+          "name": "TextBox 3"
+        }
+      },
+      {
+        "text": "ForcAD / Điều phối và tính điểm",
+        "id": {
+          "id": "5",
+          "name": "Rectangle 4"
+        }
+      },
+      {
+        "text": "Adapter và RPC / Wrapper từng task",
+        "id": {
+          "id": "6",
+          "name": "Rectangle 5"
+        }
+      },
+      {
+        "text": "Collector / Chọn đúng MEKO_LAB",
+        "id": {
+          "id": "7",
+          "name": "Rectangle 6"
+        }
+      },
+      {
+        "text": "Website / Đội, nộp flag, bảng điểm",
+        "id": {
+          "id": "8",
+          "name": "Rectangle 7"
+        }
+      },
+      {
+        "text": "Dịch vụ các đội / Dữ liệu riêng từng đội",
+        "id": {
+          "id": "9",
+          "name": "Rectangle 8"
+        }
+      },
+      {
+        "text": "VM checker / Agent và logic kiểm tra",
+        "id": {
+          "id": "10",
+          "name": "Rectangle 9"
+        }
+      },
+      {
+        "text": "API",
+        "id": {
+          "id": "16",
+          "name": "Rectangle 15"
+        }
+      },
+      {
+        "text": "SSH",
+        "id": {
+          "id": "17",
+          "name": "Rectangle 16"
+        }
+      },
+      {
+        "text": "lab.json: đội/IP, task, SSH và lệnh agent",
+        "id": {
+          "id": "18",
+          "name": "Rectangle 17"
+        }
+      },
+      {
+        "text": "Profile: đường dẫn checker, flag, tick và timeout",
+        "id": {
+          "id": "19",
+          "name": "Rectangle 18"
+        }
+      },
+      {
+        "text": "Website: ghép đúng đội và đồng bộ token sang ForcAD",
+        "id": {
+          "id": "20",
+          "name": "Rectangle 19"
+        }
+      }
+    ]
+  },
+  {
+    "slide": 7,
+    "shapes": [
+      {
+        "text": "",
+        "id": {
+          "id": "2",
+          "name": "Rectangle 1"
+        }
+      },
+      {
+        "text": "",
+        "id": {
+          "id": "3",
+          "name": "Rectangle 2"
+        }
+      },
+      {
+        "text": "Training và quyền truy cập",
+        "id": {
+          "id": "4",
+          "name": "TextBox 3"
+        }
+      },
+      {
+        "text": "Training Definition  / →  / Gán /  pool /   / → /   / Training Instance /  →  / Cấ / p /   / quyền",
+        "id": {
+          "id": "5",
+          "name": "Rectangle 4"
+        }
+      },
+      {
+        "text": "Một Training Run nhận một sandbox.",
+        "id": {
+          "id": "7",
+          "name": "Rectangle 6"
+        }
+      },
+      {
+        "text": "Sandbox nhiều đội vẫn phải phân quyền VM. / Thử truy cập bằng tài khoản thí sinh trước khi mở thi.",
+        "id": {
+          "id": "8",
+          "name": "Rectangle 7"
+        }
+      }
+    ]
+  },
+  {
+    "slide": 8,
+    "shapes": [
+      {
+        "text": "",
+        "id": {
+          "id": "2",
+          "name": "Rectangle 1"
+        }
+      },
+      {
+        "text": "",
+        "id": {
+          "id": "3",
+          "name": "Rectangle 2"
+        }
+      },
+      {
+        "text": "Nghiệm thu và mở cuộc thi",
+        "id": {
+          "id": "4",
+          "name": "TextBox 3"
+        }
+      },
+      {
+        "text": "Chạy thi thử / Kiểm tra toàn bộ luồng",
+        "id": {
+          "id": "5",
+          "name": "Rectangle 4"
+        }
+      },
+      {
+        "text": "Đạt yêu cầu?",
+        "id": {
+          "id": "6",
+          "name": "Diamond 5"
+        }
+      },
+      {
+        "text": "Chuẩn bị dữ liệu sạch / BTC mở round ForcAD",
+        "id": {
+          "id": "7",
+          "name": "Rectangle 6"
+        }
+      },
+      {
+        "text": "Chỉnh cấu hình hoặc checker / Kiểm tra lại trên môi trường",
+        "id": {
+          "id": "8",
+          "name": "Rectangle 7"
+        }
+      },
+      {
+        "text": "Đạt",
+        "id": {
+          "id": "13",
+          "name": "Rectangle 12"
+        }
+      },
+      {
+        "text": "Chưa đạt",
+        "id": {
+          "id": "14",
+          "name": "Rectangle 13"
+        }
+      },
+      {
+        "text": "Nghiệm thu: dịch vụ, check–put–get, flag, điểm, thời gian và quyền truy cập.",
+        "id": {
+          "id": "15",
+          "name": "Rectangle 14"
+        }
+      }
+    ]
+  },
+  {
+    "slide": 9,
+    "shapes": [
+      {
+        "text": "",
+        "id": {
+          "id": "2",
+          "name": "Rectangle 1"
+        }
+      },
+      {
+        "text": "",
+        "id": {
+          "id": "3",
+          "name": "Rectangle 2"
+        }
+      },
+      {
+        "text": "Phần tái sử dụng và phần tạo riêng",
+        "id": {
+          "id": "4",
+          "name": "TextBox 3"
+        }
+      },
+      {
+        "text": "Hiện round1 và meko_boutique có profile ForcAD.",
+        "id": {
+          "id": "6",
+          "name": "Rectangle 5"
+        }
+      }
+    ]
+  },
+  {
+    "slide": 10,
+    "shapes": [
+      {
+        "text": "",
+        "id": {
+          "id": "2",
+          "name": "Rectangle 1"
+        }
+      },
+      {
+        "text": "",
+        "id": {
+          "id": "3",
+          "name": "Rectangle 2"
+        }
+      },
+      {
+        "text": "Bật lại bài thi đã được cài",
+        "id": {
+          "id": "4",
+          "name": "TextBox 3"
+        }
+      },
+      {
+        "text": "1. Sandbox",
+        "id": {
+          "id": "5",
+          "name": "Rectangle 4"
+        }
+      },
+      {
+        "text": "Xác nhận môi trường và dịch vụ hoạt động.",
+        "id": {
+          "id": "6",
+          "name": "Rectangle 5"
+        }
+      },
+      {
+        "text": "2. ForcAD",
+        "id": {
+          "id": "7",
+          "name": "Rectangle 6"
+        }
+      },
+      {
+        "text": "Chạy docker compose up -d trong thư mục engine.",
+        "id": {
+          "id": "8",
+          "name": "Rectangle 7"
+        }
+      },
+      {
+        "text": "3. Website",
+        "id": {
+          "id": "9",
+          "name": "Rectangle 8"
+        }
+      },
+      {
+        "text": "Chạy npm start ở terminal riêng.",
+        "id": {
+          "id": "10",
+          "name": "Rectangle 9"
+        }
+      },
+      {
+        "text": "4. Collector",
+        "id": {
+          "id": "11",
+          "name": "Rectangle 10"
+        }
+      },
+      {
+        "text": "Chọn MEKO_LAB và chạy collector đúng bài.",
+        "id": {
+          "id": "12",
+          "name": "Rectangle 11"
+        }
+      },
+      {
+        "text": "5. Cuộc thi",
+        "id": {
+          "id": "13",
+          "name": "Rectangle 12"
+        }
+      },
+      {
+        "text": "Kiểm tra trạng thái cũ trước khi tiếp tục hoặc mở lượt mới.",
+        "id": {
+          "id": "14",
+          "name": "Rectangle 13"
+        }
+      },
+      {
+        "text": "BTC phối hợp riêng lịch website, thời gian Training và tick ForcAD.",
+        "id": {
+          "id": "15",
+          "name": "Rectangle 14"
+        }
+      }
+    ]
+  },
+  {
+    "slide": 11,
+    "shapes": [
+      {
+        "text": "CÁM ƠN",
+        "id": {
+          "id": "2",
+          "name": "Title 1"
+        }
+      },
+      {
+        "text": "Thank you",
+        "id": {
+          "id": "3",
+          "name": "Subtitle 2"
+        }
+      }
+    ]
+  }
+]

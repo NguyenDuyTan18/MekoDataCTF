@@ -102,7 +102,7 @@ exports.deleteTeam = (req, res) => {
   res.redirect('/admin/teams');
 };
 
-// Token bị lộ: cấp token mới (thành viên đăng nhập bằng token cũ bị đăng xuất ở request kế tiếp).
+// Token bị lộ: cấp token mới (token cũ không nộp flag được nữa sau khi đồng bộ sang ForcAD).
 exports.regenerateToken = (req, res, next) => {
   const team = Team.findBasic(Number(req.params.id));
   if (!team) return next();

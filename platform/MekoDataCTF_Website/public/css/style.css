@@ -387,6 +387,12 @@ img { max-width: 100%; }
 .auth-pane-title { margin: 2px 0 14px; font-size: 1.15rem; }
 .auth-foot { margin: 14px 0 0; font-size: .88rem; }
 .token-input { font-family: var(--mono) !important; letter-spacing: .12em; text-transform: lowercase; }
+.auth-pane-note { margin: -8px 0 14px; font-size: .9rem; }
+td.right { text-align: right; white-space: nowrap; }
+@media (max-width: 720px) {
+  .auth-split { grid-template-columns: 1fr; }
+  .auth-pane--token { border-left: 0; border-top: 1px solid var(--border); }
+}
 
 .token-box { margin: 6px 0 18px; padding: 16px 18px; border: 1.5px dashed var(--river-500); border-radius: 12px; background: #f1f8f7; }
 .token-box-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }

@@ -23,12 +23,6 @@
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <button type="submit" class="btn btn-ghost btn-sm"><%= t('nav.logout') %></button>
         </form>
-      <% } else if (memberTeam) { %>
-        <a href="/team" class="<%= currentPath.startsWith('/team') ? 'active' : '' %>" title="<%= memberTeam.name %>"><%= t('nav.myTeam') %></a>
-        <form action="/logout" method="post" class="inline-form">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-          <button type="submit" class="btn btn-ghost btn-sm"><%= t('nav.logout') %></button>
-        </form>
       <% } else { %>
         <a href="/login"><%= t('nav.login') %></a>
         <a href="/register" class="btn btn-primary btn-sm"><%= t('nav.register') %></a>

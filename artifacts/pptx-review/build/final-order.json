@@ -1,0 +1,102 @@
+[
+  {
+    "slide": 1,
+    "title": "ĐẠI HỌC CẦN THƠ \nTRƯỜNG CÔNG NGHỆ THÔNG TIN & TRUYỀN THÔNG \nKHOA MẠNG MÁY TÍNH VÀ TRUYỀN THÔNG "
+  },
+  {
+    "slide": 2,
+    "title": "Nội dung"
+  },
+  {
+    "slide": 3,
+    "title": "Điều kiện trước triển khai"
+  },
+  {
+    "slide": 4,
+    "title": "Cài website lần đầu"
+  },
+  {
+    "slide": 5,
+    "title": "Cài ForcAD lần đầu"
+  },
+  {
+    "slide": 6,
+    "title": "Các thành phần cần kết nối"
+  },
+  {
+    "slide": 7,
+    "title": "Quy trình triển khai tổng thể"
+  },
+  {
+    "slide": 8,
+    "title": "1. Chốt đội"
+  },
+  {
+    "slide": 9,
+    "title": "2. Soạn gói bài"
+  },
+  {
+    "slide": 10,
+    "title": "3. Soạn cấu hình môi trường"
+  },
+  {
+    "slide": 11,
+    "title": "4. Git và Sandbox Definition"
+  },
+  {
+    "slide": 12,
+    "title": "5. Tạo pool"
+  },
+  {
+    "slide": 13,
+    "title": "6. Allocate môi trường"
+  },
+  {
+    "slide": 14,
+    "title": "7. Lấy truy cập và tách quyền"
+  },
+  {
+    "slide": 15,
+    "title": "8. Cấu hình ForcAD và collector"
+  },
+  {
+    "slide": 16,
+    "title": "9. Ghép đội và đồng bộ token"
+  },
+  {
+    "slide": 17,
+    "title": "10. Thi thử và kiểm tra chấm điểm"
+  },
+  {
+    "slide": 18,
+    "title": "11. Training và quyền thí sinh"
+  },
+  {
+    "slide": 19,
+    "title": "12. Mở thi chính thức"
+  },
+  {
+    "slide": 20,
+    "title": "Giám sát và xử lý sự cố khi thi"
+  },
+  {
+    "slide": 21,
+    "title": "Kết thúc và lưu hồ sơ cuộc thi"
+  },
+  {
+    "slide": 22,
+    "title": "Khôi phục cho lượt thi tiếp theo"
+  },
+  {
+    "slide": 23,
+    "title": "Phần tái sử dụng và phần chuẩn bị riêng"
+  },
+  {
+    "slide": 24,
+    "title": "Bật lại hệ thống đã cài"
+  },
+  {
+    "slide": 25,
+    "title": "CẢM ƠN"
+  }
+]

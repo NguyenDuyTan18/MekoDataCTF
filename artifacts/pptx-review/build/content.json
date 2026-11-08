@@ -1,0 +1,224 @@
+{
+  "preparation": [
+    {
+      "title": "Điều kiện trước triển khai",
+      "input": "Máy vận hành, gói phát hành và tài khoản quản trị CyberRangeCZ.",
+      "actions": [
+        "Xác nhận Portal và cloud đã sẵn sàng, người triển khai có quyền tạo môi trường.",
+        "Kiểm tra công cụ chạy website, Python, SSH và Docker với container Linux.",
+        "Xác nhận image, cấu hình VM, hạn mức CPU/RAM/disk và đường mạng cần dùng.",
+        "Chốt nơi truy cập của đội, người phụ trách và cách bàn giao thông tin đăng nhập."
+      ],
+      "done": "Có danh sách điều kiện đạt và đủ tài nguyên cho mô hình thi đã chọn.",
+      "notes": "Phạm vi bắt đầu từ CyberRangeCZ/cloud đã được đơn vị cung cấp. Deck không hướng dẫn cài cả cụm CyberRangeCZ/OpenStack từ đầu. Không đưa ra cấu hình tối thiểu khi chưa đo tải thực tế. Nguồn: docs/QUY-TRINH-CAI-DAT-TONG-QUAT-BAO-CAO.md, mục 1 và bước 1."
+    },
+    {
+      "title": "Cài website lần đầu",
+      "input": "Gói website đã bàn giao và máy vận hành đáp ứng điều kiện.",
+      "actions": [
+        "Cài các thành phần phụ thuộc theo hướng dẫn đi kèm gói phát hành.",
+        "Thiết lập địa chỉ website, địa chỉ ForcAD và tài khoản ban tổ chức.",
+        "Khởi tạo dữ liệu và tài khoản lần đầu, sau đó khởi động website.",
+        "Thử đăng nhập quản trị và truy cập từ một máy thí sinh trong mạng dự kiến."
+      ],
+      "done": "BTC đăng nhập được và máy thí sinh mở được trang đăng ký, đăng nhập.",
+      "notes": "Chỉ áp dụng lần đầu hoặc khi chuyển môi trường. Giữ cấu hình và cơ sở dữ liệu đã bàn giao. Chỉ mở đường truy cập website cần thiết cho đội, không công khai giao diện quản trị ForcAD. Bảng điểm chưa cần có dữ liệu thi ở bước này. Nguồn: docs/QUY-TRINH-CAI-DAT-TONG-QUAT-BAO-CAO.md, bước 2; docs/HUONG-DAN-KHOI-DONG.md."
+    },
+    {
+      "title": "Cài ForcAD lần đầu",
+      "input": "Docker hoạt động và có gói ForcAD đúng phiên bản tích hợp.",
+      "actions": [
+        "Thiết lập tài khoản quản trị engine, cổng truy cập và cấu hình lưu trữ.",
+        "Khởi tạo cấu hình lần đầu và chuẩn bị giao diện theo gói bàn giao.",
+        "Khởi động các dịch vụ, chờ kho dữ liệu và tác vụ khởi tạo hoàn tất.",
+        "Đăng nhập dashboard, kiểm tra API và trạng thái trước khi chuẩn bị cuộc thi."
+      ],
+      "done": "Dashboard/API sẵn sàng, dữ liệu khởi tạo đầy đủ và cuộc thi chưa bắt đầu.",
+      "notes": "Tài khoản ForcAD khác tài khoản BTC website. Không chạy lại khởi tạo hoặc thay thông tin lưu trữ trên bản có dữ liệu nếu chưa có kế hoạch chuyển đổi. Bản chưa có giao diện dựng sẵn cần chuẩn bị giao diện trước khi dựng dịch vụ phục vụ web. Nguồn: docs/QUY-TRINH-CAI-DAT-TONG-QUAT-BAO-CAO.md, bước 3."
+    }
+  ],
+  "steps": [
+    {
+      "title": "1. Chốt đội",
+      "input": "Danh sách đăng ký trên website và quy mô cuộc thi đã duyệt.",
+      "actions": [
+        "BTC rà soát đội hợp lệ, khóa danh sách và xác nhận số lượng thành viên.",
+        "Gán tên kỹ thuật duy nhất cho từng đội, thống nhất với tên dùng trên ForcAD.",
+        "Lập bảng ánh xạ đội với VM, địa chỉ IP dự kiến và phương thức truy cập.",
+        "Đối chiếu số VM, tài nguyên và kế hoạch mạng trước khi chuẩn bị môi trường."
+      ],
+      "done": "Có bảng đội–VM–IP được duyệt, không trùng tên kỹ thuật hoặc địa chỉ IP.",
+      "notes": "Tương ứng ô 1 của sơ đồ tổng thể. Việc xuất danh sách đội không tự tạo VM hoặc đội ForcAD. Kiểm tra lại đầu ra với danh sách chốt vì công cụ hiện lấy toàn bộ đội trong database. Nguồn: tài liệu quy trình tổng quát, bước 4."
+    },
+    {
+      "title": "2. Soạn gói bài",
+      "input": "Ứng dụng bài thi, dữ liệu sạch, checker và hướng dẫn từ tác giả bài.",
+      "actions": [
+        "Tiếp nhận gói ứng dụng, yêu cầu tài nguyên và danh sách thử thách.",
+        "Kiểm tra đủ dữ liệu khởi đầu, checker và hướng dẫn dành riêng cho BTC/đội.",
+        "Xác nhận checker kiểm tra dịch vụ, đặt flag và đọc lại flag đúng quy ước.",
+        "Chốt phiên bản bàn giao, loại bỏ dữ liệu thi cũ và thông tin quản trị khỏi gói công khai."
+      ],
+      "done": "Có gói bài xác định phiên bản, đủ tài liệu và biên bản kiểm tra chức năng.",
+      "notes": "Tương ứng ô 2. Checker health đơn thuần chưa đủ thay thế checker check/put/get. Đây là bước tiếp nhận, kiểm tra và đóng gói, không trình bày cách viết ứng dụng hoặc mã khai thác. Nguồn: tài liệu quy trình tổng quát, bước 5."
+    },
+    {
+      "title": "3. Soạn cấu hình môi trường",
+      "input": "Bảng đội–VM–IP và gói bài đã chốt phiên bản.",
+      "actions": [
+        "Chọn số VM đội, VM checker, router, subnet, image và tài nguyên từng máy.",
+        "Chuẩn bị cấu hình cài tự động ứng dụng, dữ liệu, tài khoản và dịch vụ.",
+        "Quy định quyền sửa/restart cho đội và quyền quản trị riêng của BTC.",
+        "Đối chiếu tên máy, IP, cổng dịch vụ và đường checker tới từng đội."
+      ],
+      "done": "Bộ định nghĩa môi trường thống nhất về máy, mạng, cài đặt và quyền truy cập.",
+      "notes": "Tương ứng ô 3. Topology và Ansible là tài liệu cấu hình triển khai, không cần đưa đoạn cấu hình hoặc giải thích mã lên slide. Chỉ sửa cấu hình đội ở một nơi chưa bảo đảm mọi thành phần khớp. Nguồn: tài liệu quy trình tổng quát, bước 6."
+    },
+    {
+      "title": "4. Git và Sandbox Definition",
+      "input": "Gói định nghĩa môi trường đã đóng gói và có phiên bản xác định.",
+      "actions": [
+        "Đưa gói định nghĩa lên kho Git theo quy trình bàn giao của đơn vị.",
+        "Kiểm tra địa chỉ kho, cấu trúc gói và revision sẽ dùng để triển khai.",
+        "Trên Portal, tạo Sandbox Definition bằng Git URL và revision đã chốt.",
+        "Kiểm tra Portal đọc được định nghĩa và ghi nhận phiên bản vào hồ sơ triển khai."
+      ],
+      "done": "Sandbox Definition trỏ tới đúng kho và đúng phiên bản đã nghiệm thu.",
+      "notes": "Tương ứng ô 4. Đây là hướng dẫn thao tác, không thực hiện đẩy Git hay thay đổi Portal trong phiên làm việc này. Revision là phiên bản cụ thể dùng để truy vết. Thay source Git không tự cập nhật VM đã tạo. Nguồn: tài liệu quy trình tổng quát, bước 7."
+    },
+    {
+      "title": "5. Tạo pool",
+      "input": "Sandbox Definition hợp lệ và đủ hạn mức tài nguyên cloud.",
+      "actions": [
+        "Trên Portal, tạo pool mới và chọn đúng Sandbox Definition.",
+        "Đặt sức chứa pool theo số sandbox cần cấp phát, không lấy số đội làm mặc định.",
+        "Đối chiếu tổng số VM và tài nguyên trong mỗi sandbox với quy mô toàn pool.",
+        "Lưu pool, kiểm tra định nghĩa/phiên bản và ghi mã pool vào hồ sơ triển khai."
+      ],
+      "done": "Pool đúng định nghĩa, sức chứa phù hợp và đủ tài nguyên để cấp phát.",
+      "notes": "Tương ứng ô 5. Một sandbox có thể chứa nhiều VM đội. Pool mới cần thiết khi triển khai revision mới. Nguồn: https://docs.platform.cyberrange.cz/user-guide-basic/sandbox-agenda/pool/ và tài liệu quy trình tổng quát, bước 7."
+    },
+    {
+      "title": "6. Allocate môi trường",
+      "input": "Pool đã tạo và số sandbox thực sự cần sử dụng.",
+      "actions": [
+        "Chọn Allocate trên pool và cấp phát số sandbox theo kế hoạch.",
+        "Theo dõi tiến trình tạo VM, mạng và cài đặt tự động trên Portal.",
+        "Nếu thất bại, lưu thông báo lỗi và kiểm tra tài nguyên, image hoặc kết nối.",
+        "Khi hoàn tất, đối chiếu VM/IP và thử dịch vụ từ đúng đường truy cập."
+      ],
+      "done": "Cấp phát và cài đặt hoàn tất, các máy/dịch vụ khớp bản thiết kế.",
+      "notes": "Tương ứng ô 6. Trạng thái VM chạy không đủ chứng minh provisioning hoặc dịch vụ đã thành công. Khi cấp lại, kiểm tra trạng thái hiện có trước để tránh tạo trùng tài nguyên. Nguồn: tài liệu quy trình tổng quát, bước 7; https://docs.platform.cyberrange.cz/user-guide-basic/sandbox-agenda/pool/."
+    },
+    {
+      "title": "7. Lấy truy cập và tách quyền",
+      "input": "Sandbox sẵn sàng và phương án truy cập đã được phê duyệt.",
+      "actions": [
+        "BTC tải bộ SSH quản trị đúng sandbox và lưu tại nơi được kiểm soát.",
+        "Thử đường kết nối từ máy vận hành tới VM checker và từng VM đội.",
+        "Cấp thông tin SSH hoặc GUI riêng cho đội, đúng máy và đúng quyền.",
+        "Thử tài khoản đội: sửa/restart đúng dịch vụ, không dùng được quyền quản trị chéo."
+      ],
+      "done": "BTC vận hành được và mỗi đội chỉ có quyền quản trị VM được giao.",
+      "notes": "Tương ứng ô 7. Chặn quyền quản trị chéo không có nghĩa chặn lưu lượng tấn công dịch vụ được luật thi cho phép. Không phát management key; rút bớt host trong SSH config không phải cơ chế phân quyền. Collector cần đường SSH không tương tác đã được xác minh host key. Nguồn: tài liệu quy trình tổng quát, bước 8; https://docs.platform.cyberrange.cz/user-guide-advanced/sandboxes/sandbox-access/."
+    },
+    {
+      "title": "8. Cấu hình ForcAD và collector",
+      "input": "ForcAD đã cài, lab hoạt động và có bộ tích hợp đúng phiên bản.",
+      "actions": [
+        "Nạp cấu hình bài đã bàn giao: task, đội/IP, định dạng flag và lịch tick.",
+        "Kiểm tra bộ chuyển tiếp checker khớp tên bài và môi trường đang dùng.",
+        "Chọn đúng bài cho collector, khai đường SSH và đích VM checker.",
+        "Khởi động một collector, thử chuyển yêu cầu kiểm tra và đọc phản hồi."
+      ],
+      "done": "Engine nhận diện đủ task, collector gọi được checker và trả kết quả.",
+      "notes": "Tương ứng ô 8. Cấu hình bài và lab hiện chưa tự sinh hoàn toàn từ một nguồn. Bài mới cần bộ tích hợp tương thích được chuẩn bị trước, không giả định có màn hình tự động thêm mọi bài. Giữ collector hoạt động, không chạy trùng cho cùng cấu hình. Nguồn: tài liệu quy trình tổng quát, bước 9–10."
+    },
+    {
+      "title": "9. Ghép đội và đồng bộ token",
+      "input": "Danh sách đội website và đội ForcAD đã được chuẩn bị đầy đủ.",
+      "actions": [
+        "Trên website quản trị, đối chiếu tên kỹ thuật của đội với đội trên ForcAD.",
+        "Kiểm tra lại IP/VM đích trong cấu hình bài để tránh ghép nhầm đội.",
+        "Đồng bộ token từ website sang ForcAD và kiểm tra trạng thái từng đội.",
+        "Đăng nhập thử bằng một đội, xác nhận danh tính dùng khi nộp flag."
+      ],
+      "done": "Mọi đội ghép đúng và đồng bộ thành công, không còn đội thiếu/nhầm ánh xạ.",
+      "notes": "Tương ứng ô 9. Đồng bộ token không tự tạo đội hoặc VM còn thiếu. Token đội dùng đăng nhập/nộp flag, khác tài khoản Portal, token Training và thông tin quản trị checker. Không hiển thị giá trị token thật trên slide. Nguồn: tài liệu quy trình tổng quát, bước 10."
+    },
+    {
+      "title": "10. Thi thử và kiểm tra chấm điểm",
+      "input": "Đội đã ghép đúng, collector hoạt động và lab đủ dịch vụ.",
+      "actions": [
+        "Chạy phiên thử và kiểm tra đặt/đọc flag cho mọi cặp đội–task.",
+        "Thử nộp flag hợp lệ, sai, trùng và hết hạn theo luật thi đã công bố.",
+        "Đối chiếu điểm và trạng thái website với kết quả mong đợi từ engine.",
+        "Thử lỗi dịch vụ, mất kết nối và pause/resume, lưu kết quả rồi kiểm tra lại sau sửa."
+      ],
+      "done": "Có biên bản thi thử đạt về dịch vụ, flag, điểm, lịch thi và khả năng phục hồi.",
+      "notes": "Tương ứng ô 10, là kiểm thử kỹ thuật trước khi kiểm tra quyền người dùng cuối ở bước 11. Kiểm tra ít nhất một vòng đời flag hoàn chỉnh và cửa sổ hết hạn theo cấu hình thực. Test local không thay thế nghiệm thu pool thật. Nguồn: tài liệu quy trình tổng quát, bước 11."
+    },
+    {
+      "title": "11. Training và quyền thí sinh",
+      "input": "Pool phù hợp, hướng dẫn thi và tài khoản Portal của thí sinh.",
+      "actions": [
+        "Tạo/chọn Training Definition, sau đó tạo Training Instance tương ứng.",
+        "Gán pool, đặt thời gian truy cập và cấp token vào Training cho người được phép.",
+        "Đăng nhập bằng tài khoản thí sinh, kiểm tra Training và đúng quyền VM.",
+        "Thử trọn luồng truy cập, đăng nhập website và nộp flag trước khi chốt nghiệm thu."
+      ],
+      "done": "Thí sinh vào đúng môi trường, đúng quyền và đi hết luồng sử dụng thực tế.",
+      "notes": "Tương ứng ô 11. Nếu tổ chức không dùng Training thì nghiệm thu đường truy cập trực tiếp thay thế. Theo mô hình cloud tiêu chuẩn, mỗi Training Run được cấp một sandbox. Với sandbox nhiều đội, phải chốt cách tổ chức quyền/run, tránh mỗi đội nhận một bản sao toàn bộ sân đấu. Không dùng tài khoản Portal chung như bằng chứng đã phân quyền theo đội. Training token khác team token. Nguồn: https://docs.platform.cyberrange.cz/user-guide-basic/training-agenda/training-instance/ ; https://docs.platform.cyberrange.cz/user-guide-advanced/trainings/trainings-overview/ ; tài liệu quy trình tổng quát, bước 11–12."
+    },
+    {
+      "title": "12. Mở thi chính thức",
+      "input": "Biên bản nghiệm thu đạt và quyền thí sinh đã được kiểm tra.",
+      "actions": [
+        "Lưu hồ sơ thi thử và đưa lab, dữ liệu ứng dụng, engine về trạng thái đầu đã chốt.",
+        "Xác nhận lịch website, quyền truy cập Training và thời điểm bắt đầu ForcAD.",
+        "Kiểm tra website, engine, collector và sandbox đều sẵn sàng trước giờ thi.",
+        "BTC bắt đầu cuộc thi trên dashboard và theo dõi tick cùng kết quả checker đầu tiên."
+      ],
+      "done": "Cuộc thi chạy đúng cấu hình, tick đầu có kết quả và bảng điểm cập nhật.",
+      "notes": "Tương ứng ô 12. Reset điểm/tick không tự phục hồi source, bản vá hay database trên VM. Ba lịch website/Training/ForcAD chưa tự đồng bộ, BTC phối hợp riêng. Nếu giữ kín đề tới giờ mở thi phải kiểm tra thời điểm cấp quyền thực tế. Nguồn: tài liệu quy trình tổng quát, bước 12."
+    }
+  ],
+  "operation": [
+    {
+      "title": "Giám sát và xử lý sự cố khi thi",
+      "input": "Cuộc thi đang chạy và đã phân công người trực vận hành.",
+      "actions": [
+        "Theo dõi tick, kết quả checker, điểm và tình trạng kết nối của các đội.",
+        "Khi bất thường, xác định lỗi ở website, engine, collector hay môi trường đội.",
+        "Áp dụng quy tắc tạm dừng của cuộc thi, ghi thời điểm và bảo toàn dữ liệu/log.",
+        "Khắc phục, kiểm tra lại đường chấm và xác nhận trạng thái trước khi tiếp tục."
+      ],
+      "done": "Mỗi sự cố có nhật ký xử lý và bằng chứng hệ thống hoạt động lại đúng luật.",
+      "notes": "Phần bổ sung vận hành. Không đề xuất reset toàn bộ môi trường như thao tác xử lý đầu tiên. Phân biệt lỗi checker/cầu nối với lỗi dịch vụ đội. Quy tắc tạm dừng và thông báo phải được BTC chốt trước cuộc thi. Nguồn: tài liệu quy trình tổng quát, bước 11–12 và đề xuất quy trình trực vận hành."
+    },
+    {
+      "title": "Kết thúc và lưu hồ sơ cuộc thi",
+      "input": "Cuộc thi đã tới thời điểm kết thúc theo luật được công bố.",
+      "actions": [
+        "Xác nhận engine đóng cửa sổ nhận flag và hoàn tất tác vụ chấm còn lại theo luật.",
+        "Chốt bảng điểm, đối chiếu số liệu và lưu thông tin xử lý khiếu nại nếu có.",
+        "Lưu kết quả, log, bản sao dữ liệu và phiên bản cấu hình của lượt thi.",
+        "Xác nhận hồ sơ lưu đủ trước khi thu hồi quyền truy cập hoặc tài nguyên."
+      ],
+      "done": "Có hồ sơ kết quả truy vết được và tài nguyên chỉ được thu hồi sau khi lưu đủ.",
+      "notes": "Phần bổ sung sau thi. Thực hiện theo cơ chế kết thúc và chính sách lưu trữ của bản bàn giao, không giả định dashboard có sẵn một nút xuất toàn bộ database/log. Tách hồ sơ website, engine và lab. Nguồn: tài liệu quy trình tổng quát, bước 12."
+    },
+    {
+      "title": "Khôi phục cho lượt thi tiếp theo",
+      "input": "Hồ sơ lượt cũ đã lưu và có bộ dữ liệu/bản phát hành sạch.",
+      "actions": [
+        "Chọn tiếp tục lượt cũ hoặc tạo lượt mới theo kế hoạch của BTC.",
+        "Khôi phục riêng ứng dụng/bản vá, dữ liệu lab và trạng thái điểm/flag của engine.",
+        "Nếu đổi môi trường, cập nhật quyền truy cập và bảng ánh xạ đội–VM–IP.",
+        "Chạy lại kiểm tra dịch vụ, checker, nộp flag và quyền thí sinh trước khi mở."
+      ],
+      "done": "Môi trường sạch đúng phiên bản, không lẫn kết quả cũ và nghiệm thu lại đạt.",
+      "notes": "Phần bổ sung phục hồi. Phân biệt ba lớp trạng thái: ứng dụng/source/bản vá, database lab, database/flag/điểm engine. Không dùng reset điểm như bằng chứng đã làm sạch VM. Không sử dụng nguyên công cụ phục hồi riêng của round1 cho ứng dụng khác. Nguồn: tài liệu quy trình tổng quát, bước 12 và mục 5."
+    }
+  ]
+}

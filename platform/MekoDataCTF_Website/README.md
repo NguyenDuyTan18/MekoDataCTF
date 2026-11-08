@@ -54,14 +54,18 @@ Dữ liệu lưu ở `data/mekodata.db` (SQLite).
 - **Không dùng `style=""` nội tuyến** trong view: CSP của `helmet` chặn inline style, hãy thêm class vào `admin.css`.
 - Giao diện quản trị hướng tới **desktop** (`min-width` 1180px).
 
-## Token đội (đăng nhập thành viên & nộp flag)
+## Tài khoản, đội và token
 
-- Khi đội trưởng tạo đội thành công, website cấp **token đội** 16 ký tự hex (`teams.token`, cùng định dạng `secrets.token_hex(8)` của ForcAD). Token hiện ở trang **Đội của tôi** (nút Hiện / Sao chép).
-- **Đội trưởng** đăng nhập bằng email + mật khẩu và là người duy nhất được sửa đội. **Thành viên** đăng nhập ở cột phải trang `/login` bằng token đội (`POST /login/token`): phiên gắn với đội (`session.teamId` + `session.teamToken`), chỉ xem được trang đội, không sửa được.
-- Nhập sai token 10 lần trong 10 phút từ cùng một IP thì bị chặn tạm (HTTP 429).
-- **Nộp flag** (`POST /scoreboard/submit`) chỉ nhận khi đã đăng nhập (đội trưởng hoặc thành viên). Máy chủ lấy token của **đội đang đăng nhập** để gửi `X-Team-Token` sang ForcAD; token trong request của trình duyệt bị bỏ qua, nên không nộp hộ được cho đội khác.
-- BTC xem token, **cấp token mới** khi bị lộ (token cũ và mọi phiên thành viên dùng token cũ mất hiệu lực ngay), và khai **Tên đội trên ForcAD** ở trang chi tiết đội trong `/admin`.
-- DB cũ được tự nâng cấp khi khởi động (`config/database.js`): thêm cột `token`, `forcad_name` và cấp token cho các đội đã đăng ký trước đó.
+- **Mỗi thành viên tự đăng ký tài khoản** (email, họ tên, MSSV, mật khẩu). MSSV là duy nhất giữa các tài khoản.
+- Sau khi đăng nhập, người chưa có đội thấy trang `/team` với hai lựa chọn:
+  - **Tạo đội** (`POST /team/create`): người tạo là **đội trưởng** (`teams.user_id`) và là thành viên đầu tiên.
+  - **Vào đội** (`POST /team/join`): nhập **token đội** 16 ký tự hex (`teams.token`) do đội trưởng gửi. Tối đa `Setting.MAX_MEMBERS` người/đội; nhập sai 10 lần trong 10 phút thì bị chặn tạm (HTTP 429).
+- Token đội dùng chung cho **vào đội** và **nộp flag**: lộ token thì người ngoài vừa vào được đội (đội trưởng xóa được) vừa nộp flag hộ được, nên BTC cấp token mới ở `/admin` (rồi đồng bộ sang ForcAD).
+- Đội trưởng: sửa thông tin đội, xóa thành viên, giải tán đội. Thành viên: xem đội, rời đội. Khi đóng đăng ký, mọi thay đổi đội bị khóa.
+- `members.user_id` nối thành viên với tài khoản. Đội đăng ký theo cách cũ (đội trưởng nhập tay thành viên) được tự nâng cấp khi khởi động: dòng đội trưởng nối với tài khoản đội trưởng; thành viên nhập tay hiện nhãn "Chưa có tài khoản" cho đến khi người đó đăng ký với đúng MSSV và vào đội bằng token (nhận lại đúng dòng cũ). Tài khoản cũ chưa có họ tên/MSSV được yêu cầu bổ sung trước khi tạo/vào đội.
+- **Token đội** 16 ký tự hex (`teams.token`, cùng định dạng `secrets.token_hex(8)` của ForcAD) dùng để **vào đội** và **nộp flag**; không còn đăng nhập trực tiếp bằng token.
+- **Nộp flag** (`POST /scoreboard/submit`) nhận từ mọi tài khoản đã vào đội. Máy chủ lấy token của **đội của tài khoản đang đăng nhập** để gửi `X-Team-Token` sang ForcAD; token trong request của trình duyệt bị bỏ qua.
+- BTC xem token, **cấp token mới** khi bị lộ, và khai **Tên đội trên ForcAD** ở trang chi tiết đội trong `/admin`.
 
 ### Đồng bộ token sang ForcAD
 

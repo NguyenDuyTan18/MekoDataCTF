@@ -26,6 +26,32 @@ const SHIPS = [
 ];
 const SLOTS = [V(5.6, -1.3, 0.8), V(-5.6, -1.3, 0.8), V(0, 2.1, -5.2), V(-2.8, 3.4, -10), V(2.8, 3.4, -10), V(-8, 1.6, -7), V(8, 1.6, -7)];
 const SHIP_SCALE = 1.3;
+// Tự giãn khi đông đội (> SLOTS.length): xếp nhiều hàng lùi dần về sau, hàng sau cao hơn và so le,
+// mỗi hàng chia đều bề ngang nhìn thấy ở độ sâu đó (fov 40°, khung ~16:10, chừa 20% mép).
+const ROW_FRONT_Z = 0.8, ROW_FRONT_Y = -1.3, ROW_GAP = 6, ROW_RISE = 1.3, CAM_DIST_Z = 15.5;
+const VIEW_HALF = Math.tan(Math.PI / 9) * 1.6 * 0.8;   // nửa bề ngang dùng được / khoảng cách tới camera
+const SHIP_FOOT = 7.7;   // khoảng cách tâm cần cho máy bay cỡ chuẩn (rộng ~4.3) cộng biên độ lượn hai bên
+function layoutSlots(n) {
+  if (n <= SLOTS.length) return { slots: SLOTS.slice(0, n).map(v => v.clone()), k: 1 };
+  let plan = null;
+  for (let rows = 2; rows <= 8; rows++) {
+    const slots = [];
+    let minGap = SHIP_FOOT;
+    for (let r = 0; r < rows; r++) {
+      // hàng sau rộng hơn nên nhận phần dư
+      const count = Math.floor(n / rows) + (rows - 1 - r < n % rows ? 1 : 0);
+      const z = ROW_FRONT_Z - r * ROW_GAP, y = ROW_FRONT_Y + r * ROW_RISE;
+      const width = 2 * VIEW_HALF * (CAM_DIST_Z - z), gap = width / count;
+      const shift = (r % 2 ? 0.25 : -0.25) * gap;
+      for (let j = 0; j < count; j++) slots.push(V(-width / 2 + gap * (j + 0.5) + shift, y, z));
+      minGap = Math.min(minGap, gap);
+    }
+    // k thu nhỏ đồng thời máy bay và biên độ lượn để không chạm nhau
+    plan = { slots, k: Math.max(0.4, minGap / SHIP_FOOT) };
+    if (plan.k >= 0.55) break;
+  }
+  return plan;
+}
 const BG_Z = -110;
 const WINDUP = 0.6;    // seconds an attacker spends turning and charging before the first shot
 
@@ -203,6 +229,7 @@ export async function start() {
   const shieldGeo = new THREE.SphereGeometry(1, 64, 40);
 
   let teams = [];
+  let crowd = 1;   // hệ số k của layoutSlots cho số đội hiện tại
   const byId = new Map();
   const shipCache = new Map();
   async function syncTeams(list) {
@@ -212,15 +239,18 @@ export async function start() {
       return;
     }
     const next = [];
+    const plan = layoutSlots(sorted.length);
+    crowd = plan.k;
     for (const [i, team] of sorted.entries()) {
       let t = byId.get(team.id);
       if (!t) {
         const spec = SHIPS[i % SHIPS.length];
         const ship = shipCache.get(team.id) || await makeShip(spec);
         shipCache.set(team.id, ship);
-        t = createTeam(team, spec, ship, i);
+        t = createTeam(team, spec, ship, i, plan.slots[i]);
       }
-      t.name = team.name; t.index = i; t.base = SLOTS[i % SLOTS.length].clone();
+      t.name = team.name; t.index = i; t.base = plan.slots[i];
+      t.group.scale.setScalar(SHIP_SCALE * crowd);
       next.push(t);
     }
     for (const old of teams) if (!next.includes(old)) scene.remove(old.group);
@@ -230,7 +260,7 @@ export async function start() {
     buildPlates();
   }
 
-  function createTeam(team, spec, ship, i) {
+  function createTeam(team, spec, ship, i, base) {
     const group = new THREE.Group();
     group.add(ship.group);
     group.scale.setScalar(SHIP_SCALE);
@@ -240,7 +270,6 @@ export async function start() {
     shield.scale.set(ship.size.x * 0.56, Math.max(ship.size.y * 1.25, 1.05), ship.size.z * 0.62);
     shield.visible = false;
     group.add(shield);
-    const base = SLOTS[i % SLOTS.length].clone();
     group.position.copy(base);
     scene.add(group);
     return { id: team.id, name: team.name, spec, ship, group, flames, glow, shieldMesh: shield, base, index: i,
@@ -256,7 +285,7 @@ export async function start() {
     if (t >= team.nextIdle && t >= team.busyUntil) {
       const rivals = teams.filter(x => x !== team);
       if (rivals.length) team.face = rivals[Math.floor(Math.random() * rivals.length)];
-      team.goal.set(rand(-1.4, 1.4), rand(-0.55, 0.65), rand(-1.6, 1.8));
+      team.goal.set(rand(-1.4, 1.4), rand(-0.55, 0.65), rand(-1.6, 1.8)).multiplyScalar(crowd);
       if (Math.random() < 0.25) roll(team);
       team.nextIdle = t + rand(4.5, 8.5);
     }
@@ -268,7 +297,8 @@ export async function start() {
     const k = t * motion + team.phase;
     const pos = team.group.position;
     pos.copy(team.base).add(team.off);
-    pos.x += 0.28 * Math.sin(k * 0.41) * motion; pos.y += 0.16 * Math.sin(k * 0.57 + 0.7) * motion; pos.z += 0.35 * Math.sin(k * 0.33 + 2.1) * motion;
+    const wob = motion * crowd;
+    pos.x += 0.28 * Math.sin(k * 0.41) * wob; pos.y += 0.16 * Math.sin(k * 0.57 + 0.7) * wob; pos.z += 0.35 * Math.sin(k * 0.33 + 2.1) * wob;
     if (team.recoilAt && t >= team.recoilAt) { team.recoil = 1; team.recoilAt = 0; }
     team.recoil = Math.max(0, team.recoil - dt * 2.2);
     team.vel.copy(pos).sub(team.last).divideScalar(Math.max(dt, 1e-4)); team.last.copy(pos);
@@ -308,7 +338,7 @@ export async function start() {
       const p = team.ship.group.localToWorld(tmpB.copy(e.pos));
       const sp = rand(2.2, 4.2) * throttle;
       particles.spawn(p, V(back.x * sp + rand(-0.3, 0.3), back.y * sp + rand(-0.3, 0.3), back.z * sp + rand(-0.3, 0.3)).addScaledVector(team.vel, 0.4),
-        color, rand(0.12, 0.22) * SHIP_SCALE, rand(0.25, 0.45), 0.4);
+        color, rand(0.12, 0.22) * SHIP_SCALE * crowd, rand(0.25, 0.45), 0.4);
     }
   }
 
@@ -322,7 +352,7 @@ export async function start() {
   function fireVolley(attacker, victim, task, t) {
     const d = tmpA.copy(victim.base).sub(attacker.base), dist = d.length() || 1;
     d.divideScalar(dist);
-    const run = Math.min(3.2, dist * 0.3);
+    const run = Math.min(3.2 * crowd, dist * 0.3);
     attacker.face = victim; attacker.busyUntil = t + WINDUP + 1.8;
     attacker.goal.set(d.x * run, d.y * run + 0.35, d.z * run + 0.6);
     if (Math.random() < 0.35) roll(attacker);
@@ -502,7 +532,7 @@ export async function start() {
     const base = section.getBoundingClientRect(), r = roundChip ? roundChip.getBoundingClientRect() : null;
     for (const team of teams) {
       if (!team.plate) continue;
-      const lift = Math.max(team.ship.size.y * 0.9, 0.75) * SHIP_SCALE;
+      const lift = Math.max(team.ship.size.y * 0.9, 0.75) * SHIP_SCALE * crowd;
       let s = toScreen(tmpA.copy(team.group.position).add(tmpB.set(0, lift + 0.3, 0)));
       const pw = team.plate.offsetWidth || 120;
       if (r && s.x + pw / 2 > r.left - base.left && s.x - pw / 2 < r.right - base.left && s.y - 30 < r.bottom - base.top + 8) {

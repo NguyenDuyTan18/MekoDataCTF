@@ -6,7 +6,7 @@ const { sessionTeam } = require('../middlewares/auth');
 const origin = process.env.FORCAD_URL || 'http://127.0.0.1:18080';
 
 router.get('/scoreboard', (req,res) => {
- // Đội đang đăng nhập (đội trưởng hoặc thành viên token): form nộp flag dùng token của đội này.
+ // Đội của tài khoản đang đăng nhập (đội trưởng hoặc thành viên): form nộp flag dùng token của đội này.
  // Trình duyệt khớp arenaKeys với danh sách đội ForcAD để khóa ô "Đội của bạn".
  const session = sessionTeam(req);
  const submitTeam = session ? {name:session.team.name, arenaKeys:Team.forcadCandidates(session.team), forcadName:Team.forcadNameOf(session.team)} : null;
@@ -36,7 +36,7 @@ for (const endpoint of ['tick-status','teams','arena']) {
 router.post('/scoreboard/submit', async(req,res)=>{
  res.set('Cache-Control','no-store');
  const session = sessionTeam(req);
- if(!session)return res.status(401).json({error:'Đăng nhập bằng tài khoản đội trưởng hoặc token đội để nộp flag.'});
+ if(!session)return res.status(401).json({error:'Đăng nhập và vào một đội để nộp flag.'});
  const {flags}=req.body||{};
  if(!Array.isArray(flags)||flags.length<1||flags.length>100||flags.some(f=>typeof f!=='string'||f.length>100))return res.status(400).json({error:'Kiểm tra danh sách flag (tối đa 100).'});
  try{const upstream=await fetch(new URL('/flags/',origin),{method:'PUT',headers:{'Content-Type':'application/json','X-Team-Token':session.team.token},body:JSON.stringify(flags),signal:AbortSignal.timeout(8000),redirect:'error'});res.status(upstream.status).json(await upstream.json());}catch(_){res.status(503).json({error:'Bộ nhận flag chưa kết nối được.'});}

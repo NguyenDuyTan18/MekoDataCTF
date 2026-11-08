@@ -6,12 +6,15 @@
           <p class="section-kicker mono"><%= isCaptain ? t('team.roleCaptain') : t('team.roleMember') %></p>
           <h1><%= team.name %></h1>
         </div>
-        <% if (canEdit) { %>
+        <% if (isCaptain && canEdit) { %>
           <a href="/team/edit" class="btn btn-primary"><%= t('team.edit') %></a>
         <% } %>
       </div>
 
-      <% if (isCaptain && !canEdit) { %><div class="alert alert-warning"><%= t('team.locked') %></div><% } %>
+      <% if (!canEdit) { %><div class="alert alert-warning"><%= t('team.locked') %></div><% } %>
+      <% if (team.members.length < minMembers) { %>
+        <div class="alert alert-warning"><%= t('team.belowMin', { min: minMembers }) %></div>
+      <% } %>
 
       <div class="token-box">
         <div class="token-box-head">
@@ -22,7 +25,7 @@
           </div>
         </div>
         <code class="token-value mono" data-token-value="<%= team.token %>" aria-live="polite">••••••••••••••••</code>
-        <p class="token-note muted"><%= isCaptain ? t('team.tokenNoteCaptain') : t('team.tokenNoteMember') %></p>
+        <p class="token-note muted"><%= t('team.tokenNote', { max: maxMembers }) %></p>
       </div>
 
       <dl class="details">
@@ -32,8 +35,51 @@
         <dt><%= t('team.registeredAt') %></dt><dd class="mono"><%= team.created_at %> UTC</dd>
       </dl>
 
-      <h2 class="form-section-title"><%= t('team.members') %> (<%= team.members.length %>)</h2>
-      <%- include('../partials/members-table', { members: team.members }) %>
+      <h2 class="form-section-title"><%= t('team.members') %> (<%= team.members.length %>/<%= maxMembers %>)</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>#</th><th><%= t('team.fullName') %></th><th><%= t('team.studentId') %></th><th></th><th></th></tr>
+          </thead>
+          <tbody>
+            <% team.members.forEach(function (m, i) { %>
+              <tr>
+                <td><%= i + 1 %></td>
+                <td><%= m.full_name %><% if (m.user_id === userId) { %> <span class="muted">(<%= t('team.you') %>)</span><% } %></td>
+                <td class="mono"><%= m.student_id %></td>
+                <td>
+                  <% if (m.is_leader) { %><span class="badge badge-ok"><%= t('team.leader') %></span><% } %>
+                  <% if (m.user_id === null) { %><span class="badge badge-off" title="<%= t('team.noAccountHint') %>"><%= t('team.noAccount') %></span><% } %>
+                </td>
+                <td class="right">
+                  <% if (isCaptain && canEdit && m.user_id !== userId) { %>
+                    <form action="/team/members/<%= m.id %>/remove" method="post" class="inline-form" data-confirm="<%= t('team.confirmRemove', { name: m.full_name }) %>">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button type="submit" class="btn btn-danger btn-sm"><%= t('team.removeMember') %></button>
+                    </form>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <% if (canEdit) { %>
+        <div class="form-actions">
+          <% if (isCaptain) { %>
+            <form action="/team/disband" method="post" class="inline-form" data-confirm="<%= t('team.confirmDisband', { team: team.name }) %>">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-danger"><%= t('team.disband') %></button>
+            </form>
+          <% } else { %>
+            <form action="/team/leave" method="post" class="inline-form" data-confirm="<%= t('team.confirmLeave', { team: team.name }) %>">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-danger"><%= t('team.leave') %></button>
+            </form>
+          <% } %>
+        </div>
+      <% } %>
     </div>
   </div>
 </section>

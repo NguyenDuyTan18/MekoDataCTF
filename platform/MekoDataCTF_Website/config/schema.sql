@@ -5,16 +5,20 @@ CREATE TABLE IF NOT EXISTS users (
   email         TEXT    NOT NULL UNIQUE COLLATE NOCASE,
   password_hash TEXT    NOT NULL,
   role          TEXT    NOT NULL DEFAULT 'contestant' CHECK (role IN ('contestant', 'admin')),
+  -- Mỗi thí sinh tự khai khi đăng ký; admin để trống.
+  full_name     TEXT    NOT NULL DEFAULT '',
+  student_id    TEXT    NOT NULL DEFAULT '',
   created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE TABLE IF NOT EXISTS teams (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  -- Tài khoản đội trưởng (người tạo đội).
   user_id     INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
   name        TEXT    NOT NULL UNIQUE COLLATE NOCASE,
   school      TEXT    NOT NULL DEFAULT '',
   phone       TEXT    NOT NULL DEFAULT '',
-  -- Token đội: cấp khi tạo đội, dùng để thành viên đăng nhập và nộp flag (khớp token đội trên ForcAD).
+  -- Token đội: cấp khi tạo đội; thành viên nhập token để vào đội, website dùng token để nộp flag (khớp ForcAD).
   token       TEXT,
   -- Tên đội tương ứng trên ForcAD (để trống = trùng tên đội); dùng khi đồng bộ token.
   forcad_name TEXT    NOT NULL DEFAULT '',
@@ -25,6 +29,8 @@ CREATE TABLE IF NOT EXISTS teams (
 CREATE TABLE IF NOT EXISTS members (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   team_id     INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  -- Tài khoản của thành viên; NULL với thành viên do đội trưởng nhập tay trước khi có tài khoản cá nhân.
+  user_id     INTEGER REFERENCES users(id) ON DELETE CASCADE,
   full_name   TEXT    NOT NULL,
   student_id  TEXT    NOT NULL UNIQUE COLLATE NOCASE,
   is_leader   INTEGER NOT NULL DEFAULT 0,

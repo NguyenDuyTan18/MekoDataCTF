@@ -1,37 +1,16 @@
 const User = require('../models/User');
-const Team = require('../models/Team');
 const Setting = require('../models/Setting');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-// Giới hạn số lần nhập sai token theo IP để không dò được token đội.
-const TOKEN_MAX_FAILS = 10;
-const TOKEN_WINDOW_MS = 10 * 60 * 1000;
-const tokenFails = new Map(); // ip -> { count, resetAt }
-
-function tokenBlocked(ip) {
-  const entry = tokenFails.get(ip);
-  if (!entry) return false;
-  if (Date.now() > entry.resetAt) {
-    tokenFails.delete(ip);
-    return false;
-  }
-  return entry.count >= TOKEN_MAX_FAILS;
-}
-
-function recordTokenFail(ip) {
-  const entry = tokenFails.get(ip);
-  if (!entry || Date.now() > entry.resetAt) tokenFails.set(ip, { count: 1, resetAt: Date.now() + TOKEN_WINDOW_MS });
-  else entry.count += 1;
-}
+const STUDENT_ID_RE = /^[A-Za-z0-9]{4,15}$/;
 
 // Chỉ cho phép chuyển hướng nội bộ sau khi đăng nhập
 function safeNext(next) {
   return typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') ? next : null;
 }
 
-function loginView(res, req, { status = 200, email = '', next = '', errors = [], tokenErrors = [] } = {}) {
-  res.status(status).render('auth/login', { title: req.t('auth.loginTitle'), email, next, errors, tokenErrors });
+function loginView(res, req, { status = 200, email = '', next = '', errors = [] } = {}) {
+  res.status(status).render('auth/login', { title: req.t('auth.loginTitle'), email, next, errors });
 }
 
 exports.showLogin = (req, res) => {
@@ -55,64 +34,53 @@ exports.login = (req, res) => {
   });
 };
 
-// Thành viên đăng nhập bằng token đội do đội trưởng chia sẻ.
-exports.tokenLogin = (req, res) => {
-  const next = req.body.next || '';
-  if (tokenBlocked(req.ip)) {
-    return loginView(res, req, { status: 429, next, tokenErrors: [req.t('auth.tokenTooMany')] });
-  }
-  const team = Team.findByToken(req.body.token);
-  if (!team) {
-    recordTokenFail(req.ip);
-    return loginView(res, req, { status: 401, next, tokenErrors: [req.t('auth.invalidToken')] });
-  }
-  tokenFails.delete(req.ip);
-
-  req.session.regenerate((err) => {
-    if (err) throw err;
-    req.session.teamId = team.id;
-    req.session.teamToken = team.token;
-    req.flash('success', req.t('auth.tokenLoggedIn', { team: team.name }));
-    res.redirect(safeNext(next) || '/team');
-  });
-};
-
-exports.showRegister = (req, res) => {
-  res.render('auth/register', {
+function registerView(res, req, { status = 200, form = {}, errors = [] } = {}) {
+  res.status(status).render('auth/register', {
     title: req.t('auth.registerTitle'),
-    email: '',
+    form: { email: '', fullName: '', studentId: '', ...form },
     registrationOpen: Setting.isRegistrationOpen(),
+    errors,
   });
-};
+}
 
+exports.showRegister = (req, res) => registerView(res, req);
+
+// Mỗi thí sinh (đội trưởng hay thành viên) tự tạo tài khoản với họ tên, MSSV; sau đó chọn Tạo đội hoặc Vào đội.
 exports.register = (req, res) => {
-  const email = String(req.body.email || '').trim().toLowerCase();
+  const form = {
+    email: String(req.body.email || '').trim().toLowerCase(),
+    fullName: String(req.body.fullName || '').trim().replace(/\s+/g, ' ').slice(0, 80),
+    studentId: String(req.body.studentId || '').trim().toUpperCase(),
+  };
   const password = String(req.body.password || '');
   const confirm = String(req.body.confirmPassword || '');
-  const registrationOpen = Setting.isRegistrationOpen();
 
   const errors = [];
-  if (!registrationOpen) errors.push(req.t('auth.registrationClosed'));
-  if (!EMAIL_RE.test(email) || email.length > 120) errors.push(req.t('auth.invalidEmail'));
+  if (!Setting.isRegistrationOpen()) errors.push(req.t('auth.registrationClosed'));
+  if (!EMAIL_RE.test(form.email) || form.email.length > 120) errors.push(req.t('auth.invalidEmail'));
+  if (form.fullName.length < 2) errors.push(req.t('auth.fullNameRequired'));
+  if (!STUDENT_ID_RE.test(form.studentId)) errors.push(req.t('auth.studentIdInvalid'));
   if (password.length < 8) errors.push(req.t('auth.passwordTooShort'));
   if (password !== confirm) errors.push(req.t('auth.passwordMismatch'));
-  if (errors.length === 0 && User.findByEmail(email)) errors.push(req.t('auth.emailTaken'));
+  if (errors.length === 0 && User.findByEmail(form.email)) errors.push(req.t('auth.emailTaken'));
+  if (errors.length === 0 && User.isStudentIdTaken(form.studentId)) errors.push(req.t('auth.studentIdTaken'));
+  if (errors.length) return registerView(res, req, { status: 400, form, errors });
 
-  if (errors.length) {
-    return res.status(400).render('auth/register', {
-      title: req.t('auth.registerTitle'),
-      email,
-      registrationOpen,
-      errors,
-    });
+  let user;
+  try {
+    user = User.create({ email: form.email, password, fullName: form.fullName, studentId: form.studentId });
+  } catch (err) {
+    // Hai yêu cầu đăng ký cùng email/MSSV gửi cùng lúc
+    if (String(err.code).startsWith('SQLITE_CONSTRAINT')) {
+      return registerView(res, req, { status: 409, form, errors: [req.t('auth.emailOrStudentTaken')] });
+    }
+    throw err;
   }
-
-  const user = User.create({ email, password });
   req.session.regenerate((err) => {
     if (err) throw err;
     req.session.userId = user.id;
     req.flash('success', req.t('auth.registered'));
-    res.redirect('/team/edit');
+    res.redirect('/team');
   });
 };
 
