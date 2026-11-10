@@ -1,0 +1,71 @@
+---
+- name: Activate only Crypto AD at the existing HTTP address
+  hosts: 'team1:team2:team3'
+  become: true
+  gather_facts: false
+  any_errors_fatal: true
+  tasks:
+    - name: Verify Crypto AD is installed before stopping Meko
+      ansible.builtin.stat:
+        path: '{{ item }}'
+      loop:
+        - /etc/systemd/system/crypto-ad.service
+        - /etc/systemd/system/meko-boutique.service.d/round.conf
+        - /etc/crypto-ad/token
+        - /opt/crypto-ad/core.so
+      register: crypto_installation
+    - ansible.builtin.assert:
+        that: item.stat.exists
+        quiet: true
+      loop: '{{ crypto_installation.results }}'
+      loop_control:
+        label: '{{ item.item }}'
+    - name: Switch team restart permission to the Crypto AD unit
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/meko-team-service
+        owner: root
+        group: root
+        mode: '0440'
+        content: "{{ inventory_hostname }} ALL=(root) NOPASSWD: /usr/bin/systemctl restart crypto-ad.service\n"
+        validate: '/usr/sbin/visudo -cf %s'
+    - name: Block Meko startup and allow Crypto AD
+      ansible.builtin.copy:
+        content: ''
+        dest: /etc/crypto-ad/active
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Stop Meko on all team VMs
+      ansible.builtin.systemd:
+        name: meko-boutique.service
+        enabled: false
+        state: stopped
+    - name: Start Crypto AD on the same upstream port
+      ansible.builtin.systemd:
+        name: crypto-ad.service
+        enabled: true
+        state: started
+    - name: Check the service identity through the shared Apache address
+      ansible.builtin.uri:
+        url: http://127.0.0.1/health
+        use_proxy: false
+        return_content: true
+      register: crypto_health
+      until: (crypto_health.json | default({})).get('service') == 'crypto_ad'
+      retries: 10
+      delay: 2
+
+- name: Verify the Crypto AD checker reaches every team
+  hosts: checker
+  become: true
+  gather_facts: false
+  any_errors_fatal: true
+  tasks:
+    - name: Check the service with the real agent
+      ansible.builtin.command:
+        argv: [/usr/bin/python3, /opt/crypto-ad-checker/crypto_agent.py]
+        stdin: ' {{ {"task": "crypto", "action": "check", "ip": item.value} | to_json }}'
+      loop: '{{ meko_addresses | dict2items }}'
+      register: crypto_agent
+      changed_when: false
+      failed_when: (crypto_agent.stdout | from_json).status != 101

@@ -1,0 +1,7 @@
+{
+  "teams": {
+{% for team, ip in meko_addresses.items() %}
+    "{{ ip }}": {"url": "http://{{ ip }}", "token": {{ hostvars[team].crypto_token.content | b64decode | trim | to_json }}}{{ "," if not loop.last }}
+{% endfor %}
+  }
+}

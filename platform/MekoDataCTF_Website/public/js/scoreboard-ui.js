@@ -12,8 +12,6 @@ const key = name => String(name || '').toLowerCase();
 const fmt = n => (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(n);
 const timeOf = t => { const d = new Date(t); return isNaN(d) ? '' : d.toLocaleTimeString('vi-VN'); };
 
-// Luật điểm của cuộc thi, chỉ dùng cho phần chú giải.
-const RULES = { flag: 100, sla: 100, down: 100 };
 const STATUS = { 101: 'UP', 102: 'CORRUPT', 103: 'MUMBLE', 104: 'DOWN', 110: 'CHECKING', '-1': 'NOT CHECKED' };
 const BLOCK_REASON = { expired: 'flag hết hạn', invalid: 'flag sai định dạng/hết hạn', duplicate: 'flag đã nộp rồi' };
 const MAX_FX = 12;   // số đòn tối đa mỗi lần cập nhật để sân đấu không quá tải
@@ -47,15 +45,6 @@ function empty(parent, text) {
   note.className = 'feed-empty';
   note.textContent = text;
   parent.replaceChildren(note);
-}
-
-/* ---------- Điểm & chú giải ---------- */
-function paintRules(scores) {
-  const others = Math.max(0, (scores.length || teams.size) - 1);
-  $('[data-rule-attack]').textContent = fmt(RULES.flag);
-  $('[data-rule-victim]').textContent = fmt(-RULES.flag);
-  $('[data-rule-sla]').textContent = fmt(RULES.sla);
-  $('[data-rule-down]').textContent = `${RULES.down} × ${others} = ${fmt(-RULES.down * others)}`;
 }
 
 /* ---------- Nhật ký ---------- */
@@ -217,7 +206,6 @@ root.addEventListener('arena-state', e => {
   if (game.phase === 'running') $('[data-phase]').textContent = 'BATTLE IN PROGRESS';
 
   lastCaptures = captures; lastDefends = defends;
-  paintRules(scores);
   syncSubmitTeams();
   renderServices(list(d.services));
   renderChecks(list(d.checks));

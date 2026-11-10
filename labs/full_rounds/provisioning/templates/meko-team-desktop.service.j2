@@ -1,0 +1,25 @@
+[Unit]
+Description=Meko Boutique XFCE desktop for {{ inventory_hostname }}
+After=network.target
+
+[Service]
+Type=simple
+User={{ inventory_hostname }}
+Group=users
+WorkingDirectory=/home/{{ inventory_hostname }}
+Environment=HOME=/home/{{ inventory_hostname }}
+Environment=XDG_RUNTIME_DIR=/run/meko-team-desktop
+RuntimeDirectory=meko-team-desktop
+RuntimeDirectoryMode=0700
+UMask=0077
+ExecStartPre=/usr/bin/tigervncserver -list -cleanstale
+ExecStart=/usr/bin/tigervncserver -fg -autokill yes :9 -rfbport 5900 -localhost no -SecurityTypes VncAuth -PasswordFile /home/{{ inventory_hostname }}/.vnc/passwd -geometry 1440x900 -depth 24 -xstartup /usr/local/libexec/meko-team-desktop/meko-xfce
+ExecStop=/usr/bin/tigervncserver -kill :9
+Restart=on-failure
+RestartSec=3
+KillMode=control-group
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

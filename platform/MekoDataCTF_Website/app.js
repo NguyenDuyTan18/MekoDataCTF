@@ -81,8 +81,28 @@ app.use((err, req, res, next) => {
   res.status(500).render('error', { title: '500', message: req.t ? req.t('errors.server') : 'Server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`MekoDataCTF đang chạy tại http://localhost:${PORT}`);
+// Mở trên mọi card mạng (0.0.0.0) để máy khác trong LAN truy cập được; mỗi lần khởi động tự dò IP LAN hiện tại.
+const HOST = process.env.HOST || '0.0.0.0';
+app.listen(PORT, HOST, async () => {
+  const { detectLanAddress } = require('./helpers/lanAddress');
+  const lan = await detectLanAddress();
+  const lanUrl = `http://${lan.address}:${PORT}`;
+  console.log('MekoDataCTF đang chạy:');
+  console.log(`  - Máy này : http://localhost:${PORT}`);
+  if (HOST !== '0.0.0.0' && HOST !== '::') {
+    console.log(`  - Chỉ lắng nghe trên ${HOST} (HOST trong .env) — máy khác có thể không truy cập được.`);
+  } else if (lan.address) {
+    console.log(`  - LAN     : ${lanUrl}   <- gửi địa chỉ này cho thí sinh (${lan.name})`);
+    const others = lan.all.filter((c) => c.address !== lan.address).map((c) => `${c.address} (${c.name})`);
+    if (others.length) console.log(`    Card khác: ${others.join(', ')} — đặt PUBLIC_HOST trong .env nếu cần chọn card khác.`);
+  } else {
+    console.log('  - LAN     : không tìm thấy card mạng nào đang kết nối.');
+  }
   // Token đội website → ForcAD: đồng bộ khi khởi động và định kỳ (services/forcadSync.js).
   require('./services/forcadSync').start();
+}).on('error', (err) => {
+  if (err.code !== 'EADDRINUSE') throw err;
+  console.error(`[!] Cổng ${PORT} đang bị một chương trình khác dùng (thường là website đã chạy ở cửa sổ khác).`);
+  console.error(`    Tắt chương trình đó, hoặc đổi PORT trong .env. Tìm PID: netstat -ano | findstr :${PORT}  rồi  taskkill /PID <PID> /F`);
+  process.exit(1);
 });

@@ -69,7 +69,7 @@ async function load() {
   scores.forEach(s => { if (!known.has(String(s.name).toLowerCase())) known.set(String(s.name).toLowerCase(), { id: s.team_id, name: s.name }); });
   return {
     ok: true,
-    game: pick(tick, ['mode', 'round', 'tick', 'phase', 'deadline', 'tick_seconds', 'ticks_per_round', 'max_rounds', 'running', 'overall_tick']),
+    game: pick(tick, ['mode', 'round', 'tick', 'phase', 'deadline', 'preview_seconds', 'sla_ticks', 'tick_seconds', 'ticks_per_round', 'max_rounds', 'running', 'overall_tick']),
     scores,
     teams: withZodiac([...known.values()]),
     services: list(arena.services).map(s => pick(s, ['team', 'service', 'status'])),

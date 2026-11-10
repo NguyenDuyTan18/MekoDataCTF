@@ -1,57 +1,67 @@
 <template>
     <form-wrapper
         v-if="task !== null"
+        kicker="Quản lý dịch vụ"
         :title="message"
+        :success-message="taskId ? 'Đã lưu thay đổi.' : ''"
         :submit-callback="submitForm"
     >
-        <p>
-            Name:
-            <input v-model="task.name" type="text" />
-        </p>
-        <p>
-            Checker:
-            <input v-model="task.checker" type="text" />
-        </p>
-        <p>
-            Gets:
-            <input v-model="task.gets" type="number" />
-        </p>
-        <p>
-            Puts:
-            <input v-model="task.puts" type="number" />
-        </p>
-        <p>
-            Places:
-            <input v-model="task.places" type="number" />
-        </p>
-        <p>
-            Checker timeout:
-            <input v-model="task.checker_timeout" type="number" />
-        </p>
-        <p>
-            Checker type:
-            <input v-model="task.checker_type" type="text" />
-        </p>
-        <p>
-            Env path:
-            <input v-model="task.env_path" type="text" />
-        </p>
-        <p>
-            Get period:
-            <input v-model="task.get_period" type="number" />
-        </p>
-        <p>
-            Default score:
-            <input v-model="task.default_score" type="number" />
-        </p>
-        <p>
-            Active:
+        <template #actions>
+            <router-link to="/admin/" class="btn">← Danh sách</router-link>
+        </template>
+        <p class="fw-section">Thông tin</p>
+        <label class="fw-field">
+            Tên dịch vụ
+            <input v-model.trim="task.name" type="text" />
+        </label>
+        <label class="fw-field fw-mono">
+            Đường dẫn checker
+            <input v-model.trim="task.checker" type="text" />
+            <small>Ví dụ /checkers/meko_boutique/sqli.py</small>
+        </label>
+        <label class="fw-field fw-mono">
+            Kiểu checker
+            <input v-model.trim="task.checker_type" type="text" />
+            <small>hackerdom, hackerdom_pfr…</small>
+        </label>
+        <label class="fw-field fw-mono">
+            Env path
+            <input v-model.trim="task.env_path" type="text" />
+        </label>
+        <p class="fw-section">Checker</p>
+        <label class="fw-field">
+            Số lần PUT mỗi tick
+            <input v-model.number="task.puts" type="number" />
+        </label>
+        <label class="fw-field">
+            Số lần GET mỗi tick
+            <input v-model.number="task.gets" type="number" />
+        </label>
+        <label class="fw-field">
+            Số vị trí đặt flag
+            <input v-model.number="task.places" type="number" />
+        </label>
+        <label class="fw-field">
+            Timeout checker (giây)
+            <input v-model.number="task.checker_timeout" type="number" />
+        </label>
+        <label class="fw-field">
+            Chu kỳ GET (giây)
+            <input v-model.number="task.get_period" type="number" />
+        </label>
+        <label class="fw-field">
+            Điểm mặc định
+            <input v-model.number="task.default_score" type="number" />
+        </label>
+        <p class="fw-section">Trạng thái</p>
+        <label class="fw-check fw-field--wide">
             <input
                 type="checkbox"
                 :checked="task.active"
-                @input="task.active = $event.target.checked"
+                @change="task.active = $event.target.checked"
             />
-        </p>
+            <span>Đang hoạt động<small>Tắt thì checker không chạy và dịch vụ bị ẩn khỏi bảng điểm.</small></span>
+        </label>
     </form-wrapper>
 </template>
 
@@ -96,13 +106,13 @@ export default {
                     default_score: 2500,
                     active: true,
                 };
-                this.message = 'Creating task';
+                this.message = 'Thêm dịch vụ mới';
             } else {
                 const { data: task } = await this.$http.get(
                     `/admin/tasks/${this.taskId}/`
                 );
                 this.task = task;
-                this.message = `Editing task ${this.task.name} (${this.task.id})`;
+                this.message = `${this.task.name} · #${this.task.id}`;
             }
         },
         submitForm: async function () {

@@ -31,7 +31,6 @@ body {
 
 body {
     background:
-        radial-gradient(1200px 600px at 80% -10%, #15364a 0%, transparent 60%),
         var(--bg);
     color: var(--text);
     font-family: var(--sans);
@@ -75,13 +74,14 @@ button {
 }
 
 .btn-primary {
-    background: var(--accent-teal);
-    border-color: var(--accent-teal);
-    color: #05221a;
+    background: var(--accent-strong);
+    border-color: var(--accent-strong);
+    color: #fff;
 
     &:hover {
-        background: #8bf7cd;
-        color: #05221a;
+        background: #1d4fd7;
+        border-color: #1d4fd7;
+        color: #fff;
     }
 }
 
@@ -94,13 +94,13 @@ textarea {
     padding: 9px 12px;
     border-radius: 8px;
     border: 1px solid var(--line-strong);
-    background: #0c1d28;
+    background: #11161f;
     color: var(--text);
 
     &:focus {
         outline: none;
         border-color: var(--accent-teal);
-        box-shadow: 0 0 0 3px rgba(110, 240, 190, 0.18);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
     }
 }
 </style>

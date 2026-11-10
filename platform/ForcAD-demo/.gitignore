@@ -12,6 +12,18 @@ checkers/*
 !checkers/requirements.txt
 !checkers/round1/
 checkers/round1/rpc/
+!checkers/meko_boutique/
+checkers/meko_boutique/*
+!checkers/meko_boutique/*.py
+!checkers/mmoiws/
+checkers/mmoiws/*
+!checkers/mmoiws/crypto.py
+!checkers/full_rounds/
+checkers/full_rounds/*
+!checkers/full_rounds/*.py
+!checkers/full_rounds_crypto/
+checkers/full_rounds_crypto/*
+!checkers/full_rounds_crypto/*.py
 
 *.env
 /docker-compose-base.yml

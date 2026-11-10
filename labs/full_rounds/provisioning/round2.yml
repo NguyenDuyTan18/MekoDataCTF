@@ -1,0 +1,186 @@
+---
+- name: Install the Crypto AD challenges alongside the Web lab
+  hosts: 'team1:team2:team3'
+  become: true
+  vars: &crypto_ad_vars
+    crypto_ad_source: '{{ playbook_dir }}/../round2/crypto_ad'
+    crypto_ad_services:
+      curveball: 9011
+      padding_oracle: 9012
+      ecdsa_nonce: 9013
+  tasks:
+    - name: Install Crypto AD runtime packages
+      ansible.builtin.apt:
+        name: [python3, python3-ecdsa, python3-pycryptodome, netcat-openbsd]
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Create directories for Crypto AD
+      ansible.builtin.file:
+        path: '{{ item.path }}'
+        owner: '{{ item.owner }}'
+        group: users
+        mode: '{{ item.mode }}'
+        state: directory
+      loop:
+        - {path: /opt/meko-crypto, owner: root, mode: '0775'}
+        - {path: /etc/meko-crypto, owner: root, mode: '0750'}
+        - {path: /var/lib/meko-crypto, owner: '{{ inventory_hostname }}', mode: '0750'}
+        - {path: '/home/{{ inventory_hostname }}/crypto-lab', owner: '{{ inventory_hostname }}', mode: '0750'}
+
+    - name: Check whether the VM already has a Crypto AD configuration
+      ansible.builtin.stat:
+        path: /etc/meko-crypto/service.json
+      register: crypto_ad_config
+
+    - name: Create service configuration on new VMs
+      ansible.builtin.copy:
+        dest: /etc/meko-crypto/service.json
+        owner: root
+        group: users
+        mode: '0640'
+        force: false
+        content: >-
+          {{ {'team': inventory_hostname, 'data_dir': '/var/lib/meko-crypto',
+              'patched': '0', 'admin_token': (crypto_ad_admin_tokens | default({})).get(inventory_hostname)
+              or lookup('ansible.builtin.password', '/dev/null length=64 chars=hexdigits')} | to_nice_json }}
+      when: not crypto_ad_config.stat.exists
+      no_log: true
+
+    - name: Read the service config to use its token on the checker VM
+      ansible.builtin.slurp:
+        src: /etc/meko-crypto/service.json
+      register: crypto_ad_service_config
+      no_log: true
+
+    - name: Install the challenge source
+      ansible.builtin.copy:
+        src: '{{ crypto_ad_source }}/{{ item }}'
+        dest: '/opt/meko-crypto/{{ item }}'
+        owner: root
+        group: users
+        mode: '0664'
+      loop: [service.py, protocol.py]
+      notify: Restart Crypto AD services
+
+    - name: Install the Crypto AD systemd template
+      ansible.builtin.template:
+        src: meko-crypto.service.j2
+        dest: /etc/systemd/system/meko-crypto@.service
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart Crypto AD services
+
+    - name: Allow the team to restart only its Crypto AD services
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/meko-crypto
+        owner: root
+        group: root
+        mode: '0440'
+        validate: '/usr/sbin/visudo -cf %s'
+        content: |
+          {% for service in crypto_ad_services %}
+          {{ inventory_hostname }} ALL=(root) NOPASSWD: /usr/bin/systemctl restart meko-crypto@{{ service }}.service
+          {% endfor %}
+
+    - name: Publish the Crypto AD challenge instructions on each team VM
+      ansible.builtin.copy:
+        src: '{{ crypto_ad_source }}/README.md'
+        dest: '/home/{{ inventory_hostname }}/crypto-lab/README.md'
+        owner: '{{ inventory_hostname }}'
+        group: users
+        mode: '0640'
+
+    - name: Publish the other teams and their challenge ports
+      ansible.builtin.copy:
+        dest: '/home/{{ inventory_hostname }}/crypto-lab/host_port.txt'
+        owner: '{{ inventory_hostname }}'
+        group: users
+        mode: '0640'
+        content: |
+          # team ip {{ crypto_ad_services.keys() | join(' ') }}
+          {% for team, ip in meko_addresses.items() if team != inventory_hostname %}
+          {{ team }} {{ ip }} {{ crypto_ad_services.values() | join(' ') }}
+          {% endfor %}
+
+    - name: Enable the three Crypto AD services
+      ansible.builtin.systemd:
+        name: 'meko-crypto@{{ item }}.service'
+        daemon_reload: true
+        enabled: true
+        state: started
+      loop: '{{ crypto_ad_services.keys() | list }}'
+
+    - name: Apply pending Crypto AD restarts
+      ansible.builtin.meta: flush_handlers
+
+    - name: Verify that the Crypto AD ports are reachable
+      ansible.builtin.wait_for:
+        host: '{{ item.0.value }}'
+        port: '{{ item.1.value }}'
+        timeout: 20
+        state: started
+      loop: '{{ (meko_addresses | dict2items) | product(crypto_ad_services | dict2items) | list }}'
+
+  handlers:
+    - name: Restart Crypto AD services
+      ansible.builtin.systemd:
+        name: 'meko-crypto@{{ item }}.service'
+        daemon_reload: true
+        state: restarted
+      loop: '{{ crypto_ad_services.keys() | list }}'
+
+- name: Install the Crypto AD agent on the existing checker VM
+  hosts: checker
+  become: true
+  gather_facts: false
+  vars: *crypto_ad_vars
+  tasks:
+    - name: Install the Crypto AD checker runtime
+      ansible.builtin.apt:
+        name: [python3, python3-ecdsa]
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Create checker directories
+      ansible.builtin.file:
+        path: '{{ item.path }}'
+        owner: root
+        group: root
+        mode: '{{ item.mode }}'
+        state: directory
+      loop:
+        - {path: /opt/crypto-checker, mode: '0755'}
+        - {path: /etc/crypto-checker, mode: '0700'}
+
+    - name: Install the existing Crypto AD checker source
+      ansible.builtin.copy:
+        src: '{{ crypto_ad_source }}/{{ item }}'
+        dest: '/opt/crypto-checker/{{ item }}'
+        owner: root
+        group: root
+        mode: '0644'
+      loop: [agent.py, protocol.py]
+
+    - name: Configure the checker with the tokens already used by the services
+      ansible.builtin.template:
+        src: crypto-checker-config.json.j2
+        dest: /etc/crypto-checker/config.json
+        owner: root
+        group: root
+        mode: '0600'
+      no_log: true
+
+    - name: Verify each Crypto AD challenge from the checker VM
+      ansible.builtin.command:
+        argv: [/usr/bin/python3, /opt/crypto-checker/agent.py, --config, /etc/crypto-checker/config.json]
+        stdin: ' {{ {"task": item.1, "action": "check", "ip": item.0.value} | to_json }}'
+      loop: '{{ (meko_addresses | dict2items) | product(crypto_ad_services.keys() | list) | list }}'
+      loop_control:
+        label: '{{ item.0.key }}/{{ item.1 }}'
+      register: crypto_ad_probe
+      changed_when: false
+      failed_when: (crypto_ad_probe.stdout | from_json).status != 101

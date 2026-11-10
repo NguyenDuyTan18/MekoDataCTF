@@ -1,5 +1,6 @@
 """Execute a fresh sandbox health check when ForcAD requests a tick."""
 import argparse
+from contextlib import ExitStack
 from datetime import datetime, timezone
 import json
 import os
@@ -17,7 +18,6 @@ import labconfig  # noqa: E402
 
 # Active lab: $MEKO_LAB (default round1) -> labs/<lab>/lab.json and checkers/<lab>/rpc.
 LAB = labconfig.load()
-TEAM_IPS = {team['ip'] for team in LAB['teams']}
 BRIDGE = ROOT / 'checkers' / 'mekodata_bridge'
 REQUEST = BRIDGE / 'request.json'
 REMOTE = 'sudo -n -u web-checker /usr/bin/python3 /opt/web-checker/web_health.py --config /etc/web-checker/web_targets.json --json --database /var/lib/web-checker/results.sqlite3'
@@ -27,10 +27,11 @@ AGENT_COMMAND = LAB.get('agent_command', 'sudo -n /usr/bin/python3 /opt/round1/a
 AGENT_TIMEOUT = LAB.get('agent_timeout', 15)
 
 
-def process_rpc(path):
+def process_rpc(path, config=None):
     """Only send structured, expiring requests to the fixed sandbox agent."""
     identity = path.name.removesuffix('.request.json')
-    response = RPC_ROOT / (identity + '.response.json')
+    config = config or LAB
+    response = path.parent / (identity + '.response.json')
     if response.exists():
         return
     try:
@@ -39,11 +40,12 @@ def process_rpc(path):
             return
         if not 0 < float(data['expires']) - time.time() <= 45:
             return
-        if data['payload']['ip'] not in TEAM_IPS or data['payload']['task'] not in LAB['tasks']:
+        if (data['payload']['ip'] not in {team['ip'] for team in config['teams']}
+                or data['payload']['task'] not in config['tasks']):
             raise ValueError('Invalid action/team')
-        proc = subprocess.run(labconfig.ssh(LAB, LAB['checker_host'], AGENT_COMMAND),
+        proc = subprocess.run(labconfig.ssh(config, config['checker_host'], config.get('agent_command', AGENT_COMMAND)),
                               input=json.dumps(data['payload']), text=True, capture_output=True,
-                              timeout=AGENT_TIMEOUT, cwd=labconfig.WORKSPACE,
+                              timeout=config.get('agent_timeout', AGENT_TIMEOUT), cwd=labconfig.WORKSPACE,
                               creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         if proc.returncode:
             raise RuntimeError('SSH agent unavailable')
@@ -112,39 +114,59 @@ def process_request():
     return True
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--once', action='store_true')
-    args = parser.parse_args()
-    lock = (BRIDGE / 'collector.lock').open('a+b')
+def lock_collector(stack, lock_dir):
+    lock_dir.mkdir(parents=True, exist_ok=True)
+    lock = stack.enter_context((lock_dir / 'collector.lock').open('a+b'))
     if os.name == 'nt':
         import msvcrt
         lock.seek(0)
         if not lock.read(1):
             lock.write(b'0'); lock.flush()
         lock.seek(0)
+        msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+    else:
+        import fcntl
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--once', action='store_true')
+    parser.add_argument('--rpc-only', action='store_true', help='Handle lab RPC without the classic health bridge')
+    parser.add_argument('--labs', help='Comma-separated lab names or paths under labs/; requires --rpc-only')
+    args = parser.parse_args()
+    if args.labs and not args.rpc_only:
+        parser.error('--labs requires --rpc-only')
+    labs = [labconfig.load(name) for name in args.labs.split(',')] if args.labs else [LAB]
+    roots = {ROOT / 'checkers' / lab['name'] / 'rpc': lab for lab in labs}
+    with ExitStack() as stack:
         try:
-            msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
-        except OSError:
-            print('Collector is already running', file=sys.stderr)
+            for root in roots:
+                lock_collector(stack, root)
+            if not args.rpc_only:
+                lock_collector(stack, BRIDGE)
+        except OSError as exc:
+            print(f'Cannot acquire collector lock: {exc}', file=sys.stderr)
             return 1
-    executor = ThreadPoolExecutor(max_workers=8)
-    pending = {}
-    while True:
-        try:
-            process_request()
-            pending = {path: job for path, job in pending.items() if not job.done()}
-            for path in RPC_ROOT.glob('*.request.json'):
-                if path not in pending and len(pending) < 8 and not path.with_name(path.name.replace('.request.', '.response.')).exists():
-                    pending[path] = executor.submit(process_rpc, path)
-        except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.TimeoutExpired) as exc:
-            print('Collection failed:', exc, file=sys.stderr, flush=True)
+        executor = stack.enter_context(ThreadPoolExecutor(max_workers=8))
+        pending = {}
+        while True:
+            try:
+                if not args.rpc_only:
+                    process_request()
+                pending = {path: job for path, job in pending.items() if not job.done()}
+                for root, lab in roots.items():
+                    for path in root.glob('*.request.json'):
+                        response = path.with_name(path.name.replace('.request.', '.response.'))
+                        if path not in pending and len(pending) < 8 and not response.exists():
+                            pending[path] = executor.submit(process_rpc, path, lab)
+            except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.TimeoutExpired) as exc:
+                print('Collection failed:', exc, file=sys.stderr, flush=True)
+                if args.once:
+                    return 1
             if args.once:
-                return 1
-        if args.once:
-            executor.shutdown(wait=True)
-            return 0
-        time.sleep(0.5)
+                return 0
+            time.sleep(0.5)
 
 
 if __name__ == '__main__':

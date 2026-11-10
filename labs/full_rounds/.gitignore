@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+.secrets/
+*.sqlite*
+*.db
+*.pem
+*.key
+management-config
+known-hosts

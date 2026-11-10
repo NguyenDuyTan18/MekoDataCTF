@@ -59,10 +59,10 @@ export default {
     inset: 0 auto 0 0;
     background: linear-gradient(
         90deg,
-        rgba(110, 240, 190, 0.16),
-        rgba(110, 240, 190, 0.06)
+        rgba(59, 130, 246, 0.16),
+        rgba(59, 130, 246, 0.05)
     );
-    border-right: 2px solid rgba(110, 240, 190, 0.55);
+    border-right: 2px solid rgba(59, 130, 246, 0.6);
     transition: width 0.5s linear;
 }
 
@@ -108,7 +108,7 @@ export default {
     padding: 6px 14px;
     border: 1px solid var(--line-strong);
     border-radius: 999px;
-    background: rgba(10, 22, 32, 0.6);
+    background: rgba(13, 17, 24, 0.6);
 }
 
 .tick-label {

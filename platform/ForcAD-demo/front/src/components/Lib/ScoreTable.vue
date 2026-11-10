@@ -437,7 +437,7 @@ export default {
 
 .highlighted {
     border-color: var(--accent-teal);
-    box-shadow: 0 0 0 1px var(--accent-teal), 0 0 22px rgba(110, 240, 190, 0.22);
+    box-shadow: 0 0 0 1px var(--accent-teal), 0 0 22px rgba(59, 130, 246, 0.25);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -67,8 +67,35 @@ def test_flag_column_fits_every_lab_format():
     assert f"ALTER COLUMN flag TYPE VARCHAR({limit})" in lifecycle
     profiles = load_profiles()
     for name in profiles.PROFILES:
-        flag = profiles.get(name)["flag_template"].format(letter="M", body="A" * 30)
+        flag = profiles.get(name)["flag_template"].format(letter="M", body="A" * 30, hexbody="a" * 32)
         assert len(flag) <= limit
+
+
+@pytest.mark.parametrize("name,path", [("full_rounds", "full_rounds"), ("full_rounds_crypto", "full_rounds/round2")])
+def test_full_rounds_routes_to_the_expected_agent(name, path, tmp_path, monkeypatch):
+    profile = load_profiles().get(name)
+    lab = collector.labconfig.load(path)
+    assert lab["name"] == name
+    assert tuple(lab["tasks"]) == profile["tasks"]
+    assert {t["ip"]: t["name"] for t in lab["teams"]} == profile["teams"]
+    assert all((FORCAD / profile["prefix"].lstrip("/") / (task + ".py")).is_file() for task in lab["tasks"])
+    assert lab["checker_host"] == "checker"
+    expected = "/opt/crypto-checker/agent.py" if name.endswith("_crypto") else "/opt/meko-checker/agent.py"
+    assert expected in lab["agent_command"]
+
+    def fake_ssh(argv, **options):
+        assert argv[-2:] == ["checker", lab["agent_command"]]
+        assert json.loads(options["input"]) == payload
+        return subprocess.CompletedProcess(argv, 0, stdout='{"status":101,"public":"UP","private":""}')
+
+    monkeypatch.setattr(collector.subprocess, "run", fake_ssh)
+    identity = "a" * 32
+    payload = {"task": lab["tasks"][0], "ip": TEAM_IP, "action": "check"}
+    request = tmp_path / (identity + ".request.json")
+    request.write_text(json.dumps({"id": identity, "expires": time.time() + 40, "payload": payload}))
+    collector.process_rpc(request, lab)
+    reply = tmp_path / (identity + ".response.json")
+    assert json.loads(reply.read_text())["status"] == 101
 
 
 @pytest.fixture

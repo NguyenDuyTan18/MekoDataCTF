@@ -1,0 +1,9 @@
+{
+  "timeout": 4,
+  "teams": {
+{% for team, ip in meko_addresses.items() %}
+{% set config = hostvars[team].crypto_ad_service_config.content | b64decode | from_json %}
+    "{{ ip }}": {"token": {{ config.admin_token | to_json }}}{{ "," if not loop.last }}
+{% endfor %}
+  }
+}

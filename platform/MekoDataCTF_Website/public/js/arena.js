@@ -7,7 +7,7 @@
 const root = document.querySelector('[data-arena]');
 if (!root) return;
 const get = s => root.querySelector(s);
-const labels = { ready: 'READY', preparing: 'PREPARING', running: 'RUNNING', paused: 'PAUSED', checking: 'CHECKING', draining: 'FINAL FLAG WINDOW', finished: 'FINISHED', archived: 'ARCHIVED', recreating: 'RESETTING' };
+const labels = { preview: 'XEM ĐỀ', ready: 'READY', preparing: 'PREPARING', running: 'RUNNING', paused: 'PAUSED', checking: 'CHECKING', draining: 'FINAL FLAG WINDOW', finished: 'FINISHED', archived: 'ARCHIVED', recreating: 'RESETTING' };
 
 let state = null;          // trạng thái hợp lệ gần nhất
 let connected = false;
@@ -41,12 +41,12 @@ function placeholder(text) {
 function timer() {
   const el = get('[data-timer]'), game = state?.game;
   if (!game || !connected) { el.textContent = '--:--'; el.classList.remove('urgent'); return; }
-  if (!['running', 'draining'].includes(game.phase) || !game.deadline) { el.textContent = '--:--'; el.classList.remove('urgent'); return; }
+  if (!['preview', 'running', 'checking', 'draining'].includes(game.phase) || !game.deadline) { el.textContent = '--:--'; el.classList.remove('urgent'); return; }
   const left = Math.max(0, Math.ceil(game.deadline - serverNow()));
   el.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
   el.classList.toggle('urgent', left <= 20);
   const bar = get('[data-progress]');
-  bar.max = game.tick_seconds || 120;
+  bar.max = game.phase === 'preview' ? game.preview_seconds : (game.tick_seconds || 120);
   bar.value = Math.max(0, bar.max - left);
 }
 
@@ -62,7 +62,8 @@ function renderRanking() {
     return;
   }
   const rows = [...(state.scores || [])].sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
-  const key = JSON.stringify(rows) + game.ticks_per_round;
+  const slaTicks = game.sla_ticks || game.ticks_per_round;
+  const key = JSON.stringify(rows) + slaTicks;
   if (key === rankingKey) return; // không đổi: không đụng DOM
   rankingKey = key;
   const fragment = document.createDocumentFragment();
@@ -84,7 +85,7 @@ function renderRanking() {
     cell(team.total, 'b', 'total-score');
     cell(signed(team.attack), 'span', team.attack < 0 ? 'score-neg' : 'score-pos');
     cell(signed(team.defense), 'span', team.defense < 0 ? 'score-neg' : 'score-pos');
-    cell(`${team.sla} / ${game.ticks_per_round}`, 'span', 'score-sla');
+    cell(`${team.sla} / ${slaTicks}`, 'span', 'score-sla');
     fragment.append(tr);
     previous.set(team.team_id, team.total);
   });

@@ -84,7 +84,9 @@ def main(state: TickerState):
     while True:
         if round1.configured():
             try:
-                round1.pump()
+                with round1.lifecycle_lock(required=False) as locked:
+                    if locked:
+                        round1.pump()
             except Exception:
                 logger.exception('Round 1 scheduler failed; paused for organizer review')
                 round_control.set_enabled(False)

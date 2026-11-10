@@ -104,6 +104,7 @@ router.beforeEach(async function (to, from, next) {
         } catch (e) {
             next({
                 name: 'adminLogin',
+                query: { next: to.fullPath },
             });
         }
         if (ok) {

@@ -1,0 +1,135 @@
+---
+- name: Preinstall Crypto AD on the existing team VMs
+  hosts: 'team1:team2:team3'
+  become: true
+  any_errors_fatal: true
+  tasks:
+    - name: Install the Crypto AD runtime and compiler
+      ansible.builtin.apt:
+        name: [gcc, libc6-dev, python3-flask, python3-waitress]
+        state: present
+    - name: Verify the CPU supports the challenge bitmap implementation
+      ansible.builtin.command: grep -qw aes /proc/cpuinfo
+      changed_when: false
+    - name: Create the Crypto AD service account
+      ansible.builtin.user:
+        name: crypto-ad
+        system: true
+        create_home: false
+        shell: /usr/sbin/nologin
+    - name: Create service directories
+      ansible.builtin.file:
+        path: '{{ item.path }}'
+        state: directory
+        owner: '{{ item.owner }}'
+        group: crypto-ad
+        mode: '{{ item.mode }}'
+      loop:
+        - {path: /opt/crypto-ad, owner: root, mode: '0755'}
+        - {path: /etc/crypto-ad, owner: root, mode: '0750'}
+        - {path: /var/lib/crypto-ad, owner: crypto-ad, mode: '0700'}
+    - name: Generate a private checker token for this VM
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/python3
+          - -c
+          - "import os, secrets; os.umask(0o077); open('/etc/crypto-ad/token', 'x').write(secrets.token_hex(32))"
+        creates: /etc/crypto-ad/token
+      no_log: true
+    - name: Let only root and the service read the token
+      ansible.builtin.file:
+        path: /etc/crypto-ad/token
+        owner: root
+        group: crypto-ad
+        mode: '0640'
+    - name: Read the token for the checker configuration
+      ansible.builtin.slurp:
+        src: /etc/crypto-ad/token
+      register: crypto_token
+      no_log: true
+    - name: Install the service source
+      ansible.builtin.copy:
+        src: '{{ playbook_dir }}/../crypto_ad/{{ item }}'
+        dest: '/opt/crypto-ad/{{ item }}'
+        owner: '{{ "root" if item == "core.c" else inventory_hostname }}'
+        group: crypto-ad
+        mode: '0644'
+      loop: [web.py, aes.py, crypto_keys.py, core.c]
+    - name: Compile the original bitmap generator
+      ansible.builtin.command:
+        argv: [gcc, -O3, -maes, -msse2, -fopenmp, -fPIC, -shared, /opt/crypto-ad/core.c, -o, /opt/crypto-ad/core.so]
+        creates: /opt/crypto-ad/core.so
+    - name: Install the Crypto AD service unit
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/crypto-ad.service
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Crypto AD Sevenfold
+          After=network.target
+          ConditionPathExists=/etc/crypto-ad/active
+          [Service]
+          User=crypto-ad
+          Group=crypto-ad
+          WorkingDirectory=/opt/crypto-ad
+          Environment=PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1
+          ExecStart=/usr/bin/python3 /opt/crypto-ad/web.py
+          Restart=on-failure
+          NoNewPrivileges=true
+          PrivateTmp=true
+          ProtectSystem=strict
+          ProtectHome=true
+          ReadWritePaths=/var/lib/crypto-ad
+          [Install]
+          WantedBy=multi-user.target
+    - name: Create the Meko service override directory
+      ansible.builtin.file:
+        path: /etc/systemd/system/meko-boutique.service.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    - name: Prevent the Meko unit from starting during Crypto AD
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/meko-boutique.service.d/round.conf
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          [Unit]
+          ConditionPathExists=!/etc/crypto-ad/active
+    - name: Register the unit without activating it
+      ansible.builtin.systemd:
+        name: crypto-ad.service
+        daemon_reload: true
+
+- name: Install the Crypto AD agent on the shared checker VM
+  hosts: checker
+  become: true
+  tasks:
+    - name: Create private agent directories
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+      loop: [/opt/crypto-ad-checker, /etc/crypto-ad-checker]
+    - name: Copy the checker source
+      ansible.builtin.copy:
+        src: '{{ playbook_dir }}/../crypto_ad/{{ item }}'
+        dest: '/opt/crypto-ad-checker/{{ item }}'
+        owner: root
+        group: root
+        mode: '0600'
+      loop: [aes.py, crypto_keys.py, crypto_agent.py]
+    - name: Configure the agent for the same team addresses
+      ansible.builtin.template:
+        src: crypto-checker-config.json.j2
+        dest: /etc/crypto-ad-checker/config.json
+        owner: root
+        group: root
+        mode: '0600'
+      no_log: true

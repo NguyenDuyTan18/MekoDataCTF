@@ -1,15 +1,354 @@
 <!doctype html>
-<html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nộp flag — Round 1</title>
-<style>body{background:#101b23;color:#e8f1f4;font:16px system-ui;max-width:1000px;margin:32px auto;padding:0 16px}input,textarea,button{font:inherit;padding:8px}textarea{width:95%;height:110px}pre{white-space:pre-wrap;background:#1c303b;padding:12px}a{color:#6ef0be}input,textarea{background:#172a35;color:#fff;border:1px solid #527180;max-width:100%;box-sizing:border-box}button{background:#6ef0be;color:#101b23;border:0;cursor:pointer}:focus-visible{outline:3px solid #ffb46d;outline-offset:3px}#targets{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{border:1px solid #39505f;padding:8px;text-align:left}</style>
-<link rel="stylesheet" href="/arena.css"><a href="/">Scoreboard</a><h1>Nộp flag</h1>
-<p>Dùng token của đội do quản trị cung cấp. Mỗi flag một dòng; tối đa 100 flag mỗi lần.</p>
-<form id="submission"><label>Team token <input id="token" type="password" autocomplete="off" required></label><p><textarea id="flags" required placeholder="Flag lấy được từ đội khác"></textarea></p><button>Nộp flag</button></form>
-<pre id="result" aria-live="polite"></pre>
-<h2>Vị trí mục tiêu còn hiệu lực</h2><p>Đây là ID/đường dẫn mục tiêu; người chơi cần khai thác để lấy giá trị flag.</p><div id="targets"></div>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bản đồ flag · MekoDataCTF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* Cùng hệ màu với Điều khiển round / Bảng điểm trực tiếp */
+:root{--bg:#0d1118;--panel:#141a24;--panel2:#19202d;--sunk:#11161f;--line:#2a3344;--line2:#222a39;--field:#38445c;--text:#e6eaf2;--strong:#f1f4fa;--muted:#8b96ab;--label:#7c8aa5;--accent:#3b82f6;--accent2:#2563eb;--good:#4ade80;--warn:#fbbf24;--bad:#f87171;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;padding:16px 16px 40px;background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,"Segoe UI",Arial,sans-serif}
+a{color:#7cc0ff;text-decoration:none}a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid #60a5fa;outline-offset:2px}
+.wrap{max-width:1250px;margin:0 auto}
+.nav{display:flex;align-items:center;gap:18px;padding:4px 2px 14px;font-size:13px}
+.nav b{flex:1;font-size:12px;letter-spacing:.14em;color:var(--strong)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 20px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.kicker{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--label);font-weight:600}
+h1,h2{margin:0;font-size:16px;font-weight:600;color:var(--strong)}
+.hint{margin:0;padding:10px 20px;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line2)}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:4px 11px;border-radius:999px;font-size:12px;font-weight:600;background:#262f40;color:#aab4c8;white-space:nowrap}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pill.good{background:#123224;color:var(--good)}.pill.warn{background:#3a2e12;color:var(--warn)}.pill.bad{background:#3a1c1f;color:var(--bad)}
+
+/* Ô tình trạng */
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line2);border-bottom:1px solid var(--line2)}
+.stat{background:var(--panel);padding:12px 20px;min-width:0}
+.stat small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--label);font-weight:600}
+.stat b{display:block;font-size:15px;font-weight:600;color:var(--strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat b.big{font:600 20px/1.35 var(--mono)}
+
+/* Thanh công cụ */
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--field);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:6px 12px;background:#222b3c}
+.seg button+button{border-left:1px solid var(--field)}
+.seg button[aria-pressed="true"]{background:var(--accent2);color:#fff}
+input,textarea{font:13px/1.5 var(--mono);padding:8px 12px;border-radius:8px;border:1px solid var(--field);background:var(--sunk);color:var(--text)}
+input:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.25)}
+input[type=search]{width:230px;font-family:Inter,system-ui,sans-serif}
+button{font:inherit;padding:8px 15px;border-radius:8px;border:1px solid var(--field);background:#222b3c;color:var(--text);cursor:pointer}
+button:hover:not(:disabled){background:#2c3850;border-color:#4a597a}
+button:disabled{opacity:.55;cursor:wait}
+.primary{background:var(--accent2);border-color:var(--accent2);color:#fff;font-weight:600;padding:9px 22px}
+.primary:hover:not(:disabled){background:#1d4fd7;border-color:#1d4fd7}
+.updated{font-size:12px;color:var(--muted)}
+
+/* Ma trận đội × dịch vụ */
+.matrix-wrap{overflow:auto;max-height:70vh}
+table{width:100%;border-collapse:separate;border-spacing:0}
+th{position:sticky;top:0;z-index:2;background:var(--sunk);color:var(--label);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:10px 14px;border-bottom:1px solid var(--line2);white-space:nowrap}
+th small{display:block;font:500 11px var(--mono);letter-spacing:0;text-transform:none;color:var(--muted)}
+td{padding:10px 14px;border-bottom:1px solid var(--line2);vertical-align:top}
+.matrix th:first-child,.matrix td:first-child{position:sticky;left:0;z-index:1;background:var(--panel);border-right:1px solid var(--line2);min-width:150px}
+.matrix th:first-child{z-index:3;background:var(--sunk)}
+.team b{display:block;color:var(--strong)}
+.team code{font:12px var(--mono);color:var(--muted)}
+.cell{min-width:180px}
+.cell .n{display:inline-block;margin-bottom:6px;font:600 11px var(--mono);color:var(--muted)}
+.cell.zero .n{color:#5b6680}
+.loc{display:flex;align-items:center;gap:6px;margin:0 0 4px;padding:4px 6px 4px 9px;border-radius:6px;background:var(--sunk);border:1px solid var(--line2);font:12px/1.4 var(--mono);color:#c4ccdd}
+.loc span{flex:1;overflow-wrap:anywhere}
+.loc.new{border-color:#3b82f6;background:#172a4d;animation:pulse 1.6s ease-out}
+@keyframes pulse{from{box-shadow:0 0 0 3px rgba(59,130,246,.45)}to{box-shadow:0 0 0 0 transparent}}
+.copy{flex:none;padding:1px 7px;font-size:11px;border-radius:5px;background:transparent;border-color:var(--line);color:var(--muted)}
+.copy.done{color:var(--good);border-color:#1f4a33}
+.more{font-size:12px;color:#7cc0ff;cursor:pointer;background:none;border:0;padding:2px 0}
+tr.dim{opacity:.45}
+.list td:first-child{font-weight:600;color:var(--strong);white-space:nowrap}
+.list td:nth-child(2){font:12.5px var(--mono);white-space:nowrap}
+.list td:last-child{font:12.5px var(--mono);overflow-wrap:anywhere}
+tbody tr:hover td{background:#18202d}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--text);font-size:14px;margin-bottom:4px}
+
+/* Nộp flag (phụ) */
+details.card>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:var(--panel2)}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary::after{content:"▾";color:var(--muted)}
+details.card[open]>summary{border-bottom:1px solid var(--line)}
+details.card[open]>summary::after{content:"▴"}
+.body{padding:16px 20px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:14px 16px}
+label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:#9aa6bd;min-width:0}
+label small{color:var(--muted);font-size:11.5px}
+label input,textarea{width:100%}
+textarea{min-height:110px;resize:vertical}
+.token{display:flex;gap:8px}.token input{flex:1}
+.foot{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 20px;border-top:1px solid var(--line2);background:var(--sunk)}
+.foot .count{margin-right:auto;font-size:12.5px;color:var(--muted)}
+#result:empty{display:none}
+.summary{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px;border-top:1px solid var(--line2)}
+.res{list-style:none;margin:0;padding:4px 20px 14px;max-height:300px;overflow:auto}
+.res li{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line2);font-size:13px}
+.res li:last-child{border-bottom:0}
+.res li::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--bad)}
+.res li.ok::before{background:var(--good)}
+.res code{font:12px var(--mono);color:#c4ccdd;overflow-wrap:anywhere;flex:0 1 46%}
+.res span{flex:1;color:#fca5a5;overflow-wrap:anywhere}.res li.ok span{color:var(--good)}
+.error{margin:0;padding:12px 20px;color:#fecaca;background:#2a1719;border-top:1px solid #4a2326}
+@media(max-width:820px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}input[type=search]{width:160px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav"><b>MEKODATACTF</b><a href="/">Điều khiển round</a><a href="/admin/">Quản lý đội / task</a></nav>
+
+  <section class="card">
+    <div class="head">
+      <div><p class="kicker">Ban tổ chức · theo dõi</p><h1>Bản đồ flag đang hiệu lực</h1></div>
+      <span class="pill" id="live">Đang kết nối…</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><small>Giai đoạn</small><b id="s-phase">—</b></div>
+      <div class="stat"><small>Round / Tick</small><b id="s-tick">—</b></div>
+      <div class="stat"><small>Tick kế tiếp</small><b class="big" id="s-timer">—</b></div>
+      <div class="stat"><small>Flag hiệu lực</small><b class="big" id="s-flags">0</b></div>
+      <div class="stat"><small>Đội · Dịch vụ</small><b id="s-size">—</b></div>
+    </div>
+    <p class="hint">Mỗi ô là vị trí (ID / đường dẫn công khai) của flag mà checker vừa cắm vào dịch vụ của đội đó, không phải giá trị flag. Flag mới xuất hiện sau khi checker PUT thành công ở đầu tick và hết hạn sau vài tick. Ô viền xanh là vị trí mới so với lần cập nhật trước.</p>
+    <div class="head" style="background:var(--panel);border-bottom:1px solid var(--line2)">
+      <div class="seg" role="group" aria-label="Kiểu xem">
+        <button type="button" id="v-matrix" aria-pressed="true">Theo đội × dịch vụ</button>
+        <button type="button" id="v-list" aria-pressed="false">Danh sách</button>
+      </div>
+      <div class="tools"><span class="updated" id="updated"></span><input id="filter" type="search" placeholder="Lọc đội, IP, dịch vụ, vị trí…" aria-label="Lọc"></div>
+    </div>
+    <div id="view" class="matrix-wrap"><div class="empty">Đang tải…</div></div>
+  </section>
+
+  <details class="card" id="submit-box">
+    <summary><div><p class="kicker">Kiểm tra</p><h2>Nộp flag thử bằng token đội</h2></div></summary>
+    <form id="submission">
+      <div class="body">
+        <div class="grid">
+          <label>Token đội
+            <span class="token"><input id="token" type="password" autocomplete="off" spellcheck="false" required><button type="button" id="toggle" aria-pressed="false">Hiện</button></span>
+            <small>Lấy ở Quản lý đội. Chỉ lưu trong tab này.</small>
+          </label>
+          <label>Flag
+            <textarea id="flags" required spellcheck="false" placeholder="Mỗi flag một dòng, tối đa 100"></textarea>
+          </label>
+        </div>
+      </div>
+      <div class="foot"><span class="count" id="count">0 flag</span><button type="button" id="clear">Xóa</button><button class="primary" id="send">Nộp flag</button></div>
+      <div id="result" aria-live="polite"></div>
+    </form>
+  </details>
+</div>
 <script>
-const form=document.querySelector('#submission'),result=document.querySelector('#result');
-form.addEventListener('submit',async event=>{event.preventDefault();const flags=document.querySelector('#flags').value.split(/\s+/).filter(Boolean);if(flags.length>100){result.textContent='Tối đa 100 flag.';return;}try{const response=await fetch('/flags/',{method:'PUT',headers:{'Content-Type':'application/json','X-Team-Token':document.querySelector('#token').value.trim()},body:JSON.stringify(flags)});result.textContent=JSON.stringify(await response.json(),null,2);}catch(e){result.textContent='Không kết nối được bộ nhận flag.';}});
-async function targets(){try{const response=await fetch('/api/client/attack_data/',{cache:'no-store',signal:AbortSignal.timeout(7000)});const data=await response.json();const container=document.querySelector('#targets');container.replaceChildren();if(!data){container.textContent='Chưa có flag.';return;}const table=document.createElement('table');const header=table.insertRow();for(const text of ['Task','Đội / IP','Vị trí']){const cell=document.createElement('th');cell.textContent=text;header.append(cell);}for(const [task,teams] of Object.entries(data)){for(const [ip,locations] of Object.entries(teams)){for(const location of locations){const row=table.insertRow();for(const text of [task,ip,location]) row.insertCell().textContent=text;}}}container.append(table);}catch(e){document.querySelector('#targets').textContent='Không tải được mục tiêu.';}}
-async function pollTargets(){await targets();setTimeout(pollTargets,5000)}pollTargets();
-</script></html>
+const $ = s => document.querySelector(s);
+const node = (tag, cls, text) => { const el = document.createElement(tag); if (cls) el.className = cls; if (text !== undefined) el.textContent = String(text); return el; };
+const PHASES = {ready:'Sẵn sàng',preparing:'Đang chuẩn bị',preview:'Đang xem đề',running:'Đang chạy',checking:'Đang chấm',draining:'Cửa sổ flag cuối',paused:'Tạm dừng',finished:'Đã kết thúc',archived:'Đã lưu hồ sơ',recreating:'Đang tái tạo'};
+const CELL_LIMIT = 4;
+
+let view = 'matrix', teams = [], tasks = [], attack = {}, status = null, seen = null, fresh = new Set(), expanded = new Set();
+try { view = sessionStorage.getItem('flagmap-view') || 'matrix'; } catch (_) {}
+
+const shortTask = name => String(name).includes('/') ? String(name).split('/').pop() : String(name);
+const keyOf = (task, ip, loc) => task + '|' + ip + '|' + loc;
+const locText = loc => typeof loc === 'string' ? loc : JSON.stringify(loc);
+
+function copyButton(text) {
+  const b = node('button', 'copy', 'Chép'); b.type = 'button'; b.title = 'Chép vị trí';
+  b.addEventListener('click', async () => { try { await navigator.clipboard.writeText(text); b.textContent = 'Đã chép'; b.classList.add('done'); setTimeout(() => { b.textContent = 'Chép'; b.classList.remove('done'); }, 1200); } catch (_) {} });
+  return b;
+}
+function locRow(task, ip, loc) {
+  const row = node('div', 'loc' + (fresh.has(keyOf(task, ip, loc)) ? ' new' : ''));
+  row.append(node('span', '', loc), copyButton(loc));
+  return row;
+}
+
+// Các dịch vụ: lấy theo /tasks (đủ cột kể cả khi chưa có flag), cộng thêm tên lạ trong attack_data.
+function taskNames() {
+  const names = tasks.map(t => t.name);
+  for (const name of Object.keys(attack)) if (!names.includes(name)) names.push(name);
+  return names.sort((a, b) => shortTask(a).localeCompare(shortTask(b)));
+}
+function teamList() {
+  const list = teams.filter(t => t.active !== false).map(t => ({name: t.name, ip: t.ip}));
+  for (const byIp of Object.values(attack)) for (const ip of Object.keys(byIp || {})) if (!list.some(t => t.ip === ip)) list.push({name: ip, ip});
+  return list.sort((a, b) => a.name.localeCompare(b.name, 'vi', {numeric: true}));
+}
+
+function render() {
+  const box = $('#view'), q = $('#filter').value.trim().toLowerCase();
+  const names = taskNames(), list = teamList();
+  let total = 0;
+  for (const byIp of Object.values(attack)) for (const locs of Object.values(byIp || {})) total += (locs || []).length;
+  $('#s-flags').textContent = total;
+  $('#s-size').textContent = list.length + ' đội · ' + names.length + ' dịch vụ';
+
+  if (!names.length || !list.length) { box.replaceChildren(emptyState()); return; }
+
+  if (view === 'list') {
+    const rows = [];
+    for (const task of names) for (const [ip, locs] of Object.entries(attack[task] || {})) for (const loc of locs || []) {
+      const team = list.find(t => t.ip === ip);
+      rows.push({task, ip, team: team ? team.name : ip, loc: locText(loc)});
+    }
+    const shown = q ? rows.filter(r => [r.task, r.ip, r.team, r.loc].join(' ').toLowerCase().includes(q)) : rows;
+    if (!shown.length) { box.replaceChildren(rows.length ? simpleEmpty('Không có vị trí nào khớp bộ lọc.') : emptyState()); return; }
+    const table = node('table', 'list');
+    const head = table.createTHead().insertRow();
+    for (const t of ['Đội', 'IP', 'Dịch vụ', 'Vị trí flag']) head.append(node('th', '', t));
+    const body = table.createTBody();
+    for (const r of shown) {
+      const tr = body.insertRow();
+      tr.append(node('td', '', r.team), node('td', '', r.ip), node('td', '', shortTask(r.task)));
+      const td = node('td'); td.append(locRow(r.task, r.ip, r.loc)); tr.append(td);
+    }
+    box.replaceChildren(table);
+    return;
+  }
+
+  const table = node('table', 'matrix');
+  const head = table.createTHead().insertRow();
+  head.append(node('th', '', 'Đội'));
+  for (const task of names) {
+    const th = node('th', '', shortTask(task));
+    const count = Object.values(attack[task] || {}).reduce((n, l) => n + (l || []).length, 0);
+    th.append(node('small', '', count + ' flag'));
+    th.title = task; head.append(th);
+  }
+  const body = table.createTBody();
+  for (const team of list) {
+    const tr = body.insertRow();
+    const teamText = (team.name + ' ' + team.ip).toLowerCase();
+    let match = !q || teamText.includes(q);
+    const first = node('td', 'team'); first.append(node('b', '', team.name), node('code', '', team.ip)); tr.append(first);
+    for (const task of names) {
+      const locs = ((attack[task] || {})[team.ip] || []).map(locText);
+      const td = node('td', 'cell' + (locs.length ? '' : ' zero'));
+      td.append(node('span', 'n', locs.length ? locs.length + ' flag' : 'chưa có'));
+      const key = task + '|' + team.ip;
+      const visible = expanded.has(key) ? locs : locs.slice(0, CELL_LIMIT);
+      visible.forEach(loc => td.append(locRow(task, team.ip, loc)));
+      if (locs.length > CELL_LIMIT) {
+        const more = node('button', 'more', expanded.has(key) ? 'Thu gọn' : '+' + (locs.length - CELL_LIMIT) + ' vị trí nữa'); more.type = 'button';
+        more.addEventListener('click', () => { expanded.has(key) ? expanded.delete(key) : expanded.add(key); render(); });
+        td.append(more);
+      }
+      if (q && !match && (shortTask(task).toLowerCase().includes(q) && locs.length || locs.some(l => l.toLowerCase().includes(q)))) match = true;
+      tr.append(td);
+    }
+    if (!match) tr.className = 'dim';
+  }
+  box.replaceChildren(table);
+}
+function simpleEmpty(text) { const d = node('div', 'empty'); d.textContent = text; return d; }
+function emptyState() {
+  const d = node('div', 'empty');
+  const phase = status && status.phase;
+  const why = !status ? 'Chưa lấy được trạng thái cuộc thi.'
+    : ['running', 'checking', 'draining'].includes(phase) ? 'Round đang chạy nhưng chưa có flag: kiểm tra collector và kết quả checker PUT.'
+    : 'Flag chỉ được cắm khi round ở giai đoạn Đang chạy. Hiện tại: ' + (PHASES[phase] || phase || '—') + '.';
+  d.append(node('b', '', 'Chưa có flag nào đang hiệu lực'), document.createTextNode(why));
+  return d;
+}
+
+function setView(next) {
+  view = next;
+  $('#v-matrix').setAttribute('aria-pressed', String(view === 'matrix'));
+  $('#v-list').setAttribute('aria-pressed', String(view === 'list'));
+  $('#view').className = 'matrix-wrap';
+  try { sessionStorage.setItem('flagmap-view', view); } catch (_) {}
+  render();
+}
+$('#v-matrix').addEventListener('click', () => setView('matrix'));
+$('#v-list').addEventListener('click', () => setView('list'));
+$('#filter').addEventListener('input', render);
+
+function timer() {
+  const el = $('#s-timer');
+  if (!status || !status.deadline || !['preview', 'running', 'checking', 'ready', 'draining'].includes(status.phase)) { el.textContent = '—'; return; }
+  const left = Math.max(0, Math.ceil(status.deadline - Date.now() / 1000));
+  el.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+  el.style.color = left <= 20 ? 'var(--warn)' : '';
+}
+
+async function getJson(path) {
+  const r = await fetch(path, {cache: 'no-store', signal: AbortSignal.timeout(7000)});
+  if (!r.ok) throw Error('HTTP ' + r.status);
+  return r.json();
+}
+async function refresh() {
+  try {
+    const [a, tm, tk, st] = await Promise.all([
+      getJson('/api/client/attack_data/'), getJson('/api/client/teams/'),
+      getJson('/api/client/tasks/').catch(() => tasks), getJson('/api/client/tick-status/').catch(() => null)]);
+    attack = a || {}; teams = Array.isArray(tm) ? tm : []; tasks = Array.isArray(tk) ? tk : []; status = st;
+    const now = new Set();
+    for (const [task, byIp] of Object.entries(attack)) for (const [ip, locs] of Object.entries(byIp || {})) for (const loc of locs || []) now.add(keyOf(task, ip, locText(loc)));
+    fresh = seen ? new Set([...now].filter(k => !seen.has(k))) : new Set();
+    seen = now;
+    const live = $('#live');
+    if (status) {
+      $('#s-phase').textContent = PHASES[status.phase] || status.phase || '—';
+      $('#s-tick').textContent = 'Round ' + status.round + ' · Tick ' + status.tick + ' / ' + status.ticks_per_round;
+      const running = ['running', 'checking', 'draining'].includes(status.phase);
+      live.textContent = running ? 'Đang cập nhật trực tiếp' : 'Round không chạy';
+      live.className = 'pill ' + (running ? 'good' : 'warn');
+    } else { live.textContent = 'Đang cập nhật'; live.className = 'pill good'; }
+    $('#updated').textContent = 'Cập nhật ' + new Date().toLocaleTimeString('vi-VN');
+    render(); timer();
+  } catch (e) {
+    const live = $('#live'); live.textContent = 'Mất kết nối · đang thử lại'; live.className = 'pill bad';
+    if (!seen) $('#view').replaceChildren(simpleEmpty('Không tải được dữ liệu flag từ ForcAD.'));
+  }
+}
+(async function poll() { await refresh(); setTimeout(poll, 5000); })();
+setInterval(timer, 1000);
+setView(view);
+
+// ---- Nộp flag thử (giữ nguyên endpoint /flags/) ----
+const form = $('#submission'), result = $('#result'), flagsBox = $('#flags'), token = $('#token');
+const parseFlags = () => flagsBox.value.split(/\s+/).filter(Boolean);
+try { token.value = sessionStorage.getItem('submit-token') || ''; } catch (_) {}
+flagsBox.addEventListener('input', () => { const n = parseFlags().length; $('#count').textContent = n + ' flag' + (n > 100 ? ' · vượt quá 100' : ''); });
+$('#toggle').addEventListener('click', e => { const show = token.type === 'password'; token.type = show ? 'text' : 'password'; e.target.textContent = show ? 'Ẩn' : 'Hiện'; e.target.setAttribute('aria-pressed', String(show)); });
+$('#clear').addEventListener('click', () => { flagsBox.value = ''; flagsBox.dispatchEvent(new Event('input')); result.replaceChildren(); });
+const showError = text => result.replaceChildren(node('p', 'error', text));
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+  const flags = parseFlags();
+  if (!flags.length) return;
+  if (flags.length > 100) { showError('Tối đa 100 flag mỗi lần.'); return; }
+  try { sessionStorage.setItem('submit-token', token.value.trim()); } catch (_) {}
+  const send = $('#send'); send.disabled = true; send.textContent = 'Đang nộp…';
+  try {
+    const response = await fetch('/flags/', {method: 'PUT', headers: {'Content-Type': 'application/json', 'X-Team-Token': token.value.trim()}, body: JSON.stringify(flags)});
+    const data = await response.json().catch(() => null);
+    if (!response.ok || !Array.isArray(data)) { showError((data && data.error) || 'Máy chủ trả lỗi HTTP ' + response.status + '.'); return; }
+    const list = node('ul', 'res'); let ok = 0;
+    for (const item of data) {
+      const msg = String(item.msg || '').replace('[' + item.flag + '] ', '');
+      const accepted = /^Flag accepted/i.test(msg); if (accepted) ok++;
+      const li = node('li', accepted ? 'ok' : ''); li.append(node('code', '', item.flag), node('span', '', msg)); list.append(li);
+    }
+    const summary = node('div', 'summary');
+    summary.append(node('span', 'pill good', ok + ' được chấp nhận'), node('span', 'pill bad', (data.length - ok) + ' bị từ chối'));
+    result.replaceChildren(summary, list);
+  } catch (e) { showError('Không kết nối được bộ nhận flag.'); }
+  finally { send.disabled = false; send.textContent = 'Nộp flag'; }
+});
+</script>
+</body>
+</html>

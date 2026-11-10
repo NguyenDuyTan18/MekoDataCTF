@@ -41,12 +41,15 @@ def set_enabled(enabled):
     with utils.db_cursor() as (conn, curs):
         if enabled:
             from . import round1
+            curs.execute('SELECT id FROM MekodataRoundControl WHERE id=1 FOR UPDATE')
             if round1.configured():
                 s = round1.state()
+                if s.get('slot'):
+                    raise ResetUnavailable('Hãy dùng nút Round 1 hoặc Round 2 để bắt đầu.')
                 if s['phase'] in ('archived', 'recreating'):
                     raise ResetUnavailable('Cuộc thi đã đóng hoặc đang tái tạo; hoàn tất quy trình lưu hồ sơ trước khi bắt đầu mới.')
                 if s['phase'] == 'finished':
-                    raise ResetUnavailable('Round 1 đã kết thúc. Round 2 chưa triển khai.')
+                    raise ResetUnavailable('Vòng hiện tại đã kết thúc. Hãy lưu hồ sơ trước khi chuyển vòng.')
                 lab = round1.profile()
                 curs.execute('SELECT COUNT(*) FROM Tasks WHERE active AND checker LIKE %s', (lab['prefix'] + '%',))
                 if curs.fetchone()[0] != len(lab['tasks']):

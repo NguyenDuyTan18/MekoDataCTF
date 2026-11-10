@@ -1,0 +1,45 @@
+{
+  "title": "MekoDataCTF Final — Web và Crypto AD",
+  "description": "Hai vòng thực hành trên cùng một sandbox CyberRange với ba VM đội. Vòng 1 là Web Meko Boutique, vòng 2 là Crypto Attack–Defense.",
+  "prerequisites": [
+    "Sử dụng terminal Linux và kết nối SSH cơ bản",
+    "Đọc yêu cầu HTTP và dữ liệu JSON cơ bản"
+  ],
+  "outcomes": [
+    "Nhận diện các lỗi ứng dụng web qua năm challenge Meko Boutique",
+    "Phân tích giao thức TCP JSON và ba lỗi triển khai mật mã",
+    "Vá dịch vụ Crypto trên VM đội và kiểm tra dịch vụ sau khi vá"
+  ],
+  "state": "UNRELEASED",
+  "show_stepper_bar": true,
+  "estimated_duration": 120,
+  "variant_sandboxes": false,
+  "levels": [
+    {
+      "title": "Truy cập sandbox",
+      "level_type": "ACCESS_LEVEL",
+      "order": 0,
+      "estimated_duration": 0,
+      "minimal_possible_solve_time": null,
+      "passkey": "meko-ready",
+      "cloud_content": "Mở VM do BTC phân cho đội. Với **SSH** hoặc **Open Console**, dùng tài khoản Linux trùng tên VM và mật khẩu SSH đội. Nếu BTC bật **Open GUI**, dùng mật khẩu VNC riêng do BTC cấp để mở desktop.\n\nBa VM đội là `team1` — `10.90.0.11`, `team2` — `10.90.0.12` và `team3` — `10.90.0.13`. Sau khi kết nối thành công, nhập `meko-ready` để xem hướng dẫn vòng 1.",
+      "local_content": "Mở Training Instance đã được gán sandbox cloud. Dùng VM và thông tin đăng nhập do BTC cung cấp."
+    },
+    {
+      "title": "Vòng 1 — Web Meko Boutique",
+      "level_type": "INFO_LEVEL",
+      "order": 1,
+      "estimated_duration": 60,
+      "minimal_possible_solve_time": null,
+      "content": "Sau khi BTC mở vòng, bạn có 10 phút xem đề. Tiếp theo là 50 phút thi, gồm 10 tick, mỗi tick 5 phút.\n\nMỗi VM đội chạy Meko Boutique trên cổng HTTP 80. Mở shop trên VM mình bằng `http://127.0.0.1/`. Dùng địa chỉ VM đội đích khi truy cập qua mạng sandbox. Tài khoản đăng ký trong shop tách riêng với tài khoản Linux.\n\nNăm challenge gồm **SQLi**, **IDOR**, **Upload**, **JWT** và **Backup**. ForcAD bắt đầu đặt flag ở tick 1. Nộp flag thật qua scoreboard do BTC cung cấp. Chờ BTC chuyển sang vòng Crypto."
+    },
+    {
+      "title": "Vòng 2 — Crypto AD",
+      "level_type": "INFO_LEVEL",
+      "order": 2,
+      "estimated_duration": 60,
+      "minimal_possible_solve_time": null,
+      "content": "Sau khi BTC mở vòng, bạn có 10 phút xem đề. Tiếp theo là 50 phút thi, gồm 10 tick, mỗi tick 5 phút. Điểm vòng Web được giữ lại.\n\nTiếp tục dùng VM đội từ vòng 1. Mở `~/crypto-lab/README.md` và `~/crypto-lab/host_port.txt` để xem cách kết nối và danh sách đối thủ. Ba dịch vụ là **Curveball** (TCP `9011`), **Padding Oracle** (TCP `9012`) và **ECDSA Nonce** (TCP `9013`).\n\nDùng `nc IP PORT`, gửi `{\"op\":\"info\"}` để xem giao thức và `{\"op\":\"targets\"}` để lấy ID bản ghi đã có flag. Vá source trên VM đội mình tại `/opt/meko-crypto/`. Nộp flag thật qua scoreboard do BTC cung cấp khi vòng 2 đang mở. Việc bấm tiếp tục trong CyberRange chỉ chuyển trang hướng dẫn."
+    }
+  ]
+}

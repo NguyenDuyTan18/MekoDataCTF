@@ -1,0 +1,20 @@
+[Unit]
+Description=MekoDataCTF Round 2 crypto %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User={{ inventory_hostname }}
+Group=users
+WorkingDirectory=/opt/meko-crypto
+ExecStart=/usr/bin/python3 /opt/meko-crypto/service.py --service %i --config /etc/meko-crypto/service.json --host {{ meko_addresses[inventory_hostname] }}
+Restart=on-failure
+RestartSec=2
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target

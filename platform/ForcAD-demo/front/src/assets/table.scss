@@ -4,15 +4,21 @@
    cho ScoreTable, Statuses, TeamScoreboard và TeamTaskLog.
    ========================================================== */
 :root {
-    --bg: #0a1620;
-    --bg-soft: #0e1e2a;
-    --panel: #132634;
-    --panel-hi: #17303f;
-    --line: #22404f;
-    --line-strong: #31576b;
-    --text: #e8f3f7;
-    --text-dim: #8fa9b8;
-    --accent-teal: #6ef0be;
+    /* Cùng hệ màu với bảng Điều khiển round (public/round-control.js) */
+    --bg: #0d1118;
+    --bg-soft: #141a24;
+    --panel: #141a24;
+    --panel-hi: #19202d;
+    --line: #222a39;
+    --line-strong: #38445c;
+    --text: #e6eaf2;
+    --text-dim: #8b96ab;
+    --label: #7c8aa5;
+    --accent-teal: #60a5fa;
+    --accent: #3b82f6;
+    --accent-strong: #2563eb;
+    --good: #4ade80;
+    --bad: #f87171;
     --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
     --sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
@@ -50,7 +56,7 @@
     align-items: center;
     padding-top: 12px;
     padding-bottom: 12px;
-    background: rgba(10, 22, 32, 0.93);
+    background: rgba(20, 26, 36, 0.94);
     backdrop-filter: blur(8px);
     border: 1px solid var(--line);
     border-radius: 12px;

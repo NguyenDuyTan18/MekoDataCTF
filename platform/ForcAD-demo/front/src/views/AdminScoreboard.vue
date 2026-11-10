@@ -6,6 +6,9 @@
                 <h1 class="page-title">Bảng điểm quản trị</h1>
             </div>
             <div class="page-actions">
+                <a class="btn" href="/"><i class="fas fa-sliders-h" /> Điều khiển round</a>
+                <a class="btn" href="/submit.html"><i class="fas fa-flag" /> Bản đồ flag</a>
+                <span class="page-sep" />
                 <button class="btn" @click="createTask">
                     <i class="fas fa-plus" /> Thêm dịch vụ
                 </button>
@@ -14,6 +17,11 @@
                 </button>
             </div>
         </div>
+        <p class="page-hint">
+            <i class="fas fa-edit" /> cạnh tên đội hoặc dịch vụ để sửa (token, IP,
+            bật/tắt). <i class="fas fa-history" /> trong từng ô để xem lịch sử
+            checker của đội ở dịch vụ đó.
+        </p>
         <statuses />
         <admin-scoreboard />
     </div>
@@ -70,7 +78,25 @@ export default {
 
 .page-actions {
     display: flex;
+    align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+
+    a.btn {
+        text-decoration: none;
+    }
+}
+
+.page-sep {
+    width: 1px;
+    height: 24px;
+    background: var(--line-strong);
+    margin: 0 4px;
+}
+
+.page-hint {
+    margin: -8px 0 18px;
+    font-size: 12.5px;
+    color: var(--text-dim);
 }
 </style>

@@ -1,4 +1,5 @@
 from logging import Logger
+import sys
 from typing import Optional
 
 from lib import models
@@ -36,10 +37,16 @@ class CheckerRunner:
     def get(self) -> models.CheckerVerdict:
         return self._get_as_process()
 
+    def _checker_command(self):
+        path = self.task.checker
+        if path.startswith(('/checkers/full_rounds/', '/checkers/full_rounds_crypto/')):
+            return [sys.executable, path]
+        return [path]
+
     def _check_as_process(self) -> models.CheckerVerdict:
         """Check implementation using subprocess calling"""
         check_command = [
-            self.task.checker,
+            *self._checker_command(),
             'check',
             self.team.ip,
         ]
@@ -59,7 +66,7 @@ class CheckerRunner:
         assert self.flag is not None, 'Can only be called when flag is passed'
 
         put_command = [
-            self.task.checker,
+            *self._checker_command(),
             'put',
             self.team.ip,
             self.flag.private_flag_data,
@@ -80,7 +87,7 @@ class CheckerRunner:
         assert self.flag is not None, 'Can only be called when flag is passed'
 
         get_command = [
-            self.task.checker,
+            *self._checker_command(),
             'get',
             self.team.ip,
             self.flag.private_flag_data,

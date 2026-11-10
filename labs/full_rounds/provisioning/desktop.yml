@@ -1,0 +1,157 @@
+---
+- name: Cài XFCE và TigerVNC
+  ansible.builtin.apt:
+    name: [xfce4, xfce4-terminal, tigervnc-standalone-server, tigervnc-tools, xauth, xfonts-base, dbus-x11, firefox-esr, acl, iproute2, python3-pycryptodome]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Kiểm tra hostname cho TigerVNC
+  ansible.builtin.command:
+    argv: [/bin/hostname, '-f']
+  register: meko_desktop_hostname
+  changed_when: false
+  failed_when: false
+
+- name: Bổ sung hostname cục bộ khi image chưa phân giải được
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: '# {mark} MEKO TEAM DESKTOP HOSTNAME'
+    block: '127.0.1.1 {{ ansible_hostname }}'
+  when: meko_desktop_hostname.rc != 0 or (meko_desktop_hostname.stdout | trim) == ''
+
+- name: Tạo thư mục helper desktop
+  ansible.builtin.file:
+    path: /usr/local/libexec/meko-team-desktop
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Cài helper desktop
+  ansible.builtin.copy:
+    src: '{{ item }}'
+    dest: '/usr/local/libexec/meko-team-desktop/{{ item }}'
+    owner: root
+    group: root
+    mode: '0755'
+  loop: [meko-xfce, set-vnc-password.py, check-vnc.py, vnc-listener.py]
+  register: meko_desktop_helpers
+
+- name: Tạo thư mục VNC và cấu hình TigerVNC của đội
+  ansible.builtin.file:
+    path: '/home/{{ inventory_hostname }}/{{ item }}'
+    state: directory
+    owner: '{{ inventory_hostname }}'
+    group: users
+    mode: '0700'
+  loop: [.vnc, .config, .config/tigervnc]
+
+- name: Nạp mật khẩu GUI đã cấp cho đội
+  become_user: '{{ inventory_hostname }}'
+  ansible.builtin.command:
+    argv: [/usr/bin/python3, /usr/local/libexec/meko-team-desktop/set-vnc-password.py]
+    stdin: '{{ meko_team_vnc_passwords[inventory_hostname] }}'
+  environment:
+    HOME: '/home/{{ inventory_hostname }}'
+  register: meko_desktop_password
+  changed_when: meko_desktop_password.stdout == 'changed'
+  no_log: true
+
+- name: Cài systemd unit cho desktop đội
+  ansible.builtin.template:
+    src: meko-team-desktop.service.j2
+    dest: /etc/systemd/system/meko-team-desktop.service
+    owner: root
+    group: root
+    mode: '0644'
+  register: meko_desktop_unit
+
+- name: Xác minh dịch vụ đang giữ cổng VNC
+  ansible.builtin.command:
+    argv: [/usr/bin/python3, /usr/local/libexec/meko-team-desktop/vnc-listener.py, '--port', '5900']
+    stdin: ' ["xvnc.socket", "vncserver.socket", "tigervnc.socket", "x11vnc.socket", "lightdm.service", "x11vnc.service"]'
+  register: meko_vnc_listener
+  changed_when: false
+
+- name: Lưu kế hoạch chuyển cổng VNC
+  ansible.builtin.set_fact:
+    meko_vnc_plan: '{{ meko_vnc_listener.stdout | from_json }}'
+
+- name: Yêu cầu cổng VNC chỉ do dịch vụ GUI đã biết sử dụng
+  ansible.builtin.assert:
+    that: meko_vnc_plan.unknown | length == 0
+    fail_msg: 'Cổng VNC 5900 cần được kiểm tra trên {{ inventory_hostname }}. {{ meko_vnc_plan.unknown }}'
+
+- name: Khởi động và kiểm tra desktop đội
+  block:
+    - name: Đọc cấu hình khởi động của các dịch vụ VNC gốc
+      ansible.builtin.command:
+        argv: [/usr/bin/systemctl, is-enabled, '{{ item }}']
+      loop: '{{ meko_vnc_plan.stop_units }}'
+      register: meko_vnc_original
+      changed_when: false
+      failed_when: false
+
+    - name: Dừng các dịch vụ GUI gốc đã xác minh
+      ansible.builtin.systemd:
+        name: '{{ item }}'
+        state: stopped
+        enabled: false
+      loop: '{{ meko_vnc_plan.stop_units }}'
+
+    - name: Khởi động desktop của tài khoản đội
+      ansible.builtin.systemd:
+        name: meko-team-desktop.service
+        daemon_reload: true
+        enabled: true
+        state: "{{ 'restarted' if (meko_desktop_helpers.changed or meko_desktop_password.changed or meko_desktop_unit.changed) else 'started' }}"
+
+    - name: Kiểm tra desktop VNC có thể truy cập trên IP của đội
+      ansible.builtin.wait_for:
+        host: '{{ meko_addresses[inventory_hostname] }}'
+        port: 5900
+        search_regex: '^RFB '
+        timeout: 60
+
+    - name: Xác nhận XFCE chạy bằng tài khoản đội
+      ansible.builtin.command:
+        argv: [/usr/bin/pgrep, '-u', '{{ inventory_hostname }}', '-x', xfce4-session]
+      register: meko_xfce
+      changed_when: false
+      until: meko_xfce.rc == 0
+      retries: 10
+      delay: 2
+
+    - name: Xác thực mật khẩu VNC và đọc khung hình
+      ansible.builtin.command:
+        argv: [/usr/bin/python3, /usr/local/libexec/meko-team-desktop/check-vnc.py, '--port', '5900']
+        stdin: '{{ meko_team_vnc_passwords[inventory_hostname] }}'
+      register: meko_vnc_frame
+      changed_when: false
+      until: meko_vnc_frame.rc == 0
+      retries: 3
+      delay: 3
+      no_log: true
+  rescue:
+    - name: Dừng desktop mới trước khi khôi phục dịch vụ VNC gốc
+      ansible.builtin.systemd:
+        name: meko-team-desktop.service
+        state: stopped
+        enabled: false
+      when: meko_vnc_plan.stop_units | length > 0
+      failed_when: false
+
+    - name: Khôi phục các dịch vụ VNC đã xác minh
+      ansible.builtin.systemd:
+        name: '{{ item.item }}'
+        state: started
+        enabled: '{{ true if (item.stdout | trim) == "enabled" else omit }}'
+      loop: '{{ meko_vnc_original.results | default([]) }}'
+      failed_when: false
+
+    - name: Báo lỗi desktop
+      ansible.builtin.fail:
+        msg: 'Desktop của {{ inventory_hostname }} chưa sẵn sàng. Xem journalctl -u meko-team-desktop.service trên VM.'

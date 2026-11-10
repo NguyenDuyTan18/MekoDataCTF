@@ -1,0 +1,62 @@
+Host 10.32.8.175
+    HostName 10.32.8.175
+    User default-p0000000141
+    Port 22
+    IdentityFile "C:/Users/Admin/.ssh/pool-id-141-management-key"
+    UserKnownHostsFile "C:/Users/Admin/Desktop/MekoData_Ky/atk_def_platform/ops/pool141/known-hosts"
+    IdentitiesOnly True
+    StrictHostKeyChecking accept-new
+
+Host man 192.168.64.106
+    HostName 192.168.64.106
+    User ubuntu
+    IdentityFile "C:/Users/Admin/.ssh/pool-id-141-management-key"
+    ProxyJump default-p0000000141@10.32.8.175
+    UserKnownHostsFile "C:/Users/Admin/Desktop/MekoData_Ky/atk_def_platform/ops/pool141/known-hosts"
+    IdentitiesOnly True
+    StrictHostKeyChecking accept-new
+
+Host team1 192.168.128.76
+    HostName 192.168.128.76
+    User debian
+    IdentityFile "C:/Users/Admin/.ssh/pool-id-141-management-key"
+    ProxyJump ubuntu@man
+    UserKnownHostsFile "C:/Users/Admin/Desktop/MekoData_Ky/atk_def_platform/ops/pool141/known-hosts"
+    IdentitiesOnly True
+    StrictHostKeyChecking accept-new
+
+Host team2 192.168.129.226
+    HostName 192.168.129.226
+    User debian
+    IdentityFile "C:/Users/Admin/.ssh/pool-id-141-management-key"
+    ProxyJump ubuntu@man
+    UserKnownHostsFile "C:/Users/Admin/Desktop/MekoData_Ky/atk_def_platform/ops/pool141/known-hosts"
+    IdentitiesOnly True
+    StrictHostKeyChecking accept-new
+
+Host team3 192.168.130.157
+    HostName 192.168.130.157
+    User debian
+    IdentityFile "C:/Users/Admin/.ssh/pool-id-141-management-key"
+    ProxyJump ubuntu@man
+    UserKnownHostsFile "C:/Users/Admin/Desktop/MekoData_Ky/atk_def_platform/ops/pool141/known-hosts"
+    IdentitiesOnly True
+    StrictHostKeyChecking accept-new
+
+Host checker 192.168.129.128
+    HostName 192.168.129.128
+    User debian
+    IdentityFile "C:/Users/Admin/.ssh/pool-id-141-management-key"
+    ProxyJump ubuntu@man
+    UserKnownHostsFile "C:/Users/Admin/Desktop/MekoData_Ky/atk_def_platform/ops/pool141/known-hosts"
+    IdentitiesOnly True
+    StrictHostKeyChecking accept-new
+
+Host gateway 192.168.130.201
+    HostName 192.168.130.201
+    User debian
+    IdentityFile "C:/Users/Admin/.ssh/pool-id-141-management-key"
+    ProxyJump ubuntu@man
+    UserKnownHostsFile "C:/Users/Admin/Desktop/MekoData_Ky/atk_def_platform/ops/pool141/known-hosts"
+    IdentitiesOnly True
+    StrictHostKeyChecking accept-new

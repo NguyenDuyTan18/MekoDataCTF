@@ -172,6 +172,12 @@ def construct_scoreboard() -> dict:
 
 
 def construct_ctftime_scoreboard() -> Optional[list]:
+    from . import round1
+
+    if round1.configured():
+        return [{'pos': i, 'team': row['name'], 'score': row['total']}
+                for i, row in enumerate(round1.scores(), 1)]
+
     game_state = get_cached_game_state()
 
     if not game_state:
