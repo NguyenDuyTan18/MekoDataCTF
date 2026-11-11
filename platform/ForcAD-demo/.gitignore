@@ -10,6 +10,13 @@ config_backup*.yml
 
 checkers/*
 !checkers/requirements.txt
+!checkers/README.md
+!checkers/_shared/
+checkers/_shared/*
+!checkers/_shared/*.py
+!checkers/_template/
+checkers/_template/*
+!checkers/_template/*.py
 !checkers/round1/
 checkers/round1/rpc/
 !checkers/meko_boutique/
@@ -45,3 +52,5 @@ deploy/kustomization.yml
 terraform.tfstate*
 /deploy/terraform/credentials.auto.tfvars
 /deploy/terraform/credentials.auto.tfvars.json
+# Ma bi mat cau noi tren may (khoi-dong/host_bridge.py)
+backend/.host-bridge-token

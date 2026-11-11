@@ -38,7 +38,7 @@ Tên hướng luận văn: Thiết kế và phát triển phân hệ quản lý 
 - API kết quả công khai, lọc dữ liệu, cache và truyền trạng thái trực tiếp tới website.
 - Backend chuyển tiếp nộp flag lấy danh tính từ phiên; giao diện bảng điểm/nộp flag.
 
-Mã liên quan: platform/ForcAD-demo/backend/lib/flags/, backend/services/http_receiver/, backend/lib/storage/attacks.py, phần chấm điểm trong backend/lib/storage/round1.py, API kết quả trong backend/services/api/; services/arenaService.js, routes/scoreboard.js và giao diện scoreboard của website.
+Mã liên quan: platform/ForcAD-demo/backend/lib/flags/, backend/services/http_receiver/, backend/lib/storage/attacks.py, phần chấm điểm trong backend/lib/storage/competition.py, API kết quả trong backend/services/api/; services/arenaService.js, routes/scoreboard.js và giao diện scoreboard của website.
 
 Nghiệm thu: bộ dữ liệu tính tay khớp điểm; nộp trùng/đồng thời không cộng ngoài luật; flag của chính đội hoặc quá hạn được xử lý đúng; bảng điểm khớp backend; dữ liệu công khai không chứa flag/token riêng; thử được mất kết nối và khôi phục cập nhật.
 
@@ -53,7 +53,7 @@ Tên hướng luận văn: Thiết kế và phát triển phân hệ tiếp nh�
 - Topology/provisioning, đóng gói, triển khai và khôi phục một lab chính meko_boutique.
 - Hoàn thiện thử thách hiện có và kiểm chứng bản vá trong phạm vi đã chốt; ghi rõ app/checker kế thừa.
 
-Mã liên quan: platform/ForcAD-demo/backend/services/ticker/, backend/lib/storage/round_schedule.py, phần điều phối trong backend/lib/storage/round1.py, checkers/meko_boutique/, collect_checker.py, shared/labconfig.py; app/checker và provisioning tại labs/meko_boutique/.
+Mã liên quan: platform/ForcAD-demo/backend/services/ticker/, backend/lib/storage/round_schedule.py, phần điều phối trong backend/lib/storage/competition.py, checkers/meko_boutique/, collect_checker.py, shared/labconfig.py; app/checker và provisioning tại labs/meko_boutique/.
 
 Nghiệm thu: put/check/get đủ chu trình; flag lưu/đọc đúng đội và locator; lịch tick và pause/resume khớp đặc tả; phân biệt lỗi dịch vụ với lỗi checker/cầu nối; bản vá giữ chức năng hợp lệ; dựng và khôi phục được môi trường ba đội. Báo cáo riêng kiểm thử local và nghiệm thu CyberRange thực tế.
 
@@ -66,7 +66,7 @@ Một số file hiện chứa nhiều miền nghiệp vụ. Phân công theo hà
 | Điểm giao | Trách nhiệm |
 |---|---|
 | Điều khiển thi | Người 1 xác thực lệnh/quản lý trạng thái; người 3 thực thi lịch/tác vụ; người 2 áp dụng cửa sổ nhận flag và truy vấn kết quả tương ứng |
-| round1.py | Người 1: thao tác vòng đời liên quan; người 2: scores(), record_attack(), luật SLA; người 3: pump(), schedule_puts(), verify(), kết quả checker |
+| competition.py | Người 1: thao tác vòng đời liên quan; người 2: scores(), record_attack(), luật SLA; người 3: pump(), schedule_puts(), verify(), kết quả checker |
 | Danh tính/token | Người 1 cấp/ghép/đồng bộ; người 2 kiểm tra khi nhận flag; người 3 dùng ánh xạ đội/task để gọi đúng dịch vụ |
 | SLA | Người 3 cung cấp kết quả đội/task/tick; người 2 quy đổi thành điểm; cả hai kiểm thử lỗi |
 | Cấu hình lab | Người 3 quản lý lab.json và loader; người 1 cung cấp danh sách/ánh xạ đội; người 2 xác định dữ liệu task cần chấm |

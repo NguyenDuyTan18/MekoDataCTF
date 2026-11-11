@@ -65,8 +65,8 @@ class Sim:
                  "lib.helpers.checkers": checkers}
         self.fakes = fakes
         with patch.dict(sys.modules, fakes):
-            sys.modules.pop("lib.storage.round1", None)
-            module = importlib.import_module("lib.storage.round1")
+            sys.modules.pop("lib.storage.competition", None)
+            module = importlib.import_module("lib.storage.competition")
         self.storage = storage
         return module
 
@@ -295,7 +295,7 @@ def test_slots_can_start_in_reverse_order_and_resume_with_the_same_tick_clock():
     sim.call("pump")
     assert sim.row["phase"] == "paused" and sim.row["remaining"] == 200
     m.start_slot(1)
-    assert sim.row["tick"] == 0 and m.profile()["crypto_seed"]
+    assert sim.row["tick"] == 0 and m.profile()["seed_with_tick"]
     sim.call("pump")
     assert sim.row["phase"] == "preview" and not sim.call("accepting")
     sim.now += 50

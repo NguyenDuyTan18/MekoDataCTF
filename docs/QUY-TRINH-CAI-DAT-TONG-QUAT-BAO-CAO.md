@@ -385,7 +385,7 @@ Do đó có thể trình bày trong báo cáo: “Hệ thống áp dụng quy tr
 | Xuất danh sách đội | [export-lab-teams.js](../platform/MekoDataCTF_Website/scripts/export-lab-teams.js) |
 | Đồng bộ token | [forcadSync.js](../platform/MekoDataCTF_Website/services/forcadSync.js) |
 | Build/chạy engine | [docker-compose.yml](../platform/ForcAD-demo/docker-compose.yml), [CLI setup](../platform/ForcAD-demo/cli/base/setup.py), [Dockerfile nginx](../platform/ForcAD-demo/docker_config/nginx/Dockerfile) |
-| Cấu hình bài và vòng đời | [lab_profile.py](../platform/ForcAD-demo/backend/lib/storage/lab_profile.py), [round1.py](../platform/ForcAD-demo/backend/lib/storage/round1.py) |
+| Cấu hình bài và vòng đời | [lab_profile.py](../platform/ForcAD-demo/backend/lib/storage/lab_profile.py), [competition.py](../platform/ForcAD-demo/backend/lib/storage/competition.py) |
 | Lựa chọn bài trên dashboard | [round-control.js](../platform/ForcAD-demo/front/public/round-control.js) |
 | Kết nối engine với sandbox | [collect_checker.py](../platform/ForcAD-demo/collect_checker.py), [labconfig.py](../shared/labconfig.py) |
 | Ví dụ provisioning tích hợp | [Meko Boutique playbook](../labs/meko_boutique/sandbox/provisioning/playbook.yml), [trainee-access.yml](../labs/meko_boutique/sandbox/provisioning/trainee-access.yml) |

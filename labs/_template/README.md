@@ -20,8 +20,8 @@ platform/ForcAD-demo/checkers/<ten-lab>/   # checker ForcAD (bắt buộc nằm 
    **Quy ước tên:** tên đội đăng ký → slug (bỏ dấu, a-z 0-9 '-', ví dụ "Hà Nội #1" → `ha-noi-1`). Slug này vừa là tên đội ForcAD vừa là tên máy ảo. `host` để trống thì lấy bằng `name`. Muốn đặt tên khác, sửa ô "Tên đội trên ForcAD" ở trang quản trị đội.
 2. Chép `labs/round1/sandbox/` sang `labs/<ten-lab>/sandbox/`. Sửa `topology.yml`, `provisioning/group_vars/all.yml`, `checker/web_targets.json` cho khớp với `lab.json`. Ba file này do CyberRange/Ansible đọc trực tiếp nên vẫn phải tự sửa.
 3. Chép `labs/round1/service/` sang `labs/<ten-lab>/service/` rồi thay `webservice.py`/`agent.py` bằng dịch vụ mới. `deploy.py` và `recycle.py` tự đọc `lab.json` của thư mục cha, nên không cần sửa danh sách đội hay IP.
-4. Chép `platform/ForcAD-demo/checkers/round1/` sang `checkers/<ten-lab>/`. File `common.py` dùng lại nguyên vẹn; mỗi task chỉ là một file `<task>.py` gọi `main('<task>')`.
-   ⚠️ Vòng đời Round 1 trên dashboard (Chuẩn bị/Lưu/Tái tạo) nằm trong `platform/ForcAD-demo/backend/lib/storage/round1.py`. File này vẫn viết cứng `PREFIX = '/checkers/round1/'`, các task `idor/sqli/upload` và 4 IP `10.80.0.11–14`. Lab mới chỉ chạy được trên dashboard mà không sửa backend khi giữ nguyên 4 IP và tên task này, **và** đặt `"name": "round1"` (checker nằm ở `checkers/round1/`, thay cho checker cũ). Nếu khác, phải sửa `round1.py` (và `round_control.py`) rồi build lại container backend.
+4. Tạo `platform/ForcAD-demo/checkers/<ten-lab>/`: với mỗi task, chép `checkers/_template/task.py` thành `<task>.py` (chỉ đổi tên tệp; phần chung nằm ở `checkers/_shared/forcad_rpc.py`). Xem `platform/ForcAD-demo/checkers/README.md`.
+   Vòng đời cuộc thi trên dashboard (Chuẩn bị/Lưu/Tái tạo, hai vòng, SLA, tính điểm) nằm trong `platform/ForcAD-demo/backend/lib/storage/competition.py` (trước tên là `round1.py`). File này dùng chung cho mọi lab và đọc đội/IP/task/giờ giấc từ `lab_profile.py`, nên lab mới **không cần sửa** file này; chỉ cần thêm mục vào `lab_profile.py` (mục dưới) rồi khởi động lại các container backend.
 5. Tạo đội trên ForcAD **đúng các tên trong `lab.json`** (kèm IP). Website đang chạy sẽ tự đẩy token sang trong vòng 60 giây (xem [docs/DONG-BO-TOKEN-FORCAD.md](../../docs/DONG-BO-TOKEN-FORCAD.md)). Sau đó form nộp flag tự khóa ô "Đội của bạn" theo đúng đội.
 6. Chạy collector cho lab đó: `$env:MEKO_LAB = '<ten-lab>'; python platform/ForcAD-demo/collect_checker.py`. Nếu không đặt `MEKO_LAB` thì mặc định là `round1`.
 
@@ -29,8 +29,9 @@ Nếu dùng file SSH khác `ops/pool101/management-config`, đặt `MEKO_SSH_CON
 
 ## Khai báo lịch thi cho lab mới
 
-Thêm một mục vào `PROFILES` trong `platform/ForcAD-demo/backend/lib/storage/lab_profile.py`, thêm nút Chuẩn bị trong
-`front/public/round-control.js`, rồi build lại `nginx`. Không cần sửa `round1.py` hay `round_schedule.py`.
+Thêm một mục vào `PROFILES` trong `platform/ForcAD-demo/backend/lib/storage/lab_profile.py` (hoặc đặt vào `DEFAULT_SLOTS` để chạy
+kiểu hai vòng; bảng điều khiển tự liệt kê lab trong ô "Đổi lab cho từng vòng"), rồi khởi động lại các container backend.
+Không cần sửa `competition.py` hay `round_schedule.py`.
 
 | Trường | Ý nghĩa | Ví dụ Meko Boutique |
 |---|---|---|

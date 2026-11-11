@@ -205,7 +205,7 @@ Nhánh classic hiện còn gửi yêu cầu `mekodata_bridge/request.json` để
 
 ```text
 ticker/__main__.py
-  -> lib/storage/round1.py: pump()
+  -> lib/storage/competition.py: pump()
      -> schedule_puts() -> put_flag() -> CheckerRunner.put()
      -> hết thời gian tick: verify() -> CheckerRunner.check()/get()
      -> ghi trạng thái TeamTasks và MekodataSLA
@@ -217,7 +217,7 @@ Round 1 dùng `ThreadPoolExecutor` trong tiến trình ticker cho PUT/verify. Kh
 ### 4.3 Một lần gọi checker Round 1 đi hết hệ thống
 
 ```text
-round1.py -> CheckerRunner -> helpers/commands.py
+competition.py -> CheckerRunner -> helpers/commands.py
   -> checkers/round1/idor.py (hoặc sqli.py, upload.py)
      -> common.py: main(task) -> rpc(payload)
         -> ghi rpc/<id>.request.json
@@ -412,7 +412,7 @@ Các test được đọc để hiểu thiết kế; lần phân tích này khô
 | Sandbox topology/Ansible/systemd/ACL | Trung bình, dùng làm khung | Đổi mạng, image, host, app, quyền và target; giữ layout tương đối mà playbook sử dụng. |
 | `deploy.py`, `recycle.py` | Trung bình, tái dùng quy trình | Danh sách đội linh động, nhưng đường dẫn, app, patched flags và lifecycle API vẫn Round 1. |
 | `webservice.py`, `agent.py` | Dùng nguyên cho bài cùng loại; sửa nhiều cho bài khác | Logic nghiệp vụ/lỗ hổng/locator/kiểm tra chức năng gắn với IDOR/SQLi/Upload. |
-| `backend/lib/storage/round1.py`, `round_control.py` | Chưa là module đa lab | Cố định prefix checker, ba task, bốn IP, số tick; recreate còn kiểm tra alias `attacker1..4`. |
+| `backend/lib/storage/competition.py`, `round_control.py` | Chưa là module đa lab | Cố định prefix checker, ba task, bốn IP, số tick; recreate còn kiểm tra alias `attacker1..4`. |
 | `tools/modeling/`, `tools/scenarios/` | Tái dùng ý tưởng và hàm dựng mô hình | Cần tham số hóa file đầu vào, tên đối tượng và luật minh họa. |
 | `tools/documents/` | Thấp cho tác vụ khác | Đang bám bài tài liệu và PDF nguồn cụ thể. |
 | `.ua/`, log, DB, `.dump`, `.secrets/`, gói `.tar` | Dữ liệu tham khảo/backup | Không coi là module code dùng lại hoặc nguồn cấu hình mới. |
@@ -445,7 +445,7 @@ Các hướng dưới đây là đề xuất từ việc đọc phụ thuộc, c
 2. `platform/MekoDataCTF_Website/app.js`, `routes/scoreboard.js`: website khởi động và nối ForcAD.
 3. `platform/MekoDataCTF_Website/services/arenaService.js`, `forcadSync.js`: dữ liệu điểm và token.
 4. `platform/ForcAD-demo/docker-compose.yml`, `backend/services/ticker/__main__.py`: các tiến trình và cách chọn nhánh engine.
-5. `platform/ForcAD-demo/backend/lib/storage/round1.py`: nguồn quyết định vòng đời/điểm Round 1.
+5. `platform/ForcAD-demo/backend/lib/storage/competition.py`: nguồn quyết định vòng đời/điểm Round 1.
 6. `platform/ForcAD-demo/checkers/round1/common.py`, `collect_checker.py`, `labs/round1/service/agent.py`, `webservice.py`: một yêu cầu đi tới VM và quay về.
 7. `platform/ForcAD-demo/backend/services/http_receiver/views.py`, `lib/storage/attacks.py`: flag được chấp nhận như thế nào.
 8. `labs/round1/sandbox/provisioning/playbook.yml`, `service/deploy.py`, `service/recycle.py`: môi trường được tạo, nâng thành lab thi và tái tạo ra sao.

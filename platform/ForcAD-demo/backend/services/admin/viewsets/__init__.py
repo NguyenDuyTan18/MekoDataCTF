@@ -27,3 +27,8 @@ admin_bp.add_url_rule('/round1/restart/', 'round1_restart', round1_restart, meth
 
 from .round_control import arena_data
 admin_bp.add_url_rule("/arena/", "arena_data", arena_data, methods=["GET"])
+
+# Nút "Bật bộ cờ" / "Collector" — chuyển tiếp tới cầu nối trên máy (khoi-dong/host_bridge.py)
+from .host_bridge import host_status, host_action
+admin_bp.add_url_rule('/host/status/', 'host_status', host_status, methods=['GET'])
+admin_bp.add_url_rule('/host/<path:action>/', 'host_action', host_action, methods=['POST'])

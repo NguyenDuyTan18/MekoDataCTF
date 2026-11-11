@@ -5,7 +5,7 @@ kết quả rà soát tick, và phần chưa được kiểm chứng. Chưa có 
 
 ## 1. Tick hoạt động thế nào
 
-Bộ điều phối là `pump()` trong `platform/ForcAD-demo/backend/lib/storage/round1.py`, được ticker gọi
+Bộ điều phối là `pump()` trong `platform/ForcAD-demo/backend/lib/storage/competition.py`, được ticker gọi
 mỗi 0,5 giây. Quy tắc thời gian nằm trong `round_schedule.py`, số liệu của từng lab trong `lab_profile.py`. Trạng thái lưu trong bảng `MekodataRound1`.
 
 ```text
@@ -74,7 +74,7 @@ Sao từ `labs/fashion_shop`, source của thư mục đó không bị sửa.
 | `checkers/meko_boutique/` (mới) | `common.py`, 5 script RPC. Bị `.gitignore`, commit bằng `git add -f` |
 | `backend/lib/storage/lab_profile.py` (mới) | Task, đội, máy, `round_time`, `ticks_per_round` của từng lab |
 | `backend/lib/storage/round_schedule.py` (mới) | Quy tắc thời gian dùng chung, không phụ thuộc database |
-| `backend/lib/storage/round1.py` | Đọc theo lab, cột `lab`, `started_at`, `refresh_flag_cache()`, `leave_archived_lab()`, lịch neo cố định |
+| `backend/lib/storage/competition.py` | Đọc theo lab, cột `lab`, `started_at`, `refresh_flag_cache()`, `leave_archived_lab()`, lịch neo cố định |
 | `backend/lib/storage/round_control.py` | Đếm task theo lab |
 | `backend/services/admin/viewsets/round_control.py` | API chuẩn bị nhận `lab`, API trạng thái trả `ticks_per_round` |
 | `backend/services/api/views.py` | `ticks_per_round` lấy theo lab |
@@ -89,7 +89,7 @@ Chế độ health-only không đổi: vẫn 2 round × 15 tick, trần 30 tick.
 
 ## 4b. Đổi cách chấm điểm sang công thức RuCTFE 2012 (07/11/2026)
 
-Thay toàn bộ cách tính điểm trong `platform/ForcAD-demo/backend/lib/storage/round1.py` theo công thức RuCTFE 2012.
+Thay toàn bộ cách tính điểm trong `platform/ForcAD-demo/backend/lib/storage/competition.py` theo công thức RuCTFE 2012.
 Trước đó: mỗi flag cướp được +1 cho đội tấn công, −1 cho đội bị mất; tổng = `attack − lost + sla`, không chuẩn hóa.
 
 **Điểm tấn công — `record_attack()`:**
@@ -106,8 +106,8 @@ Trước đó: mỗi flag cướp được +1 cho đội tấn công, −1 cho �
 
 | File | Thay đổi |
 |---|---|
-| `backend/lib/storage/round1.py` → `record_attack()` | first-blood +2/+1; bỏ phạt −1; `victim_delta=0`; thông điệp nêu first blood |
-| `backend/lib/storage/round1.py` → `scores()` | tính attack/defense/first-blood từ `StolenFlags`, `MekodataPlacements`, `MekodataSLA`; chuẩn hóa 100 khi đọc |
+| `backend/lib/storage/competition.py` → `record_attack()` | first-blood +2/+1; bỏ phạt −1; `victim_delta=0`; thông điệp nêu first blood |
+| `backend/lib/storage/competition.py` → `scores()` | tính attack/defense/first-blood từ `StolenFlags`, `MekodataPlacements`, `MekodataSLA`; chuẩn hóa 100 khi đọc |
 
 **Chưa làm:** văn bản "Luật điểm" trên website vẫn ghi +100/−100 — `platform/MekoDataCTF_Website/public/js/scoreboard-ui.js`
 (`RULES = {flag:100, sla:100, down:100}`) và `views/scoreboard.ejs` (card ATTACK). Cần cập nhật riêng cho khớp engine.

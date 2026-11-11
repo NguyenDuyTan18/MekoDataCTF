@@ -1,4 +1,12 @@
-"""Round-one lifecycle; reuse ForcAD Flag, CheckerRunner, storage and judge."""
+"""Vận hành cuộc thi cho MỌI bài trong lab_profile.PROFILES; dùng lại Flag, CheckerRunner, storage, judge của ForcAD.
+
+Gồm: trạng thái cuộc thi, chế độ hai vòng (slot), đổi bài, nhịp tick (pump), cắm/lấy flag,
+SLA kiểm tra liên tục, tính điểm, lưu hồ sơ / chơi lại. Bài mới chỉ cần thêm vào lab_profile.py.
+
+Tệp này trước tên là round1.py (bài đầu tiên). Các tên sau VẪN giữ "round1" vì dữ liệu/giao diện
+đang dùng, không đổi: bảng MekodataRound1, đường dẫn /api/admin/round1/..., khóa JSON "round1"
+trong /api/admin/round-control/, "mode": "round1" trong /api/client/tick-status/, tên bài 'round1'.
+"""
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 import json
@@ -359,15 +367,17 @@ def prepare(lab=lab_profile.DEFAULT):
         next_full_round(lab, chosen)
         return
     if 'previous_lab' in chosen:
+        before = lab_profile.get(chosen['previous_lab'])['title']
         previous = state()
         retrying = not previous['configured'] and previous['phase'] == 'ready'
         if previous['phase'] != 'archived' and not retrying:
-            raise ValueError('Lưu hồ sơ vòng 1 trước khi chuẩn bị Crypto AD.')
+            raise ValueError(f'Lưu hồ sơ {before} trước khi chuẩn bị {chosen["title"]}.')
         if lab_profile.transition_delay(chosen, previous, time.time()):
-            raise ValueError('Crypto AD chỉ có thể bắt đầu sau khi vòng 1 kết thúc đủ 10 phút.')
+            raise ValueError(f'{chosen["title"]} chỉ có thể bắt đầu sau khi {before} kết thúc đủ '
+                             f'{chosen["intermission_seconds"] // 60} phút.')
     leave_archived_lab(lab)
     if round_control.get_enabled() or storage.game.get_real_round_from_db() != 0:
-        raise ValueError('Dừng và reset bản health về tick 0 trước khi chuẩn bị Round 1.')
+        raise ValueError(f'Dừng và reset bản health về tick 0 trước khi chuẩn bị {chosen["title"]}.')
     with utils.db_cursor() as (_, c):
         c.execute('SELECT phase FROM MekodataRound1 WHERE id=1')
         if c.fetchone()[0] in ('archived', 'recreating'):
@@ -416,8 +426,9 @@ def prepare(lab=lab_profile.DEFAULT):
 
 
 def next_full_round(lab, chosen):
-    """Switch the finished Web round to Crypto while keeping match data and team tokens."""
+    """Chuyển từ bài first_lab (đã kết thúc) sang bài lab, giữ dữ liệu trận, đội và token."""
     offset = chosen['tick_offset']
+    first = lab_profile.get(chosen['first_lab'])['title']
     with utils.db_cursor(dict_cursor=True) as (conn, c):
         c.execute('SELECT enabled,resetting FROM MekodataRoundControl WHERE id=1 FOR UPDATE')
         gate = c.fetchone()
@@ -426,10 +437,10 @@ def next_full_round(lab, chosen):
         if (gate['enabled'] or gate['resetting'] or not current['configured']
                 or current['lab'] != chosen['first_lab'] or current['phase'] != 'finished'
                 or current['tick'] != offset):
-            raise ValueError('Chỉ chuyển sang Crypto sau khi vòng Web Full Rounds kết thúc.')
+            raise ValueError(f'Chỉ chuyển sang {chosen["title"]} sau khi {first} kết thúc.')
         c.execute('SELECT checker FROM Tasks WHERE checker LIKE %s', (chosen['prefix'] + '%',))
         if {row['checker'] for row in c.fetchall()} != {chosen['prefix'] + task + '.py' for task in chosen['tasks']}:
-            raise ValueError('Thiếu cấu hình checker Crypto của Full Rounds.')
+            raise ValueError(f'Thiếu cấu hình checker của {chosen["title"]}.')
         c.execute('UPDATE Tasks SET active=(checker LIKE %s)', (chosen['prefix'] + '%',))
         c.execute('UPDATE GameConfig SET real_round=%s,round_time=%s WHERE id=1', (offset, chosen['round_time']))
         c.execute("""UPDATE MekodataRound1 SET lab=%s,phase='ready',started_at=NULL,finished_at=NULL,
@@ -452,7 +463,7 @@ def put_flag(args):
         chosen = profile()
         flag = models.Flag.generate(task.name[0], team.id, task.id, tick, template=chosen['flag_template'])
         seed = secrets.token_hex(20)
-        flag.private_flag_data = json.dumps({'seed': seed, 'tick': tick}) if chosen.get('crypto_seed') else seed
+        flag.private_flag_data = json.dumps({'seed': seed, 'tick': tick}) if chosen.get('seed_with_tick', chosen.get('crypto_seed')) else seed
         flag.vuln_number = 1
         c.execute('''INSERT INTO MekodataPlacements(team_id,task_id,tick,seed)
                      VALUES(%s,%s,%s,%s) ON CONFLICT DO NOTHING''', (team.id, task.id, tick, flag.to_json()))
@@ -806,7 +817,7 @@ def archive_competition():
             c.execute('SELECT * FROM MekodataRound1 WHERE id=1 FOR UPDATE')
             lifecycle = dict(c.fetchone())
             if not lifecycle['configured']:
-                raise ValueError('Chưa có cuộc thi Round 1 được chuẩn bị để đóng.')
+                raise ValueError('Chưa có cuộc thi nào được chuẩn bị để đóng.')
             if (lifecycle['phase'] not in SWITCHABLE_PHASES
                     or (lifecycle.get('slot') and not slot_can_start(lifecycle))):
                 raise ValueError('Đợi checker hoàn tất chu kỳ hiện tại rồi mới đóng cuộc thi.')
@@ -939,7 +950,7 @@ def _reset_slots(c, saved):
 
 
 def reset_round_profile(c, current_lab):
-    """A replay of Full Rounds starts with Web, even if the archived round was Crypto."""
+    """Chơi lại một chuỗi bài luôn bắt đầu từ first_lab, kể cả khi hồ sơ đang ở bài sau."""
     first_lab = lab_profile.get(current_lab).get('first_lab', current_lab)
     if first_lab != current_lab:
         c.execute('UPDATE GameConfig SET round_time=%s WHERE id=1', (lab_profile.get(first_lab)['round_time'],))

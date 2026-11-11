@@ -22,3 +22,4 @@ docker_volumes/
 **/.ua/intermediate/
 **/.ua/.trash-*/
 **/.ua/diff-overlay.json
+khoi-dong/logs/

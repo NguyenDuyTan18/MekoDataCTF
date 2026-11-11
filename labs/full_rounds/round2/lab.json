@@ -4,10 +4,28 @@
   "checker_host": "checker",
   "agent_command": "sudo -n /usr/bin/python3 /opt/crypto-checker/agent.py --config /etc/crypto-checker/config.json",
   "agent_timeout": 35,
-  "tasks": ["curveball", "padding_oracle", "ecdsa_nonce"],
+  "tasks": [
+    "curveball",
+    "padding_oracle",
+    "ecdsa_nonce"
+  ],
   "teams": [
-    {"name": "team1", "ip": "10.90.0.11"},
-    {"name": "team2", "ip": "10.90.0.12"},
-    {"name": "team3", "ip": "10.90.0.13"}
+    {
+      "name": "team1",
+      "ip": "10.90.0.11"
+    },
+    {
+      "name": "team2",
+      "ip": "10.90.0.12"
+    },
+    {
+      "name": "team3",
+      "ip": "10.90.0.13"
+    }
+  ],
+  "service_ports": [
+    9011,
+    9012,
+    9013
   ]
 }

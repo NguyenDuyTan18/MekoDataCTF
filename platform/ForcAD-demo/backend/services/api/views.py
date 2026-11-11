@@ -55,12 +55,12 @@ def health_check():
 
 @client_bp.route('/tick-status/')
 def tick_status():
-    from lib.storage import round1
-    if round1.configured():
-        s = round1.state()
-        profile = round1.profile(s)
+    from lib.storage import competition
+    if competition.configured():
+        s = competition.state()
+        profile = competition.profile(s)
         offset = profile.get('tick_offset', 0)
-        slots = round1.scoring_slots(s)
+        slots = competition.scoring_slots(s)
         return jsonify({'mode': 'round1', 'round': profile.get('round', 1), 'tick': s['tick'] - offset,
                         'phase': s['phase'], 'deadline': s['deadline'], 'error': s['error'],
                         'preview_seconds': profile.get('preview_seconds', 0),
@@ -68,7 +68,7 @@ def tick_status():
                                       else offset + profile['ticks_per_round']),
                         'tick_seconds': storage.game.get_current_game_config().round_time,
                         'max_rounds': 2, 'ticks_per_round': profile['ticks_per_round'],
-                        'scores': round1.scores(s)})
+                        'scores': competition.scores(s)})
     with storage.utils.db_cursor() as (_, curs):
         curs.execute('SELECT real_round FROM GameConfig WHERE id=1')
         tick = curs.fetchone()[0]

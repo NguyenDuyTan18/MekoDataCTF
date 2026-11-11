@@ -66,7 +66,8 @@ PROFILES['full_rounds_crypto'] = {
     'flag_template': 'MekoDataCTF{{{hexbody}}}',
     'preview_seconds': 600,
     'probe_seconds': 0,
-    'crypto_seed': True,
+    # Bộ chấm nhận {seed, tick} thay vì chỉ seed (tên cũ 'crypto_seed' vẫn được chấp nhận).
+    'seed_with_tick': True,
     'round': 2,
     'tick_offset': PROFILES['full_rounds']['ticks_per_round'],
     'first_lab': 'full_rounds',
@@ -76,7 +77,7 @@ PROFILES['full_rounds_crypto'] = {
 def transition_delay(lab, state, now):
     """Seconds left before the next lab may use the shared sandbox."""
     if state.get('lab') != lab['previous_lab'] or state.get('finished_at') is None:
-        raise ValueError('Meko Boutique phải kết thúc trước khi chuyển sang Crypto AD.')
+        raise ValueError(get(lab['previous_lab'])['title'] + ' phải kết thúc trước khi chuyển sang ' + lab['title'] + '.')
     return max(0, state['finished_at'] + lab['intermission_seconds'] - now)
 
 

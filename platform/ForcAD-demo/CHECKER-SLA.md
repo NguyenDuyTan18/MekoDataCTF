@@ -12,7 +12,7 @@
 
 - `lab_profile`: thêm `probe_seconds` (mặc định **30** cho cả round1 và meko_boutique).
 - Bảng `MekodataTickHealth(team_id, tick, probes, downs, last_status)` — theo dõi cả tick.
-- Trong phase `running` ([round1.py](backend/lib/storage/round1.py) `pump`): mỗi `probe_seconds`
+- Trong phase `running` ([competition.py](backend/lib/storage/competition.py) `pump`): mỗi `probe_seconds`
   chạy `run_health_probes()` = **full `check()` chức năng** cho mọi (đội × task). Đội nào có task
   không UP → cộng 1 `downs` cho `(đội, tick)`.
 - Cuối tick (phase `checking`): `points = 1` **chỉ khi** lần check cuối UP **và** `downs = 0`.

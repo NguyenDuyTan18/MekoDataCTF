@@ -36,8 +36,8 @@ Tài liệu này chỉ ra **chức năng nào được cấu hình ở đâu** t
 | Tài khoản BTC website | `platform/MekoDataCTF_Website/.env` + `npm run seed` | [3.1](#31-biến-môi-trường-env) |
 | Địa chỉ ForcAD mà website đọc điểm/nộp flag | `platform/MekoDataCTF_Website/.env` → `FORCAD_URL` | [3.1](#31-biến-môi-trường-env) |
 | **Số lượng đội** | Nhiều tầng: ForcAD, sandbox, lab, checker, bản đồ | [8.1](#81-thay-đổi-số-lượng-đội) |
-| Thời lượng tick, số tick Round 1 | `platform/ForcAD-demo/backend/lib/storage/round1.py` | [4.4](#44-round-1-3-task-ctf-attackdefense) |
-| Luật điểm Attack/Defense/SLA thật | `platform/ForcAD-demo/backend/lib/storage/round1.py` | [4.4](#44-round-1-3-task-ctf-attackdefense) |
+| Thời lượng tick, số tick Round 1 | `platform/ForcAD-demo/backend/lib/storage/competition.py` | [4.4](#44-round-1-3-task-ctf-attackdefense) |
+| Luật điểm Attack/Defense/SLA thật | `platform/ForcAD-demo/backend/lib/storage/competition.py` | [4.4](#44-round-1-3-task-ctf-attackdefense) |
 | Chú giải luật điểm trên thẻ scoreboard (+100…) | `platform/MekoDataCTF_Website/public/js/scoreboard-ui.js` → `RULES` | [3.7](#37-world-arena--scoreboard) |
 | Cổng scoreboard ForcAD (18080) | `platform/ForcAD-demo/docker-compose.yml` | [4.2](#42-docker-và-cổng) |
 | Mật khẩu admin ForcAD | 🔒 `platform/ForcAD-demo/config.yml` → `admin.*` | [4.1](#41-forcad-democonfigyml) |
@@ -296,7 +296,7 @@ Lệnh `platform/ForcAD-demo/control.py` (định nghĩa ở `platform/ForcAD-de
 
 ### 4.4 Round 1 (3 task, CTF Attack/Defense)
 
-File chính: `platform/ForcAD-demo/backend/lib/storage/round1.py`. Phần lớn giá trị đang **viết cứng trong code**:
+File chính: `platform/ForcAD-demo/backend/lib/storage/competition.py`. Phần lớn giá trị đang **viết cứng trong code**:
 
 | Thông số | Vị trí | Hiện tại |
 |---|---|---|
@@ -311,7 +311,7 @@ File chính: `platform/ForcAD-demo/backend/lib/storage/round1.py`. Phần lớn 
 | Số đội bắt buộc khi chuẩn bị | `prepare` → `!= 4` + danh sách IP `10.80.0.11`–`14` (≈ dòng 118–120) | Đúng 4 đội đang hoạt động với 4 IP đó. |
 | Máy kiểm tra khi tái tạo | `expected_hosts = ['attacker1', …, 'attacker4']` (≈ dòng 378) | 4 VM. |
 | Sinh lại token đội khi tái tạo | `UPDATE Teams SET token=…` (≈ dòng 406) | Có — nhớ chạy lại đồng bộ token. |
-| Hiển thị "Round x / Tick y/15", "max 2 round" | `platform/ForcAD-demo/backend/services/api/views.py` → `'max_rounds': 2, 'ticks_per_round': 15` | Chỉ là số hiển thị; phải khớp với `round1.py`. |
+| Hiển thị "Round x / Tick y/15", "max 2 round" | `platform/ForcAD-demo/backend/services/api/views.py` → `'max_rounds': 2, 'ticks_per_round': 15` | Chỉ là số hiển thị; phải khớp với `competition.py`. |
 | Checker từng task | `platform/ForcAD-demo/checkers/round1/idor.py`, `sqli.py`, `upload.py`, `health.py`, `common.py` | `common.py` chỉ chấp nhận IP `10.80.0.11`–`14`. |
 | Bảng điều khiển round (Chuẩn bị / Bắt đầu / Dừng / Đóng và lưu hồ sơ) | `platform/ForcAD-demo/front/public/round-control.js` (giao diện), API ở `backend/services/admin/viewsets/round_control.py` | Hiện trên trang `/` khi đăng nhập admin. |
 | Trang nộp flag của ForcAD | `platform/ForcAD-demo/front/public/submit.html` | Dùng team token. |
@@ -456,7 +456,7 @@ Số đội **không** nằm ở một chỗ. Hiện cả hệ thống được 
 | SSH | Thêm alias `Host attackerN` | 🔒 `ops/pool101/management-config` |
 | Lab Round 1 | Sửa `range(1, 5)`, `range(11, 15)`, `HOSTS`, `TEAM_IPS` | `labs/round1/service/deploy.py`, `labs/round1/service/recycle.py` |
 | ForcAD — đội | Tạo đội + IP | `/admin/` của ForcAD, hoặc `platform/ForcAD-demo/configure_mekodata_demo.py` |
-| ForcAD — Round 1 | Sửa điều kiện `!= 4` + danh sách IP; `expected_hosts` | `platform/ForcAD-demo/backend/lib/storage/round1.py` |
+| ForcAD — Round 1 | Sửa điều kiện `!= 4` + danh sách IP; `expected_hosts` | `platform/ForcAD-demo/backend/lib/storage/competition.py` |
 | ForcAD — checker round1 | Sửa tập IP hợp lệ | `platform/ForcAD-demo/checkers/round1/common.py` |
 | Collector / adapter health | Sửa `expected` + `!= 4`; `MAPPING` | `platform/ForcAD-demo/collect_checker.py`, `platform/ForcAD-demo/checkers/mekodata_bridge/bridge.py` |
 | Bản đồ World Arena | ≤ 16 đội có sẵn vị trí; nhiều hơn → thêm `SLOTS`/`LANDS` rồi `npm run bake:map` | `platform/MekoDataCTF_Website/config/arenaMap.js` |
@@ -465,13 +465,13 @@ Số đội **không** nằm ở một chỗ. Hiện cả hệ thống được 
 
 ### 8.2 Đổi thời lượng tick hoặc số tick
 
-- **Round 1:** sửa `round_time=120` / `flag_lifetime=2` và các chỗ `15` trong `platform/ForcAD-demo/backend/lib/storage/round1.py`; sửa số hiển thị `ticks_per_round`, `max_rounds` trong `platform/ForcAD-demo/backend/services/api/views.py`; build + khởi động lại `ticker`, `client-api`, `admin-api`. Thời lượng tick mới có hiệu lực từ lần "Chuẩn bị Round 1" kế tiếp.
+- **Round 1:** sửa `round_time=120` / `flag_lifetime=2` và các chỗ `15` trong `platform/ForcAD-demo/backend/lib/storage/competition.py`; sửa số hiển thị `ticks_per_round`, `max_rounds` trong `platform/ForcAD-demo/backend/services/api/views.py`; build + khởi động lại `ticker`, `client-api`, `admin-api`. Thời lượng tick mới có hiệu lực từ lần "Chuẩn bị Round 1" kế tiếp.
 - **Health-only:** `config.yml` → `game.round_time` (chỉ khi khởi tạo DB) và giới hạn 30 tick trong `round_control.py`.
 - Đồng hồ trên website và bảng điểm ForcAD tự đọc `tick_seconds` từ API, không cần sửa.
 
 ### 8.3 Đổi luật điểm
 
-- **Điểm thật** (được cộng/trừ trong DB): `platform/ForcAD-demo/backend/lib/storage/round1.py` → `record_attack` (attack/defense) và đoạn ghi `MekodataSLA` (SLA). Điểm health-only: `platform/ForcAD-demo/backend/lib/storage/tasks.py`.
+- **Điểm thật** (được cộng/trừ trong DB): `platform/ForcAD-demo/backend/lib/storage/competition.py` → `record_attack` (attack/defense) và đoạn ghi `MekodataSLA` (SLA). Điểm health-only: `platform/ForcAD-demo/backend/lib/storage/tasks.py`.
 - **Chú giải trên thẻ scoreboard** (+100 / −100 × số đội còn lại): `platform/MekoDataCTF_Website/public/js/scoreboard-ui.js` → `RULES`. Số trên sân đấu theo điểm thật (+1/−1, SLA theo chênh lệch từ ForcAD), nên phải sửa backend thì số mới khớp chú giải. Đổi điểm tấn công thì sửa cả `'+1 ATK'`, `'−1 DEF'` trong `public/arena-ui/`.
 
 ### 8.4 Mở/đóng đăng ký, đổi lịch thi
@@ -527,9 +527,9 @@ docker compose up -d --no-deps nginx
 | Nhu cầu | Hiện trạng | Chỗ phải sửa |
 |---|---|---|
 | Giới hạn tổng số đội được đăng ký trên website | Không có giới hạn | `controllers/authController.js` (`register`) hoặc `controllers/teamController.js` (`save`) |
-| Đổi số tick, thời lượng tick Round 1 qua giao diện | Viết cứng | `platform/ForcAD-demo/backend/lib/storage/round1.py`, `backend/services/api/views.py` |
-| Luật điểm 100 / phạt theo số đội | Backend vẫn tính +1/−1/+1; 100 chỉ là chú giải | `round1.py` (`record_attack`, SLA), `public/js/scoreboard-ui.js` (`RULES`) |
-| Tự chạy Round 2 | Chưa có | `round1.py` |
+| Đổi số tick, thời lượng tick Round 1 qua giao diện | Viết cứng | `platform/ForcAD-demo/backend/lib/storage/competition.py`, `backend/services/api/views.py` |
+| Luật điểm 100 / phạt theo số đội | Backend vẫn tính +1/−1/+1; 100 chỉ là chú giải | `competition.py` (`record_attack`, SLA), `public/js/scoreboard-ui.js` (`RULES`) |
+| Tự chạy Round 2 | Chưa có | `competition.py` |
 | Số đội khác 4 | Viết cứng ở nhiều nơi | Xem 8.1 |
 | Đội trưởng tự đổi mật khẩu / quên mật khẩu | Chưa có | `controllers/authController.js`, `routes/auth.js` |
 | Feed "đòn bị chặn" (flag cũ/sai/trùng) trên bản đồ | ForcAD chưa trả `defends`; website đã sẵn sàng nhận | `platform/ForcAD-demo/backend/services/api/views.py` (endpoint `/api/client/arena/`) |

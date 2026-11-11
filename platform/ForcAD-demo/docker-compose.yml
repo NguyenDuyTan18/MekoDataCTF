@@ -82,6 +82,9 @@ services:
     - SERVICE=admin
   events:
     build: *id004
+    # Dùng mã backend hiện tại (như ticker/admin-api); nếu không sẽ chạy bản cũ đóng trong image.
+    volumes:
+    - ./backend/:/app:ro
     env_file: *id001
     restart: on-failure
     environment:
@@ -89,6 +92,10 @@ services:
     - SERVICE=events
   http-receiver:
     build: *id004
+    # Bộ nhận cờ PHẢI dùng mã backend hiện tại: bản trong image không biết lab mới
+    # (vd. full_rounds) nên mọi flag hợp lệ trả HTTP 500.
+    volumes:
+    - ./backend/:/app:ro
     env_file: *id001
     restart: on-failure
     environment:

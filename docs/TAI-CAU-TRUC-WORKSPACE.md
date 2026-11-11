@@ -65,7 +65,7 @@ atk_def_platform/
 ├── platform/                         # Dùng chung, không sửa khi thêm lab
 │   ├── ForcAD-demo/
 │   │   ├── docker-compose.yml        # mount ./checkers → /checkers trong container
-│   │   ├── backend/                  # ForcAD + vòng đời Round 1 (lib/storage/round1.py)
+│   │   ├── backend/                  # ForcAD + vòng đời Round 1 (lib/storage/competition.py)
 │   │   ├── front/                    # Dashboard (Vite) → front/dist do nginx phục vụ
 │   │   ├── checkers/
 │   │   │   ├── round1/               # common.py, health.py, idor.py, sqli.py, upload.py, rpc/
@@ -242,9 +242,9 @@ Xem [labs/_template/README.md](../labs/_template/README.md). Tóm tắt những 
 | `labs/<lab>/lab.json` | Có |
 | `sandbox/topology.yml`, `group_vars/all.yml`, `checker/web_targets.json` | Có: CyberRange/Ansible đọc trực tiếp |
 | `service/webservice.py`, `agent.py` | Có: đây là nội dung bài lab |
-| `backend/lib/storage/round1.py`, `round_control.py` | ⚠️ **Hiện vẫn viết cứng** `/checkers/round1/`, task `idor/sqli/upload` và 4 IP `10.80.0.11–14`. Lab mới khác những giá trị này thì phải sửa backend và build lại container. |
+| `backend/lib/storage/competition.py`, `round_control.py` | ⚠️ **Hiện vẫn viết cứng** `/checkers/round1/`, task `idor/sqli/upload` và 4 IP `10.80.0.11–14`. Lab mới khác những giá trị này thì phải sửa backend và build lại container. |
 
-Bước tiếp theo nên làm nếu cần tạo nhiều lab: mount `labs/` vào container (chỉ đọc) và cho `round1.py` đọc `lab.json`, để backend cũng không cần sửa.
+Bước tiếp theo nên làm nếu cần tạo nhiều lab: mount `labs/` vào container (chỉ đọc) và cho `competition.py` đọc `lab.json`, để backend cũng không cần sửa.
 
 ---
 
@@ -284,7 +284,7 @@ Lab round1 hiện tại: đội ForcAD vẫn là `team01–04`. Để form khóa
 
 Từ 02/11/2026 token được **đồng bộ tự động**: khi website khởi động, định kỳ 60 giây, sau mỗi thay đổi đội trên website, và cuối `recycle.py`. Chi tiết: [DONG-BO-TOKEN-FORCAD.md](DONG-BO-TOKEN-FORCAD.md).
 
-Phần **chưa tự động hóa**: tạo đội trên ForcAD theo `lab.json`, đặt tên VM trong `topology.yml`, alias trong file SSH. Backend `round1.py` vẫn viết cứng 4 IP (xem mục 5).
+Phần **chưa tự động hóa**: tạo đội trên ForcAD theo `lab.json`, đặt tên VM trong `topology.yml`, alias trong file SSH. Backend `competition.py` vẫn viết cứng 4 IP (xem mục 5).
 
 ---
 
@@ -297,7 +297,7 @@ Thêm ngày 02/11/2026. Nút nằm trong khung "Điều khiển round" (`front/p
 | Round 1 | Round đang dừng, đã chạy ít nhất 1 tick (`paused`, `finished`, hoặc `ready` với tick > 0), chưa đóng hồ sơ | `POST /api/admin/round1/restart/` (`{"confirm":"RESTART ROUND1"}`), rồi `POST /api/admin/round-control/` `{"running":true}` |
 | Bản health (chưa chuẩn bị Round 1) | Round đang dừng | `POST /api/admin/round-control/reset/` rồi bắt đầu |
 
-`round1.restart_competition()` (`backend/lib/storage/round1.py`) làm các bước sau:
+`round1.restart_competition()` (`backend/lib/storage/competition.py`) làm các bước sau:
 
 1. Từ chối nếu round đang bật, hoặc mới dừng chưa đủ `RESTART_QUIET_SECONDS` = 45 giây (bằng `checker_timeout`, để PUT của lượt cũ không ghi vào tick 1 của lượt mới). Khi kết thúc tự nhiên, ForcAD tự tắt round, nên cũng phải chờ 45 giây.
 2. Gọi `archive_competition()`: lưu snapshot vào `MekodataArchives`. Link "Tải hồ sơ lượt trước" xuất hiện trên dashboard.

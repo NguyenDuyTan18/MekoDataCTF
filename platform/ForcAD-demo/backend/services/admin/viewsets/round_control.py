@@ -8,17 +8,23 @@ from .utils import abort_with_error
 def round_control_status():
     check_session()
     round_control.ensure_table()
-    from lib.storage import round1
-    state = round1.state()
-    profile = round1.profile(state)
+    from lib.storage import competition
+    state = competition.state()
+    profile = competition.profile(state)
     running = round_control.get_enabled()
     slots = {slot: {'lab': row['lab'], 'phase': row['phase']}
-             for slot, row in round1.slot_states(state).items()}
+             for slot, row in competition.slot_states(state).items()}
     return jsonify({'running': running, 'round1': state, 'slots': slots,
-                    'can_configure_slots': not running and round1.slot_can_configure(state),
-                    'can_start_slot': bool(slots) and not running and round1.slot_can_start(state),
-                    'default_slots': round1.lab_profile.DEFAULT_SLOTS,
-                    'labs': {lab: settings['title'] for lab, settings in round1.lab_profile.PROFILES.items()},
+                    'can_configure_slots': not running and competition.slot_can_configure(state),
+                    'can_start_slot': bool(slots) and not running and competition.slot_can_start(state),
+                    'default_slots': competition.lab_profile.DEFAULT_SLOTS,
+                    'labs': {lab: settings['title'] for lab, settings in competition.lab_profile.PROFILES.items()},
+                    # Bài chuẩn bị trực tiếp được (không phải bài nối sau first_lab/previous_lab) — nút "Chuẩn bị" tự sinh từ đây.
+                    'prepare_labs': {lab: {'title': settings['title'], 'tasks': list(settings['tasks'])}
+                                     for lab, settings in competition.lab_profile.PROFILES.items()
+                                     if 'first_lab' not in settings and 'previous_lab' not in settings},
+                    'next_lab_title': (competition.lab_profile.PROFILES[profile['next_lab']]['title']
+                                       if not slots and profile.get('next_lab') in competition.lab_profile.PROFILES else None),
                     'ticks_per_round': profile['ticks_per_round'],
                     'display_tick': state['tick'] - profile.get('tick_offset', 0),
                     'preview_seconds': profile.get('preview_seconds', 0),
@@ -32,13 +38,13 @@ def round_slots_update():
     data = request.get_json(silent=True)
     if not isinstance(data, dict) or set(data) not in ({'labs'}, {'slot'}):
         abort_with_error('Expected labs or slot', 400)
-    from lib.storage import round1
+    from lib.storage import competition
     round_control.ensure_table()
     try:
         if 'labs' in data:
-            round1.configure_slots(data['labs'])
+            competition.configure_slots(data['labs'])
         else:
-            round1.start_slot(data['slot'])
+            competition.start_slot(data['slot'])
     except ValueError as exc:
         abort_with_error(str(exc), 409)
     return jsonify({'running': round_control.get_enabled()})
@@ -51,10 +57,10 @@ def round1_prepare():
     data = request.get_json(silent=True) or {}
     if data.get('confirm') != 'PREPARE ROUND1':
         abort_with_error('Preparation confirmation required', 400)
-    from lib.storage import round1
+    from lib.storage import competition
     try:
-        with round1.lifecycle_lock():
-            round1.prepare(data.get('lab', 'round1'))
+        with competition.lifecycle_lock():
+            competition.prepare(data.get('lab', 'round1'))
     except ValueError as exc:
         abort_with_error(str(exc), 409)
     return jsonify({'status': 'prepared', 'running': False})
@@ -66,10 +72,10 @@ def round1_archive():
         abort_with_error('Invalid origin', 403)
     if (request.get_json(silent=True) or {}).get('confirm') != 'ARCHIVE ROUND1':
         abort_with_error('Archive confirmation required', 400)
-    from lib.storage import round1
+    from lib.storage import competition
     try:
-        with round1.lifecycle_lock():
-            archive_id = round1.archive_competition()
+        with competition.lifecycle_lock():
+            archive_id = competition.archive_competition()
     except ValueError as exc:
         abort_with_error(str(exc), 409)
     return jsonify({'status': 'archived', 'archive_id': archive_id})
@@ -81,10 +87,10 @@ def round1_restart():
         abort_with_error('Invalid origin', 403)
     if (request.get_json(silent=True) or {}).get('confirm') != 'RESTART ROUND1':
         abort_with_error('Restart confirmation required', 400)
-    from lib.storage import round1
+    from lib.storage import competition
     try:
-        with round1.lifecycle_lock():
-            archive_id = round1.restart_competition()
+        with competition.lifecycle_lock():
+            archive_id = competition.restart_competition()
     except ValueError as exc:
         abort_with_error(str(exc), 409)
     return jsonify({'status': 'ready', 'archive_id': archive_id, 'round': 0, 'running': False})
@@ -93,8 +99,8 @@ def round1_restart():
 def round1_archive_download(archive_id):
     check_session()
     from flask import make_response
-    from lib.storage import round1
-    archive = round1.get_archive(archive_id)
+    from lib.storage import competition
+    archive = competition.get_archive(archive_id)
     if not archive:
         abort_with_error('Archive not found', 404)
     response = make_response(jsonify(archive))
@@ -110,10 +116,10 @@ def round1_recreate():
     data = request.get_json(silent=True)
     if not isinstance(data, dict) or data.get('confirm') != 'RECREATE ROUND1':
         abort_with_error('Recreate confirmation required', 400)
-    from lib.storage import round1
+    from lib.storage import competition
     try:
-        with round1.lifecycle_lock():
-            round1.recreate_from_archive(data.get('archive_id'), data.get('verified_hosts'))
+        with competition.lifecycle_lock():
+            competition.recreate_from_archive(data.get('archive_id'), data.get('verified_hosts'))
     except ValueError as exc:
         abort_with_error(str(exc), 409)
     return jsonify({'status': 'ready', 'round': 0, 'running': False})

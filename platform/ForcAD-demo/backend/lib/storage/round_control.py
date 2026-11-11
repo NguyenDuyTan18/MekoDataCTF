@@ -26,8 +26,8 @@ def ensure_table():
             UNIQUE (team_id, task_id, checker_cycle)
         )''')
         conn.commit()
-    from . import round1
-    round1.ensure_schema()
+    from . import competition
+    competition.ensure_schema()
 
 
 def get_enabled():
@@ -40,17 +40,17 @@ def get_enabled():
 def set_enabled(enabled):
     with utils.db_cursor() as (conn, curs):
         if enabled:
-            from . import round1
+            from . import competition
             curs.execute('SELECT id FROM MekodataRoundControl WHERE id=1 FOR UPDATE')
-            if round1.configured():
-                s = round1.state()
+            if competition.configured():
+                s = competition.state()
                 if s.get('slot'):
                     raise ResetUnavailable('Hãy dùng nút Round 1 hoặc Round 2 để bắt đầu.')
                 if s['phase'] in ('archived', 'recreating'):
                     raise ResetUnavailable('Cuộc thi đã đóng hoặc đang tái tạo; hoàn tất quy trình lưu hồ sơ trước khi bắt đầu mới.')
                 if s['phase'] == 'finished':
                     raise ResetUnavailable('Vòng hiện tại đã kết thúc. Hãy lưu hồ sơ trước khi chuyển vòng.')
-                lab = round1.profile()
+                lab = competition.profile()
                 curs.execute('SELECT COUNT(*) FROM Tasks WHERE active AND checker LIKE %s', (lab['prefix'] + '%',))
                 if curs.fetchone()[0] != len(lab['tasks']):
                     raise ResetUnavailable('Cuộc thi cần đủ task: ' + ', '.join(t.upper() for t in lab['tasks']) + '.')
@@ -79,9 +79,9 @@ def reset_health_demo():
     from lib import storage
     from .keys import CacheKeys
     ensure_table()
-    from . import round1
-    if round1.configured():
-        raise ResetUnavailable('Round 1 dùng flag thật: không hỗ trợ reset xóa dữ liệu bằng nút health-only.')
+    from . import competition
+    if competition.configured():
+        raise ResetUnavailable('Bài đã chuẩn bị dùng flag thật: không hỗ trợ reset xóa dữ liệu bằng nút health-only.')
     with utils.db_cursor() as (conn, curs):
         try:
             curs.execute('SELECT enabled, resetting, EXTRACT(EPOCH FROM (now() - updated_at)) FROM MekodataRoundControl WHERE id=1 FOR UPDATE')

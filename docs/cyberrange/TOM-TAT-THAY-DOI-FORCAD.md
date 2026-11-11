@@ -87,7 +87,7 @@ Phần này cập nhật trạng thái mới nhất, thay thế các nhận đ�
 | `platform/ForcAD-demo/checkers/round1/common.py` | Cầu nối checker native ForcAD bằng RPC file có mã yêu cầu và thời hạn. |
 | `platform/ForcAD-demo/checkers/round1/idor.py`, `sqli.py`, `upload.py`, `health.py` | Entry point CHECK/PUT/GET cho ba task và kiểm tra kết nối. |
 | `platform/ForcAD-demo/collect_checker.py` | Thêm xử lý các yêu cầu RPC song song qua agent SSH, bên cạnh đường health cũ. |
-| `platform/ForcAD-demo/backend/lib/storage/round1.py` | Chuẩn bị ba task; điều phối đặt flag/mở tick 60 giây/xác minh; lưu seed chống sinh trùng; chấm SLA một lần mỗi đội; fixed attack +1/defense -1; pause/resume và kết thúc sau 15 tick +120 giây nhận flag. |
+| `platform/ForcAD-demo/backend/lib/storage/competition.py` | Chuẩn bị ba task; điều phối đặt flag/mở tick 60 giây/xác minh; lưu seed chống sinh trùng; chấm SLA một lần mỗi đội; fixed attack +1/defense -1; pause/resume và kết thúc sau 15 tick +120 giây nhận flag. |
 | `platform/ForcAD-demo/backend/lib/storage/round_control.py` | Nhận biết chế độ round1; cho phép ba task; không tự xóa dữ liệu thi có flag bằng reset health. |
 | `platform/ForcAD-demo/backend/services/ticker/__main__.py` | Chuyển sang bộ điều phối round1 khi đã chuẩn bị; khởi động container luôn giữ gate dừng. |
 | `platform/ForcAD-demo/backend/lib/storage/attacks.py` | Giữ kiểm tra flag của ForcAD, chuyển các bài nộp round1 sang điểm cố định và xử lý trùng nguyên tử trên bảng StolenFlags. |
@@ -107,7 +107,7 @@ Kiểm thử: 5 test đều pass. Có mô phỏng đủ 15 tick và 180 flag duy
 
 ## 8. Đổi mỗi tick thành 120 giây (28/10/2026)
 
-- `platform/ForcAD-demo/backend/lib/storage/round1.py`: thời lượng cấu hình 120 giây; SLA/flag kiểm tra sau tick; giai đoạn nhận flag cuối round tăng lên 240 giây; cache expiration lấy theo thời lượng hiện tại.
+- `platform/ForcAD-demo/backend/lib/storage/competition.py`: thời lượng cấu hình 120 giây; SLA/flag kiểm tra sau tick; giai đoạn nhận flag cuối round tăng lên 240 giây; cache expiration lấy theo thời lượng hiện tại.
 - `platform/ForcAD-demo/backend/services/api/views.py` và `platform/ForcAD-demo/front/dist/tick-display.js`: dashboard API/UI hiển thị thời lượng tick.
 - `labs/round1/service/test_round1.py` và `labs/round1/service/README.md`: kiểm thử và hướng dẫn cập nhật theo 120 giây.
 - Đã cập nhật trận đang dừng tại tick 9: thời lượng cấu hình 120 giây, phần còn lại của tick được tăng 60 giây (giữ 8.8 giây đang còn); điểm, flag và tick giữ nguyên. Làm mới cache flag để áp dụng TTL mới.
@@ -162,4 +162,4 @@ Lỗi đã sửa: `flush_teams_cache` chỉ xóa tập `teams`, không xóa khó
 
 Kiểm thử: unit test giả lập DB/Redis cho `update_team` (token mới dùng được, token cũ bị từ chối, giữ nguyên token vẫn dùng được, đội ngừng hoạt động bị từ chối) — 3/3 đạt với bản sửa, 2/3 thất bại với bản cũ. Chưa chạy trên ForcAD thật (Docker Desktop đang tắt). `update_team` chỉ được gọi từ API quản trị, nên chỉ cần build lại và khởi động lại container `admin-api` (`docker compose build admin-api` rồi `docker compose up -d --no-deps admin-api` trong `platform/ForcAD-demo`) trước khi chạy đồng bộ token.
 
-Sau khi round1 "tái tạo", ForcAD sinh lại token đội (`round1.py`), nên phải chạy lại `npm run sync:forcad -- --apply` để người chơi tiếp tục dùng token cũ của website.
+Sau khi round1 "tái tạo", ForcAD sinh lại token đội (`competition.py`), nên phải chạy lại `npm run sync:forcad -- --apply` để người chơi tiếp tục dùng token cũ của website.

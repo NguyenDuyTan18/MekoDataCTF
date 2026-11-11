@@ -7343,7 +7343,7 @@
                 "$ref": "9HmN5UizRPyDWicxyx6JPA=="
               },
               "name": "Chuẩn bị và chuyển lab thi",
-              "documentation": "Chọn hồ sơ lab, thiết lập đội/task và đưa tick về 0. Chuyển Meko Boutique sang Crypto AD yêu cầu vòng trước kết thúc, lưu hồ sơ, nghỉ đủ thời gian và thử collector. Nguồn: backend/lib/storage/round1.py (prepare), lab_profile.py, switch_round.py."
+              "documentation": "Chọn hồ sơ lab, thiết lập đội/task và đưa tick về 0. Chuyển Meko Boutique sang Crypto AD yêu cầu vòng trước kết thúc, lưu hồ sơ, nghỉ đủ thời gian và thử collector. Nguồn: backend/lib/storage/competition.py (prepare), lab_profile.py, switch_round.py."
             },
             {
               "_type": "UMLUseCase",
@@ -7361,7 +7361,7 @@
                 "$ref": "9HmN5UizRPyDWicxyx6JPA=="
               },
               "name": "Lưu hồ sơ và chạy lại vòng thi",
-              "documentation": "Đóng vòng, lưu và tải hồ sơ JSON, chạy lại từ tick 0 hoặc tái tạo trạng thái thi sau khi xác nhận các máy đội đã dựng lại. Nguồn: backend/services/admin/viewsets/round_control.py, backend/lib/storage/round1.py."
+              "documentation": "Đóng vòng, lưu và tải hồ sơ JSON, chạy lại từ tick 0 hoặc tái tạo trạng thái thi sau khi xác nhận các máy đội đã dựng lại. Nguồn: backend/services/admin/viewsets/round_control.py, backend/lib/storage/competition.py."
             },
             {
               "_type": "UMLUseCase",
@@ -7406,7 +7406,7 @@
                 "$ref": "9HmN5UizRPyDWicxyx6JPA=="
               },
               "name": "Nộp flag và nhận kết quả chấm",
-              "documentation": "Nhận danh sách flag qua PUT /flags/ và trả kết quả từng flag. Flag hợp lệ được ghi nhận để cộng điểm tấn công. Ở nhánh lab đã chuẩn bị, lượt lấy đầu tiên nhận 2 điểm, lượt của đội khác sau đó nhận 1 điểm. Nguồn: backend/services/http_receiver/views.py, backend/lib/flags/judge.py, backend/lib/storage/attacks.py, round1.py (record_attack).",
+              "documentation": "Nhận danh sách flag qua PUT /flags/ và trả kết quả từng flag. Flag hợp lệ được ghi nhận để cộng điểm tấn công. Ở nhánh lab đã chuẩn bị, lượt lấy đầu tiên nhận 2 điểm, lượt của đội khác sau đó nhận 1 điểm. Nguồn: backend/services/http_receiver/views.py, backend/lib/flags/judge.py, backend/lib/storage/attacks.py, competition.py (record_attack).",
               "ownedElements": [
                 {
                   "_type": "UMLInclude",
@@ -7430,7 +7430,7 @@
                 "$ref": "9HmN5UizRPyDWicxyx6JPA=="
               },
               "name": "Xác thực đội và kiểm tra flag",
-              "documentation": "Kiểm tra token, cửa sổ nhận, dữ liệu nộp, flag tồn tại và còn hạn, chủ sở hữu và lượt nộp trùng. Nguồn: backend/services/http_receiver/views.py, backend/lib/storage/attacks.py, flags.py, round1.py."
+              "documentation": "Kiểm tra token, cửa sổ nhận, dữ liệu nộp, flag tồn tại và còn hạn, chủ sở hữu và lượt nộp trùng. Nguồn: backend/services/http_receiver/views.py, backend/lib/storage/attacks.py, flags.py, competition.py."
             },
             {
               "_type": "UMLUseCase",
@@ -7439,7 +7439,7 @@
                 "$ref": "9HmN5UizRPyDWicxyx6JPA=="
               },
               "name": "Xem bảng điểm và tiến độ thi",
-              "documentation": "Xem điểm, thứ hạng, tick, trạng thái dịch vụ, lịch sử đội và lượt cướp flag. Trong nhánh lab, tổng điểm bằng Attack cộng Defense; Defense gồm flag bảo vệ được và SLA. Nguồn: backend/services/api/views.py (tick-status, arena, ctftime, teams), backend/services/events/app.py, backend/lib/storage/game.py, round1.py (scores)."
+              "documentation": "Xem điểm, thứ hạng, tick, trạng thái dịch vụ, lịch sử đội và lượt cướp flag. Trong nhánh lab, tổng điểm bằng Attack cộng Defense; Defense gồm flag bảo vệ được và SLA. Nguồn: backend/services/api/views.py (tick-status, arena, ctftime, teams), backend/services/events/app.py, backend/lib/storage/game.py, competition.py (scores)."
             },
             {
               "_type": "UMLUseCase",
@@ -7448,7 +7448,7 @@
                 "$ref": "9HmN5UizRPyDWicxyx6JPA=="
               },
               "name": "Kiểm tra dịch vụ và ghi nhận SLA",
-              "documentation": "Chạy CHECK theo lịch và probe trong tick nếu hồ sơ lab có cấu hình. Trong nhánh lab, kết quả kiểm tra cuối tick và probe được dùng để ghi SLA. Nguồn: backend/lib/storage/round1.py (health_probe, verify, pump), backend/services/ticker/hooks/, backend/services/tasks/actions.py."
+              "documentation": "Chạy CHECK theo lịch và probe trong tick nếu hồ sơ lab có cấu hình. Trong nhánh lab, kết quả kiểm tra cuối tick và probe được dùng để ghi SLA. Nguồn: backend/lib/storage/competition.py (health_probe, verify, pump), backend/services/ticker/hooks/, backend/services/tasks/actions.py."
             },
             {
               "_type": "UMLUseCase",
@@ -7457,7 +7457,7 @@
                 "$ref": "9HmN5UizRPyDWicxyx6JPA=="
               },
               "name": "Đặt và xác minh flag trên dịch vụ",
-              "documentation": "Sinh flag theo task và tick, gọi PUT để lưu vào dịch vụ và GET để xác minh khi chế độ thi có flag. Collector chuyển yêu cầu qua SSH sang agent lab. Nguồn: backend/lib/storage/round1.py (put_flag, verify), backend/lib/helpers/checkers.py, checkers/round1/, checkers/meko_boutique/, checkers/mmoiws/, collect_checker.py."
+              "documentation": "Sinh flag theo task và tick, gọi PUT để lưu vào dịch vụ và GET để xác minh khi chế độ thi có flag. Collector chuyển yêu cầu qua SSH sang agent lab. Nguồn: backend/lib/storage/competition.py (put_flag, verify), backend/lib/helpers/checkers.py, checkers/round1/, checkers/meko_boutique/, checkers/mmoiws/, collect_checker.py."
             }
           ]
         },

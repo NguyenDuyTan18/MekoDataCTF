@@ -48,9 +48,9 @@ def handle_attack(
         if current_round - flag.round > game_config.flag_lifetime:
             raise FlagExceptionEnum.FLAG_TOO_OLD
 
-        from . import round1
-        if round1.configured():
-            return round1.record_attack(result, flag)
+        from . import competition
+        if competition.configured():
+            return competition.record_attack(result, flag)
 
         if game_config.volga_attacks_mode:
             teamtask = storage.tasks.get_latest_teamtask(

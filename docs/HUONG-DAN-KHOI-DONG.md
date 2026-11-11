@@ -41,7 +41,7 @@ Không cần sửa mã nguồn mỗi lần bật hệ thống. Chỉ chỉnh cá
 | `platform/ForcAD-demo/docker-compose.yml` | Mapping cổng nginx đang là `127.0.0.1:18080:80`. | Chỉ khi cần đổi cổng hoặc địa chỉ lắng nghe; đổi cổng thì cập nhật cả `FORCAD_URL`. Cấu hình hiện tại chỉ mở ForcAD trên máy local. |
 | `labs/round1/sandbox/topology.yml`, `provisioning/group_vars/all.yml`, `checker/web_targets.json` | Topology, biến provisioning và danh sách máy cần kiểm tra. | Chỉ khi tạo/thay đổi Sandbox Definition trên CyberRange. Docker Compose không tạo các VM này. |
 
-**Lưu ý về đội/IP:** backend Round 1 vẫn có giá trị cố định trong `platform/ForcAD-demo/backend/lib/storage/round1.py` và `round_control.py`. Thay số đội/IP hoặc tạo lab khác không chỉ sửa `lab.json`; cần đối chiếu backend, checker và topology. Sửa `config.yml` cũng không tự cập nhật đội/task đã lưu trong database đang tồn tại.
+**Lưu ý về đội/IP:** backend Round 1 vẫn có giá trị cố định trong `platform/ForcAD-demo/backend/lib/storage/competition.py` và `round_control.py`. Thay số đội/IP hoặc tạo lab khác không chỉ sửa `lab.json`; cần đối chiếu backend, checker và topology. Sửa `config.yml` cũng không tự cập nhật đội/task đã lưu trong database đang tồn tại.
 
 Tài khoản website trong `.env` và tài khoản ForcAD trong `config.yml` là hai tài khoản riêng. Token đội dùng để đăng nhập/nộp flag khác với token quản trị web lab.
 

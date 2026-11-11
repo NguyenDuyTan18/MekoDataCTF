@@ -77,20 +77,20 @@ def bootstrap_schedules(state: TickerState):
 
 def main(state: TickerState):
     round_control.ensure_table()
-    from lib.storage import round1
+    from lib.storage import competition
     # Require an organizer to start rounds after the scheduler restarts.
     round_control.set_enabled(False)
     was_enabled = False
     while True:
-        if round1.configured():
+        if competition.configured():
             try:
-                with round1.lifecycle_lock(required=False) as locked:
+                with competition.lifecycle_lock(required=False) as locked:
                     if locked:
-                        round1.pump()
+                        competition.pump()
             except Exception:
                 logger.exception('Round 1 scheduler failed; paused for organizer review')
                 round_control.set_enabled(False)
-                round1.update(error='Scheduler gặp lỗi; đã dừng. Kiểm tra log trước khi tiếp tục.')
+                competition.update(error='Scheduler gặp lỗi; đã dừng. Kiểm tra log trước khi tiếp tục.')
             time.sleep(0.5)
             continue
         if not round_control.get_enabled():

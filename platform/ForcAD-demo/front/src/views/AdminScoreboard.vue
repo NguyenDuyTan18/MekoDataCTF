@@ -22,6 +22,7 @@
             bật/tắt). <i class="fas fa-history" /> trong từng ô để xem lịch sử
             checker của đội ở dịch vụ đó.
         </p>
+        <host-control />
         <statuses />
         <admin-scoreboard />
     </div>
@@ -29,11 +30,13 @@
 
 <script>
 import AdminScoreboard from '@/components/Admin/Scoreboard.vue';
+import HostControl from '@/components/Admin/HostControl.vue';
 import Statuses from '@/components/General/Statuses.vue';
 
 export default {
     components: {
         AdminScoreboard,
+        HostControl,
         Statuses,
     },
 

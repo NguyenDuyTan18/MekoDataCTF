@@ -239,7 +239,7 @@ page('9 Phụ lục thư mục và tài liệu tham chiếu')
 p('Nền tảng dùng chung được giữ trong platform và shared. Mỗi bài có gói nội dung và cấu hình riêng trong labs. Bộ truy cập nằm trong ops theo môi trường.')
 code(['atk_def_platform/', '  platform/', '    MekoDataCTF_Website/       Website va dong bo doi', '    ForcAD-demo/              Engine, profile va adapter', '      collect_checker.py     Cau noi SSH', '      checkers/<ma-bai>/      Wrapper task va RPC', '  shared/labconfig.py        Doc cau hinh lab', '  labs/<ma-bai>/', '    lab.json                 Doi, IP, task, SSH va agent', '    sandbox/', '      topology.yml           May va mang', '      provisioning/          Playbook va template', '      app/                   Ung dung cua bai', '      checker/               Logic checker cua bai', '  ops/<moi-truong>/          SSH key va config dung moi truong', '  report/                    Tai lieu Word va PowerPoint'])
 h('Nguồn dự án', 2)
-p('Căn cứ chính: README.md; website models/Team.js, scripts/export-lab-teams.js và services/forcadSync.js; ForcAD docker-compose.yml, collect_checker.py, backend/lib/storage/lab_profile.py và round1.py; topology và provisioning của các lab.')
+p('Căn cứ chính: README.md; website models/Team.js, scripts/export-lab-teams.js và services/forcadSync.js; ForcAD docker-compose.yml, collect_checker.py, backend/lib/storage/lab_profile.py và competition.py; topology và provisioning của các lab.')
 p('Bản hướng dẫn thao tác: docs/QUY-TRINH-TAO-DE-THI-TAI-SU-DUNG.md. Bản phân tích đầy đủ: docs/QUY-TRINH-CAI-DAT-TONG-QUAT-BAO-CAO.md.')
 h('Tài liệu chính thức CyberRangeCZ', 2)
 for label, url in [

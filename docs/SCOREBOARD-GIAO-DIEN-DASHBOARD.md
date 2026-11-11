@@ -78,7 +78,7 @@ Sân đấu sắp xếp đội bằng `localeCompare`, nên `scoreboard-ui.js` �
 
 ## 7. Vấn đề còn lại
 
-1. **Thẻ luật điểm ghi ±100 nhưng điểm thật là ±1.** `record_attack` trong `round1.py` cộng +1/−1 và SLA +1. Chữ 100 đến từ `RULES`, có từ giao diện cũ và chỉ là chú giải. Sân đấu và bảng điểm hiện điểm thật. Cần chốt sửa `RULES` hay sửa backend (xem `adjust_settings.md` mục 8.3).
+1. **Thẻ luật điểm ghi ±100 nhưng điểm thật là ±1.** `record_attack` trong `competition.py` cộng +1/−1 và SLA +1. Chữ 100 đến từ `RULES`, có từ giao diện cũ và chỉ là chú giải. Sân đấu và bảng điểm hiện điểm thật. Cần chốt sửa `RULES` hay sửa backend (xem `adjust_settings.md` mục 8.3).
 2. **Tên đội chưa khớp lab.** Website có `hehe`, `team04`, `team1`; `labs/meko_boutique/lab.json` có `team1`, `team2`, `team3`. Chỉ `team1` ghép được. Sửa bằng cách điền "Tên đội trên ForcAD" hoặc tạo đội đúng tên. Token chưa đồng bộ vì Docker đang tắt lúc ghi tài liệu này.
 3. **Xếp hạng trên sân đấu không có đồng hạng.** Nhãn trên tàu luôn là #1, #2, #3 khi các đội bằng điểm; bảng điểm vẫn đồng hạng đúng.
 4. **Dòng EXPIRED màu xanh.** Kết quả nộp flag dùng chung một màu cho mọi trạng thái.

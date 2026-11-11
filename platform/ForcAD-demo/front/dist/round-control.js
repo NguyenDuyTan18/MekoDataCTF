@@ -111,7 +111,7 @@
   const start = mkbtn('Bắt đầu', 'rc-primary');
   const stop = mkbtn('Dừng', 'rc-stop');
   const restart = mkbtn('Bắt đầu lại từ tick 0');       // lưu hồ sơ, về tick 0, giữ đội/token/VM, chạy luôn
-  const next = mkbtn('Chuyển sang Round 2 · Crypto', 'rc-primary');
+  const next = mkbtn('Chuyển sang bài kế tiếp', 'rc-primary');   // nhãn lấy từ data.next_lab_title
   const archive = mkbtn('Đóng và lưu hồ sơ');
   const login = el('a', {id: 'rc-login', href: '/admin/login/?next=/', textContent: 'Đăng nhập quản trị', className: 'rc-loginbtn', hidden: true});
   const actions = group('Hành động');
@@ -136,11 +136,31 @@
   let renderedLabs = '';
 
   // Chuẩn bị lab (chế độ một lab)
-  const prepare = mkbtn('Round 1 · 3 task');
-  const prepareMeko = mkbtn('Meko Boutique · 5 task');
+  // Nút tự sinh từ data.prepare_labs (mỗi bài trong lab_profile.py, trừ bài nối sau bài khác).
   const setup = group('Chuẩn bị lab', 'Dựng đội và task cho lab được chọn. Chưa sinh flag cho tới khi bấm Bắt đầu.');
-  setup.append(el('div', {className: 'rc-row'}, [prepare, prepareMeko]));
+  const prepareRow = el('div', {className: 'rc-row'});
+  setup.append(prepareRow);
   panel.append(setup);
+  const prepareButtons = new Map();   // lab -> button
+  let renderedPrepare = '';
+  function renderPrepare(labs) {
+    const key = JSON.stringify(labs || {});
+    if (key === renderedPrepare) return;
+    renderedPrepare = key;
+    prepareButtons.clear();
+    prepareRow.replaceChildren(...Object.entries(labs || {}).map(([lab, info]) => {
+      const button = mkbtn(`${info.title} · ${info.tasks.length} task`);
+      button.addEventListener('click', () => prepareLab(button, lab,
+        `Chuẩn bị ${info.title} với ${info.tasks.length} task (${info.tasks.map(t => t.toUpperCase()).join(', ')})? ` +
+        'Chỉ thực hiện khi bản health đã dừng và reset về 0, hoặc lab khác đã đóng và lưu hồ sơ ' +
+        '(điểm, flag lượt đó sẽ bị xóa khỏi bảng thi, hồ sơ vẫn giữ). Chưa sinh flag cho đến khi bấm Bắt đầu.'));
+      prepareButtons.set(lab, button);
+      return button;
+    }));
+  }
+  // show(lab) -> true để hiện nút của lab đó; bỏ trống = ẩn tất cả.
+  const showPrepare = (show = () => false) => prepareButtons.forEach((button, lab) => { button.hidden = !show(lab); });
+  let nextLab = null;
 
   // Vùng nguy hiểm
   const reset = mkbtn('Reset round và điểm', 'rc-danger');
@@ -177,8 +197,9 @@
   let slotMode = false;
   let busy = false;
   const hideAll = () => {
-    start.hidden = stop.hidden = reset.hidden = prepare.hidden = prepareMeko.hidden = roundPicker.hidden =
+    start.hidden = stop.hidden = reset.hidden = roundPicker.hidden =
       next.hidden = archive.hidden = download.hidden = restart.hidden = previous.hidden = true;
+    showPrepare();
   };
 
   // ---- Logic điều khiển (giữ nguyên hành vi và các lệnh gọi API) ----------
@@ -196,6 +217,7 @@
       setPill(data.running ? 'Đang chạy' : 'Đã dừng', data.running ? 'run' : 'pause');
       login.hidden = true; start.hidden = data.running; stop.hidden = !data.running; reset.hidden = data.running;
       const r1 = data.round1 || {};
+      renderPrepare(data.prepare_labs);
       const tick = data.display_tick ?? r1.tick;
       const slots = data.slots || {};
       slotMode = !!r1.slot;
@@ -221,7 +243,9 @@
         button.disabled = !data.can_start_slot || phase === 'finished';
         button.setAttribute('aria-pressed', String(slot === r1.slot));
       });
-      next.hidden = data.running || r1.phase !== 'finished' || data.next_lab !== 'full_rounds_crypto';
+      nextLab = data.next_lab || null;
+      next.hidden = data.running || r1.phase !== 'finished' || !nextLab;
+      next.textContent = 'Chuyển sang Round 2 · ' + (data.next_lab_title || nextLab || '');
       start.textContent = r1.phase === 'paused' ? 'Tiếp tục' : data.preview_seconds && tick === 0 ? 'Bắt đầu xem đề' : 'Bắt đầu';
       if (slotMode) start.hidden = true;
       round1Mode = !!r1.configured;
@@ -234,7 +258,8 @@
         : ['archived', 'recreating'].includes(r1.phase));
       previous.hidden = !lastArchive || ['archived', 'recreating'].includes(r1.phase);
       if (lastArchive) previous.href = '/api/admin/round1/archive/' + encodeURIComponent(lastArchive) + '/';
-      prepareMeko.hidden = prepare.hidden = data.running || r1.configured || ['archived','recreating'].includes(r1.phase);
+      const canPrepare = !(data.running || r1.configured || ['archived','recreating'].includes(r1.phase));
+      showPrepare(() => canPrepare);
       archive.hidden = data.running || !r1.configured || !['ready','paused','finished'].includes(r1.phase) ||
         (slotMode && !data.can_start_slot) || !!r1.archive_id;
       download.hidden = !['archived','recreating'].includes(r1.phase) || !r1.archive_id;
@@ -242,7 +267,10 @@
         download.href = '/api/admin/round1/archive/' + encodeURIComponent(r1.archive_id) + '/';
         maintenance.textContent = slotMode
           ? `Đã lưu hai vòng vào hồ sơ ${r1.archive_id}. Bạn có thể tải JSON, chơi lại hoặc chọn cặp lab mới.`
-          : `Đã đóng và lưu hồ sơ ${r1.archive_id}. Hãy tải JSON lưu ngoài máy trước khi dọn dữ liệu.\n• Chơi lại ngay, không dọn VM: bấm "Bắt đầu lại từ tick 0" (giữ đội và token).\n• Dọn sạch VM rồi chơi lại: sau khi dọn và kiểm tra đủ attacker1–4, chạy trong PowerShell tại workspace:\npython labs/round1/service/recycle.py --archive-id ${r1.archive_id}`;
+          : `Đã đóng và lưu hồ sơ ${r1.archive_id}. Hãy tải JSON lưu ngoài máy trước khi dọn dữ liệu.\n• Chơi lại ngay, không dọn VM: bấm "Bắt đầu lại từ tick 0" (giữ đội và token).\n` +
+            ((r1.lab || 'round1') === 'round1'
+              ? `• Dọn sạch VM rồi chơi lại: sau khi dọn và kiểm tra đủ attacker1–4, chạy trong PowerShell tại workspace:\npython labs/round1/service/recycle.py --archive-id ${r1.archive_id}`
+              : '• Dọn sạch VM rồi chơi lại: dựng lại máy các đội bằng playbook của bài, rồi bấm "Bắt đầu lại từ tick 0".');
       } else maintenance.textContent = '';
 
       // Ô tình trạng
@@ -263,12 +291,12 @@
       if (r1.phase === 'archived') {
         start.hidden = stop.hidden = reset.hidden = true;
         // Đã lưu hồ sơ: cho phép chuyển sang lab khác, dữ liệu lượt cũ được xóa khỏi bảng thi.
-        prepare.hidden = slotMode || (r1.lab || 'round1') === 'round1';
-        prepareMeko.hidden = slotMode || r1.lab === 'meko_boutique';
+        showPrepare(lab => !slotMode && lab !== (r1.lab || 'round1'));
         setPill('Đã đóng · dữ liệu đã lưu', 'done');
       }
       if (r1.phase === 'recreating') {
-        start.hidden = stop.hidden = reset.hidden = prepare.hidden = prepareMeko.hidden = roundPicker.hidden = next.hidden = archive.hidden = restart.hidden = true;
+        start.hidden = stop.hidden = reset.hidden = roundPicker.hidden = next.hidden = archive.hidden = restart.hidden = true;
+        showPrepare();
         download.hidden = false;
         setPill('Đang tái tạo', 'pause');
         maintenance.textContent = 'Đang hoàn tất tái tạo; chạy lại script cùng archive ID nếu cần.';
@@ -310,9 +338,9 @@
   });
   restart.addEventListener('click', async () => {
     const question = slotMode
-      ? 'Lưu hồ sơ và đưa cả hai vòng về tick 0? Đội, token và lab đã chọn sẽ được giữ lại. Cần dừng ít nhất 45 giây trước.'
+      ? 'Bắt đầu lại từ tick 0?\n\n• Lưu hồ sơ lượt hiện tại, đưa cả hai vòng về tick 0 (giữ đội, token và lab đã chọn).\n• Sau đó TỰ MỞ Round 1: 10 phút xem đề rồi tick 1. Nhớ bật collector trước.\n• Cần dừng ít nhất 45 giây trước.'
       : round1Mode
-      ? 'Bắt đầu lại Round 1 từ tick 0?\n\n• Hồ sơ lượt hiện tại được lưu vào PostgreSQL trước (nếu đã đóng và lưu thì dùng lại hồ sơ đó; tải lại được).\n• Xóa flag, điểm, lịch sử checker; giữ đội, token đội và task.\n• KHÔNG dọn dữ liệu trên VM đội (bản vá của đội vẫn còn). Muốn dọn VM: dùng "Đóng và lưu hồ sơ" rồi chạy recycle.py.\n• Cần dừng ít nhất 45 giây trước.'
+      ? `Bắt đầu lại ${labVal.textContent} từ tick 0?\n\n• Hồ sơ lượt hiện tại được lưu vào PostgreSQL trước (nếu đã đóng và lưu thì dùng lại hồ sơ đó; tải lại được).\n• Xóa flag, điểm, lịch sử checker; giữ đội, token đội và task.\n• KHÔNG dọn dữ liệu trên VM đội (bản vá của đội vẫn còn). Muốn dọn VM: dùng "Đóng và lưu hồ sơ" rồi dựng lại máy đội.\n• Cần dừng ít nhất 45 giây trước.`
       : 'Reset tick và điểm về 0 rồi bắt đầu lại? Cần dừng ít nhất 30 giây trước.';
     if (!confirm(question)) return;
     busy = true; restart.disabled = true; showFlash('');
@@ -324,7 +352,9 @@
       } else {
         await post('/api/admin/round-control/reset/', {confirm:'RESET'});
       }
-      if (!slotMode) await post('/api/admin/round-control/', {running:true});
+      // Một bài: bật chạy. Hai vòng: đặt lại chỉ đưa về "Sẵn sàng", nên mở luôn Round 1 (trước đây phải tự bấm thẻ Round 1).
+      if (slotMode) await post('/api/admin/round-control/slots/', {slot: 1});
+      else await post('/api/admin/round-control/', {running:true});
       location.reload();
     } catch (err) { showFlash('Không bắt đầu lại được: ' + err.message); }
     finally { busy = false; restart.disabled = false; await refresh(); }
@@ -347,9 +377,7 @@
     } catch (err) { showFlash(err.message); }
     finally { busy = false; button.disabled = false; }
   }
-  prepare.addEventListener('click', () => prepareLab(prepare, 'round1', 'Chuẩn bị Round 1 với ba task IDOR, SQLi, Upload? Chỉ thực hiện khi bản health đã dừng và reset về 0, hoặc lab khác đã đóng và lưu hồ sơ (điểm, flag lượt đó sẽ bị xóa khỏi bảng thi, hồ sơ vẫn giữ). Chưa sinh flag cho đến khi bấm Bắt đầu.'));
-  prepareMeko.addEventListener('click', () => prepareLab(prepareMeko, 'meko_boutique', 'Chuẩn bị Meko Boutique với năm task IDOR, SQLi, Upload, JWT, Backup? Chỉ thực hiện khi bản health đã dừng và reset về 0, hoặc lab khác đã đóng và lưu hồ sơ (điểm, flag lượt đó sẽ bị xóa khỏi bảng thi, hồ sơ vẫn giữ). Chưa sinh flag cho đến khi bấm Bắt đầu.'));
-  next.addEventListener('click', () => prepareLab(next, 'full_rounds_crypto', 'Chuyển sang Round 2 Crypto và giữ điểm vòng Web? Sau khi chuyển, bấm Bắt đầu xem đề.'));
+  next.addEventListener('click', () => nextLab && prepareLab(next, nextLab, `Chuyển sang ${next.textContent.replace('Chuyển sang ', '')} và giữ điểm vòng trước? Sau khi chuyển, bấm Bắt đầu xem đề.`));
   archive.addEventListener('click', async () => {
     if (!confirm('Đóng cuộc thi và lưu flag, điểm vào hồ sơ PostgreSQL?')) return;
     busy = true; archive.disabled = true; showFlash('');

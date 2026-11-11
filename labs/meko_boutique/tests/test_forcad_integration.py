@@ -63,7 +63,7 @@ def test_round1_stays_the_default_profile():
 def test_flag_column_fits_every_lab_format():
     schema = (FORCAD / "backend" / "scripts" / "create_tables.sql").read_text(encoding="utf-8")
     limit = int(re.search(r"flag\s+VARCHAR\((\d+)\)", schema).group(1))
-    lifecycle = (FORCAD / "backend" / "lib" / "storage" / "round1.py").read_text(encoding="utf-8")
+    lifecycle = (FORCAD / "backend" / "lib" / "storage" / "competition.py").read_text(encoding="utf-8")
     assert f"ALTER COLUMN flag TYPE VARCHAR({limit})" in lifecycle
     profiles = load_profiles()
     for name in profiles.PROFILES:

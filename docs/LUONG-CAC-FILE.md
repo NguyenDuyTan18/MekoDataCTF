@@ -71,7 +71,7 @@ GET /scoreboard
 
 ```text
 FAD/backend/services/api/views.py        /tick-status/, /teams/, /arena/
-   │  round1.scores(), round1.state() trong FAD/backend/lib/storage/round1.py
+   │  round1.scores(), round1.state() trong FAD/backend/lib/storage/competition.py
    ▼
 WEB/services/arenaService.js             load(): gom 3 API, cache 1,5 giây, lọc trường công khai
    ▼
@@ -119,7 +119,7 @@ public/js/scoreboard-ui.js                    form gửi flag kèm CSRF, không 
          └─ FAD/backend/services/http_receiver/views.py    token → team_id
             └─ FAD/backend/lib/flags/judge.py
                └─ FAD/backend/lib/storage/attacks.py       handle_attack(): kiểm tra flag
-                  └─ FAD/backend/lib/storage/round1.py     record_attack(): +1 đội tấn công, −1 đội mất flag
+                  └─ FAD/backend/lib/storage/competition.py     record_attack(): +1 đội tấn công, −1 đội mất flag
 ```
 
 Kết quả trả ngược về form. Capture mới xuất hiện trên sân đấu qua luồng ở mục 3.
@@ -144,7 +144,7 @@ Nút chỉ đổi trạng thái trong database. Ticker đọc trạng thái đó
 
 Ticker khởi động lại hoặc `pump()` gặp lỗi đều tắt round. BTC phải kiểm tra rồi bấm **Bắt đầu** để chạy tiếp.
 
-| Pha | Việc làm | Hàm trong `round1.py` |
+| Pha | Việc làm | Hàm trong `competition.py` |
 |---|---|---|
 | `ready` | Chờ tới tick kế tiếp, rồi tăng số tick | `pump()` |
 | `preparing` | Đặt round hiện tại, chuyển sang `running` | `pump()` |
@@ -182,8 +182,8 @@ Kết quả đi ngược lại: agent in JSON → collector ghi `<id>.response.j
 |---|---|---|
 | `WEB/.env` | Cổng website, khóa phiên, `FORCAD_URL` | `WEB/app.js`, `arenaService.js`, `forcadSync.js` |
 | `FAD/config.yml` | Tài khoản admin, cấu hình game ForcAD | `forcadSync.js`, backend ForcAD |
-| `FAD/backend/lib/storage/lab_profile.py` | Task, số tick, thời lượng, mẫu flag của từng lab | `round1.py` |
-| `FAD/backend/lib/storage/round_schedule.py` | Quy tắc tính thời gian tick | `round1.py` |
+| `FAD/backend/lib/storage/lab_profile.py` | Task, số tick, thời lượng, mẫu flag của từng lab | `competition.py` |
+| `FAD/backend/lib/storage/round_schedule.py` | Quy tắc tính thời gian tick | `competition.py` |
 | `LAB/lab.json` | Đội, IP, file SSH, lệnh agent | `shared/labconfig.py`, `collect_checker.py` |
 | `ops/pool139/management-config` | Alias SSH tới VM | Lệnh `ssh` do `labconfig.py` dựng |
 | Biến `MEKO_LAB` | Collector phục vụ lab nào | `shared/labconfig.py` |

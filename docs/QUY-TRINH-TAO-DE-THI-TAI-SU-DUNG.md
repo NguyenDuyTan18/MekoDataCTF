@@ -81,7 +81,7 @@ atk_def_platform/
 │       ├── docker-compose.yml             [DÙNG LẠI] cơ chế chạy nền tảng
 │       ├── config.yml                     [DÙNG KHUNG, SỬA CẤU HÌNH] thiết lập nền tảng
 │       ├── backend/lib/storage/
-│       │   ├── round1.py                  [DÙNG LẠI] vòng đời đã đọc lab_profile
+│       │   ├── competition.py                  [DÙNG LẠI] vòng đời đã đọc lab_profile
 │       │   ├── round_schedule.py          [DÙNG LẠI] điều phối lịch
 │       │   └── lab_profile.py             [DÙNG KHUNG, SỬA CẤU HÌNH] thêm profile đề
 │       ├── front/public/round-control.js  [DÙNG KHUNG, SỬA CẤU HÌNH/MÃ] thêm lựa chọn đề
@@ -600,7 +600,7 @@ docker compose up -d --no-deps --build nginx
 
 Backend các service trên đang mount source; restart để nạp thay đổi profile. Chỉ thực hiện trong giai đoạn chuẩn bị, trước khi bắt đầu lượt thi. Nếu sửa dependency/image thì cần build lại các service liên quan.
 
-- **[DÙNG LẠI]:** `common.py` khi tương thích, collector, cơ chế đọc profile, scheduler và vòng đời trong `round1.py`.
+- **[DÙNG LẠI]:** `common.py` khi tương thích, collector, cơ chế đọc profile, scheduler và vòng đời trong `competition.py`.
 - **[DÙNG KHUNG, SỬA CẤU HÌNH]:** wrapper task, profile và nút chọn đề.
 - **[KHÔNG TÁI SỬ DỤNG]:** logic checker của bài khác chỉ bằng cách đổi tên wrapper.
 - **Hoàn thành khi:** profile đã được nạp, các wrapper tồn tại đúng đường dẫn và có cách chọn đề mới.

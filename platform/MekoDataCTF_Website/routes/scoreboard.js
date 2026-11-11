@@ -39,6 +39,17 @@ router.post('/scoreboard/submit', async(req,res)=>{
  if(!session)return res.status(401).json({error:'Đăng nhập và vào một đội để nộp flag.'});
  const {flags}=req.body||{};
  if(!Array.isArray(flags)||flags.length<1||flags.length>100||flags.some(f=>typeof f!=='string'||f.length>100))return res.status(400).json({error:'Kiểm tra danh sách flag (tối đa 100).'});
- try{const upstream=await fetch(new URL('/flags/',origin),{method:'PUT',headers:{'Content-Type':'application/json','X-Team-Token':session.team.token},body:JSON.stringify(flags),signal:AbortSignal.timeout(8000),redirect:'error'});res.status(upstream.status).json(await upstream.json());}catch(_){res.status(503).json({error:'Bộ nhận flag chưa kết nối được.'});}
+ let upstream;
+ try{upstream=await fetch(new URL('/flags/',origin),{method:'PUT',headers:{'Content-Type':'application/json','X-Team-Token':session.team.token},body:JSON.stringify(flags),signal:AbortSignal.timeout(8000),redirect:'error'});}
+ catch(_){return res.status(503).json({error:'Bộ nhận flag chưa kết nối được.'});}
+ // ForcAD/nginx có thể trả trang HTML (429 nộp quá nhanh, 5xx lỗi) thay vì JSON: báo đúng lý do, không báo "chưa kết nối".
+ const text=await upstream.text();
+ try{return res.status(upstream.status).json(JSON.parse(text));}
+ catch(_){
+  const error=upstream.status===429?'Nộp quá nhanh (tối đa 2 lần mỗi giây cho mỗi đội). Đợi 1 giây rồi nộp lại.'
+   :upstream.status>=500?`Bộ nhận flag đang lỗi (HTTP ${upstream.status}). Báo ban tổ chức.`
+   :`Bộ nhận flag trả lỗi HTTP ${upstream.status}.`;
+  return res.status(upstream.status===429?429:502).json({error});
+ }
 });
 module.exports=router;

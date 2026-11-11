@@ -526,7 +526,14 @@ form?.addEventListener('submit', async e => {
       body: JSON.stringify({ flags: form.elements.flags.value.trim().split(/\s+/) }),
       signal: AbortSignal.timeout(10000),
     });
-    const result = await r.json();
+    // Website trả trang HTML khi phiên/CSRF hết hạn (403) hoặc lỗi máy chủ: báo đúng lý do, không báo "mất kết nối".
+    let result;
+    try { result = await r.json(); } catch (_) {
+      out.textContent = r.status === 403
+        ? 'Phiên làm việc đã hết hạn. Tải lại trang (F5) rồi nộp lại.'
+        : 'Website trả lỗi HTTP ' + r.status + '. Thử lại hoặc báo ban tổ chức.';
+      return;
+    }
     if (!Array.isArray(result)) { out.textContent = result.error || JSON.stringify(result); return; }
     const kinds = result.map(x => classify(x.msg));
     out.textContent = result.map((x, i) => RESULT_LABEL[kinds[i]] + ' · ' + (x.msg || '')).join('\n');
